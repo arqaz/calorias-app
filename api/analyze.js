@@ -16,20 +16,27 @@ export default async function handler(req, res) {
     return;
   }
 
-  const prompt = `Olha para esta foto de um prato de comida e estima o valor nutricional de UMA dose visível na imagem.
-Responde APENAS com um objeto JSON válido, sem markdown, sem texto antes ou depois, com exatamente estes campos:
+  const prompt = `Olha para esta foto de um prato de comida. Identifica cada alimento/componente distinto visível (ex: "arroz", "frango grelhado", "brócolos") e estima a quantidade de cada um em gramas.
+Responde APENAS com um objeto JSON válido, sem markdown, sem texto antes ou depois, com exatamente esta estrutura:
 {
-  "food_name": "nome curto do prato em português",
-  "description": "descrição breve dos ingredientes principais, em português, máximo 12 palavras",
-  "calories": número inteiro (estimativa central de kcal para a dose mostrada),
-  "protein_g": número,
-  "carbs_g": número,
-  "fat_g": número,
-  "fiber_g": número,
+  "food_name": "nome curto do prato completo em português",
+  "description": "descrição breve do prato, em português, máximo 12 palavras",
+  "items": [
+    {
+      "name": "nome do alimento em português",
+      "quantity_g": número inteiro (quantidade estimada em gramas visível na foto),
+      "grams_per_tbsp": número (peso aproximado em gramas de UMA colher de sopa deste alimento específico, ex: arroz cozido ~15, azeite ~13, açúcar ~12, farinha ~8),
+      "calories_per_100g": número,
+      "protein_per_100g": número,
+      "carbs_per_100g": número,
+      "fat_per_100g": número,
+      "fiber_per_100g": número
+    }
+  ],
   "confidence": "alta" | "média" | "baixa",
   "emoji": "um único emoji que represente o prato"
 }
-Se não conseguires identificar comida na imagem, define food_name como "Não foi possível identificar" e os valores numéricos como 0.`;
+Lista cada alimento separadamente (não agregues tudo num só item), no máximo 6 itens. Se não conseguires identificar comida na imagem, devolve "items" como um array vazio e food_name como "Não foi possível identificar".`;
 
   try {
     const model = 'gemini-flash-latest';
