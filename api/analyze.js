@@ -32,7 +32,7 @@ Responde APENAS com um objeto JSON válido, sem markdown, sem texto antes ou dep
 Se não conseguires identificar comida na imagem, define food_name como "Não foi possível identificar" e os valores numéricos como 0.`;
 
   try {
-    const model = 'gemini-2.5-flash';
+    const model = 'gemini-flash-latest';
     const apiResponse = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
       {
