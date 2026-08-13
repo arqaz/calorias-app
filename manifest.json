@@ -1,0 +1,14 @@
+{
+  "name": "Prato → Calorias",
+  "short_name": "Calorias",
+  "description": "Estima calorias a partir de uma foto do prato e mantém um registo diário",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F6F8F2",
+  "theme_color": "#FF3D68",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
