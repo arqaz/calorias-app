@@ -93,6 +93,7 @@
     display:flex;align-items:center;gap:12px;
     margin-bottom:10px;
     animation:fadein .35s ease;
+    cursor:pointer;
   }
   @keyframes fadein{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
   .meal-emoji{
@@ -224,6 +225,27 @@
     padding:11px 12px;font-family:'Plus Jakarta Sans',sans-serif;color:var(--ink);
   }
   .manual-form input:focus{outline:none;border-color:var(--a2);}
+  .onboard-overlay{
+    position:fixed;inset:0;background:var(--bg);z-index:100;
+    display:flex;flex-direction:column;justify-content:center;padding:28px 22px;
+    overflow-y:auto;
+  }
+  .onboard-overlay.hide{display:none;}
+  .onboard-emoji{font-size:44px;margin-bottom:6px;}
+  .onboard-title{font-size:26px;font-weight:800;letter-spacing:-.01em;margin-bottom:6px;}
+  .onboard-sub{font-size:13.5px;color:var(--muted);font-weight:500;margin-bottom:26px;line-height:1.5;}
+  .onboard-field{margin-bottom:18px;}
+  .onboard-field label{font-size:12.5px;font-weight:700;color:var(--muted);display:block;margin-bottom:7px;}
+  .onboard-field input,.onboard-field select{
+    width:100%;font-size:16px;font-weight:700;border:2px solid var(--track);border-radius:14px;
+    padding:13px 14px;font-family:'Plus Jakarta Sans',sans-serif;color:var(--ink);background:var(--card);
+  }
+  .onboard-field input:focus,.onboard-field select:focus{outline:none;border-color:var(--a2);}
+  .onboard-start{
+    width:100%;margin-top:8px;background:linear-gradient(135deg,var(--a1),var(--a2));
+    color:#fff;border:none;font-weight:800;font-size:15.5px;padding:16px;border-radius:16px;cursor:pointer;
+  }
+  .onboard-skip{width:100%;background:none;border:none;color:var(--muted);font-weight:600;font-size:12.5px;padding:12px;cursor:pointer;}
   .item-row{
     display:flex;align-items:center;gap:10px;
     padding:10px 0;border-bottom:1px solid var(--track);
@@ -305,6 +327,65 @@
 </style>
 </head>
 <body>
+<div class="onboard-overlay hide" id="onboardOverlay">
+  <div class="onboard-emoji">🍽️</div>
+  <div class="onboard-title">Bem-vindo</div>
+  <div class="onboard-sub">Antes de começares, define alguns dados básicos. Podes alterá-los sempre que quiseres nas definições (ícone da engrenagem).</div>
+
+  <div class="onboard-field">
+    <label>Sexo</label>
+    <select id="onSex">
+      <option value="f">Feminino</option>
+      <option value="m">Masculino</option>
+    </select>
+  </div>
+
+  <div class="onboard-field">
+    <label>Idade</label>
+    <input type="number" id="onAge" inputmode="numeric" placeholder="ex: 34">
+  </div>
+
+  <div class="onboard-field">
+    <label>Altura (cm)</label>
+    <input type="number" id="onHeight" inputmode="numeric" placeholder="ex: 170">
+  </div>
+
+  <div class="onboard-field">
+    <label>Peso atual (kg)</label>
+    <input type="number" id="onWeight" inputmode="numeric" placeholder="ex: 75">
+  </div>
+
+  <div class="onboard-field">
+    <label>Nível de atividade</label>
+    <select id="onActivity">
+      <option value="sedentario">Sedentário (pouco ou nenhum exercício)</option>
+      <option value="leve">Leve (exercício 1-3x/semana)</option>
+      <option value="moderado" selected>Moderado (exercício 3-5x/semana)</option>
+      <option value="ativo">Ativo (exercício 6-7x/semana)</option>
+      <option value="muito_ativo">Muito ativo (exercício intenso diário)</option>
+    </select>
+  </div>
+
+  <div class="onboard-field">
+    <label>Objetivo</label>
+    <select id="onObjective">
+      <option value="perder">Perder peso</option>
+      <option value="manter" selected>Manter peso</option>
+      <option value="ganhar">Ganhar massa muscular</option>
+    </select>
+  </div>
+
+  <button class="onboard-skip" id="onboardSuggestBtn" style="border:2px solid var(--track);border-radius:14px;color:var(--ink);margin-bottom:10px;">Sugerir meta de calorias</button>
+
+  <div class="onboard-field">
+    <label>Meta diária de calorias (kcal)</label>
+    <input type="number" id="onGoal" inputmode="numeric" placeholder="2000" value="2000">
+  </div>
+
+  <button class="onboard-start" id="onboardStartBtn">Começar</button>
+  <button class="onboard-skip" id="onboardSkipBtn">Saltar por agora</button>
+</div>
+
 <div class="app">
   <div class="header">
     <div>
@@ -429,9 +510,18 @@
 <div class="overlay" id="goalOverlay">
   <div class="sheet">
     <div class="sheet-handle"></div>
-    <div class="sheet-title">Meta diária</div>
+    <div class="sheet-title">Definições</div>
     <div class="goal-edit">
-      <label>Objetivo de calorias (kcal)</label>
+      <label>Peso atual (kg)</label>
+      <input type="number" id="weightInput" inputmode="numeric" min="0" step="0.5">
+      <label style="display:block;margin-top:16px;">Objetivo</label>
+      <select id="objectiveInput" style="width:100%;margin-top:8px;font-size:15px;font-weight:700;border:2px solid var(--track);border-radius:14px;padding:12px 14px;font-family:'Plus Jakarta Sans',sans-serif;color:var(--ink);">
+        <option value="perder">Perder peso</option>
+        <option value="manter">Manter peso</option>
+        <option value="ganhar">Ganhar massa muscular</option>
+      </select>
+      <button class="onboard-skip" id="recalcGoalBtn" style="border:2px solid var(--track);border-radius:14px;color:var(--ink);margin-top:14px;width:100%;">Sugerir meta com base nestes dados</button>
+      <label style="display:block;margin-top:16px;">Objetivo de calorias (kcal)</label>
       <input type="number" id="goalInput" inputmode="numeric" min="0" step="50">
       <button class="goal-save" id="goalSaveBtn">Guardar</button>
     </div>
@@ -443,6 +533,26 @@
     <div class="sheet-handle"></div>
     <div class="sheet-title">Histórico</div>
     <div id="historyList"></div>
+  </div>
+</div>
+
+<div class="overlay" id="editMealOverlay">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Editar refeição</div>
+    <div class="manual-form">
+      <label>Nome</label>
+      <input type="text" id="editName">
+      <label>Calorias (kcal)</label>
+      <input type="number" id="editCal" inputmode="numeric">
+      <div class="macro-edit-grid" style="margin-top:12px;">
+        <div class="macro-edit"><label>Proteína (g)</label><input type="number" id="editProtein" inputmode="numeric"></div>
+        <div class="macro-edit"><label>Hidratos (g)</label><input type="number" id="editCarbs" inputmode="numeric"></div>
+        <div class="macro-edit"><label>Gordura (g)</label><input type="number" id="editFat" inputmode="numeric"></div>
+      </div>
+      <button class="add-btn" id="editSaveBtn" style="margin-top:16px;">Guardar alterações</button>
+      <button class="discard-btn" id="editDeleteBtn" style="color:#D64545;">Eliminar refeição</button>
+    </div>
   </div>
 </div>
 
@@ -494,6 +604,7 @@ const els = {
   addBtn: document.getElementById('addBtn'),
   discardBtn: document.getElementById('discardBtn'),
   goalInput: document.getElementById('goalInput'),
+  weightInput: document.getElementById('weightInput'),
   goalSaveBtn: document.getElementById('goalSaveBtn'),
   prevDayBtn: document.getElementById('prevDayBtn'),
   nextDayBtn: document.getElementById('nextDayBtn'),
@@ -511,6 +622,14 @@ const els = {
   manualFat: document.getElementById('manualFat'),
   manualAddBtn: document.getElementById('manualAddBtn'),
   itemsList: document.getElementById('itemsList'),
+  editMealOverlay: document.getElementById('editMealOverlay'),
+  editName: document.getElementById('editName'),
+  editCal: document.getElementById('editCal'),
+  editProtein: document.getElementById('editProtein'),
+  editCarbs: document.getElementById('editCarbs'),
+  editFat: document.getElementById('editFat'),
+  editSaveBtn: document.getElementById('editSaveBtn'),
+  editDeleteBtn: document.getElementById('editDeleteBtn'),
 };
 
 els.ringProgress.setAttribute('stroke-dasharray', CIRC.toFixed(2));
@@ -605,7 +724,65 @@ async function init(){
   await loadSettings();
   await loadDay();
   render();
+  if(!settings.onboarded){
+    document.getElementById('onboardOverlay').classList.remove('hide');
+  }
 }
+
+function finishOnboarding(){
+  document.getElementById('onboardOverlay').classList.add('hide');
+}
+
+function calcSuggestedGoal({ sex, weight, height, age, activity, objective }){
+  if(!weight || !height || !age) return null;
+  const bmr = sex === 'm'
+    ? (10*weight + 6.25*height - 5*age + 5)
+    : (10*weight + 6.25*height - 5*age - 161);
+  const factors = { sedentario:1.2, leve:1.375, moderado:1.55, ativo:1.725, muito_ativo:1.9 };
+  const tdee = bmr * (factors[activity] || 1.375);
+  const adjust = objective === 'perder' ? -500 : objective === 'ganhar' ? 400 : 0;
+  return Math.max(1200, Math.round((tdee + adjust) / 10) * 10);
+}
+
+document.getElementById('onboardSuggestBtn').addEventListener('click', ()=>{
+  const suggestion = calcSuggestedGoal({
+    sex: document.getElementById('onSex').value,
+    weight: parseFloat(document.getElementById('onWeight').value),
+    height: parseFloat(document.getElementById('onHeight').value),
+    age: parseInt(document.getElementById('onAge').value, 10),
+    activity: document.getElementById('onActivity').value,
+    objective: document.getElementById('onObjective').value,
+  });
+  if(suggestion){
+    document.getElementById('onGoal').value = suggestion;
+  } else {
+    document.getElementById('onWeight').focus();
+  }
+});
+
+document.getElementById('onboardStartBtn').addEventListener('click', async ()=>{
+  const w = parseFloat(document.getElementById('onWeight').value);
+  const h = parseFloat(document.getElementById('onHeight').value);
+  const a = parseInt(document.getElementById('onAge').value, 10);
+  const g = parseInt(document.getElementById('onGoal').value, 10);
+  settings.weight = (!isNaN(w) && w > 0) ? w : settings.weight;
+  settings.height = (!isNaN(h) && h > 0) ? h : settings.height;
+  settings.age = (!isNaN(a) && a > 0) ? a : settings.age;
+  settings.sex = document.getElementById('onSex').value;
+  settings.activity = document.getElementById('onActivity').value;
+  settings.goal = (!isNaN(g) && g > 0) ? g : 2000;
+  settings.objective = document.getElementById('onObjective').value;
+  settings.onboarded = true;
+  await saveSettings();
+  render();
+  finishOnboarding();
+});
+
+document.getElementById('onboardSkipBtn').addEventListener('click', async ()=>{
+  settings.onboarded = true;
+  await saveSettings();
+  finishOnboarding();
+});
 
 async function loadSettings(){
   try{
@@ -673,6 +850,7 @@ function render(){
   dayData.meals.slice().reverse().forEach(m=>{
     const item = document.createElement('div');
     item.className = 'meal-item';
+    item.setAttribute('data-id', m.id);
     item.innerHTML = `
       <div class="meal-emoji">${m.emoji || '🍽️'}</div>
       <div class="meal-mid">
@@ -687,11 +865,18 @@ function render(){
     els.mealList.appendChild(item);
   });
   els.mealList.querySelectorAll('.meal-del').forEach(btn=>{
-    btn.addEventListener('click', async ()=>{
+    btn.addEventListener('click', async (e)=>{
+      e.stopPropagation();
       const id = btn.getAttribute('data-id');
       dayData.meals = dayData.meals.filter(m=> String(m.id) !== String(id));
       await saveDay();
       render();
+    });
+  });
+  els.mealList.querySelectorAll('.meal-item').forEach(row=>{
+    row.addEventListener('click', ()=>{
+      const id = row.getAttribute('data-id');
+      openEditMeal(id);
     });
   });
 }
@@ -706,6 +891,45 @@ els.clearLink.addEventListener('click', async ()=>{
   dayData.meals = [];
   await saveDay();
   render();
+});
+
+let editingMealId = null;
+
+function openEditMeal(id){
+  const meal = dayData.meals.find(m => String(m.id) === String(id));
+  if(!meal) return;
+  editingMealId = id;
+  els.editName.value = meal.name || '';
+  els.editCal.value = meal.calories || 0;
+  els.editProtein.value = meal.protein_g || 0;
+  els.editCarbs.value = meal.carbs_g || 0;
+  els.editFat.value = meal.fat_g || 0;
+  els.editMealOverlay.classList.add('show');
+}
+els.editMealOverlay.addEventListener('click', (e)=>{ if(e.target === els.editMealOverlay) els.editMealOverlay.classList.remove('show'); });
+
+els.editSaveBtn.addEventListener('click', async ()=>{
+  if(!editingMealId) return;
+  const meal = dayData.meals.find(m => String(m.id) === String(editingMealId));
+  if(!meal) return;
+  meal.name = els.editName.value.trim() || meal.name;
+  meal.calories = Number(els.editCal.value) || 0;
+  meal.protein_g = Number(els.editProtein.value) || 0;
+  meal.carbs_g = Number(els.editCarbs.value) || 0;
+  meal.fat_g = Number(els.editFat.value) || 0;
+  await saveDay();
+  render();
+  els.editMealOverlay.classList.remove('show');
+  editingMealId = null;
+});
+
+els.editDeleteBtn.addEventListener('click', async ()=>{
+  if(!editingMealId) return;
+  dayData.meals = dayData.meals.filter(m => String(m.id) !== String(editingMealId));
+  await saveDay();
+  render();
+  els.editMealOverlay.classList.remove('show');
+  editingMealId = null;
 });
 
 els.fabBtn.addEventListener('click', ()=>{
@@ -986,15 +1210,37 @@ function renderWeekChart(){
 
 els.gearBtn.addEventListener('click', ()=>{
   els.goalInput.value = settings.goal || 2000;
+  els.weightInput.value = settings.weight || '';
+  document.getElementById('objectiveInput').value = settings.objective || 'manter';
   els.goalOverlay.classList.add('show');
 });
 els.goalOverlay.addEventListener('click', (e)=>{ if(e.target === els.goalOverlay) els.goalOverlay.classList.remove('show'); });
 els.goalSaveBtn.addEventListener('click', async ()=>{
   const v = parseInt(els.goalInput.value, 10);
   settings.goal = (!isNaN(v) && v > 0) ? v : 2000;
+  const w = parseFloat(els.weightInput.value);
+  settings.weight = (!isNaN(w) && w > 0) ? w : settings.weight;
+  settings.objective = document.getElementById('objectiveInput').value;
   await saveSettings();
   render();
   els.goalOverlay.classList.remove('show');
+});
+
+document.getElementById('recalcGoalBtn').addEventListener('click', ()=>{
+  const w = parseFloat(els.weightInput.value) || settings.weight;
+  const suggestion = calcSuggestedGoal({
+    sex: settings.sex || 'f',
+    weight: w,
+    height: settings.height,
+    age: settings.age,
+    activity: settings.activity || 'leve',
+    objective: document.getElementById('objectiveInput').value,
+  });
+  if(suggestion){
+    els.goalInput.value = suggestion;
+  } else {
+    alert('Preciso da tua altura e idade para sugerir uma meta — define-as na primeira utilização ou apaga os dados da app para repetir essa introdução.');
+  }
 });
 
 init();
