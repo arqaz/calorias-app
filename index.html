@@ -133,8 +133,9 @@
     background:var(--bg);
     width:100%;max-width:480px;
     border-radius:26px 26px 0 0;
-    max-height:92vh;overflow-y:auto;
-    padding:14px 18px 28px;
+    max-height:85vh;overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    padding:14px 18px 60px;
     animation:slideup .28s cubic-bezier(.2,.9,.3,1);
   }
   @keyframes slideup{from{transform:translateY(40px);opacity:0;}to{transform:translateY(0);opacity:1;}}
@@ -227,8 +228,9 @@
   .manual-form input:focus{outline:none;border-color:var(--a2);}
   .onboard-overlay{
     position:fixed;inset:0;background:var(--bg);z-index:100;
-    display:flex;flex-direction:column;justify-content:center;padding:28px 22px;
     overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    padding:28px 22px 70px;
   }
   .onboard-overlay.hide{display:none;}
   .onboard-emoji{font-size:44px;margin-bottom:6px;}
@@ -426,7 +428,7 @@
     </div>
     <div class="ring-info">
       <div class="ring-label">Meta diária</div>
-      <div class="ring-goal"><b id="goalRemain">2000</b> kcal restantes</div>
+      <div class="ring-goal"><b id="goalRemainNum">2000</b> <span id="goalRemainLabel">kcal restantes</span></div>
       <div class="macro-mini">
         <div class="macro-row"><span class="macro-dot" style="background:#2FA66B;"></span>Proteína<span class="macro-val" id="totProtein">0g</span></div>
         <div class="macro-row"><span class="macro-dot" style="background:#FF7A45;"></span>Hidratos<span class="macro-val" id="totCarbs">0g</span></div>
@@ -576,7 +578,8 @@ const els = {
   dateBig: document.getElementById('dateBig'),
   ringProgress: document.getElementById('ringProgress'),
   ringNum: document.getElementById('ringNum'),
-  goalRemain: document.getElementById('goalRemain'),
+  goalRemainNum: document.getElementById('goalRemainNum'),
+  goalRemainLabel: document.getElementById('goalRemainLabel'),
   totProtein: document.getElementById('totProtein'),
   totCarbs: document.getElementById('totCarbs'),
   totFat: document.getElementById('totFat'),
@@ -825,11 +828,14 @@ function render(){
   els.ringProgress.setAttribute('stroke-dashoffset', offset.toFixed(2));
   els.ringNum.textContent = Math.round(t.cal);
   const remain = Math.max(goal - t.cal, 0);
-  const goalWrap = els.goalRemain.parentElement;
   if(t.cal > goal){
-    goalWrap.innerHTML = '<b style="color:#FF3D68;">'+Math.round(t.cal-goal)+'</b> kcal acima da meta';
+    els.goalRemainNum.textContent = Math.round(t.cal-goal);
+    els.goalRemainNum.style.color = '#FF3D68';
+    els.goalRemainLabel.textContent = 'kcal acima da meta';
   } else {
-    goalWrap.innerHTML = '<b id="goalRemain">'+Math.round(remain)+'</b> kcal restantes';
+    els.goalRemainNum.textContent = Math.round(remain);
+    els.goalRemainNum.style.color = '';
+    els.goalRemainLabel.textContent = 'kcal restantes';
   }
   els.totProtein.textContent = Math.round(t.protein)+'g';
   els.totCarbs.textContent = Math.round(t.carbs)+'g';
