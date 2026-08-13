@@ -198,6 +198,46 @@
     background:var(--fresh-soft);color:var(--fresh);font-size:11.5px;font-weight:700;
     padding:6px 11px;border-radius:20px;
   }
+  .edit-name{
+    width:100%;font-size:19px;font-weight:800;border:none;border-bottom:2px solid var(--track);
+    padding:4px 0;margin-bottom:2px;font-family:'Plus Jakarta Sans',sans-serif;color:var(--ink);background:none;
+  }
+  .edit-name:focus{outline:none;border-color:var(--a2);}
+  .cal-edit-row{display:flex;align-items:baseline;gap:8px;margin:12px 0;}
+  .cal-edit-row input{
+    width:110px;font-size:34px;font-weight:800;color:var(--a2);border:none;border-bottom:2px solid var(--track);
+    font-family:'Plus Jakarta Sans',sans-serif;background:none;padding:2px 0;
+  }
+  .cal-edit-row input:focus{outline:none;border-color:var(--a2);}
+  .macro-edit-grid{display:flex;gap:10px;margin-bottom:16px;}
+  .macro-edit{flex:1;}
+  .macro-edit label{font-size:10.5px;font-weight:700;color:var(--muted);display:block;margin-bottom:4px;}
+  .macro-edit input{
+    width:100%;font-size:15px;font-weight:700;border:2px solid var(--track);border-radius:10px;
+    padding:8px 9px;font-family:'Plus Jakarta Sans',sans-serif;color:var(--ink);
+  }
+  .macro-edit input:focus{outline:none;border-color:var(--fresh);}
+  .link-btn{background:none;border:none;color:var(--muted);font-weight:700;font-size:12.5px;text-decoration:underline;cursor:pointer;padding:8px;}
+  .manual-form label{font-size:12px;font-weight:700;color:var(--muted);display:block;margin:12px 0 6px;}
+  .manual-form input[type=text],.manual-form input[type=number]{
+    width:100%;font-size:15px;font-weight:600;border:2px solid var(--track);border-radius:12px;
+    padding:11px 12px;font-family:'Plus Jakarta Sans',sans-serif;color:var(--ink);
+  }
+  .manual-form input:focus{outline:none;border-color:var(--a2);}
+  .item-row{
+    display:flex;align-items:center;gap:10px;
+    padding:10px 0;border-bottom:1px solid var(--track);
+  }
+  .item-row:last-of-type{border-bottom:none;}
+  .item-info{flex:1;min-width:0;}
+  .item-name{font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .item-cal{font-size:11px;color:var(--muted);font-weight:600;margin-top:1px;}
+  .item-qty{width:64px;font-size:13.5px;font-weight:700;border:2px solid var(--track);border-radius:10px;padding:7px 8px;text-align:center;font-family:'Plus Jakarta Sans',sans-serif;color:var(--ink);}
+  .item-qty:focus{outline:none;border-color:var(--a2);}
+  .item-unit{font-size:12px;font-weight:600;border:2px solid var(--track);border-radius:10px;padding:7px 6px;font-family:'Plus Jakarta Sans',sans-serif;color:var(--ink);background:var(--card);}
+  .item-unit:focus{outline:none;border-color:var(--a2);}
+  .items-list{margin:14px 0 4px;}
+  .items-empty{font-size:12.5px;color:var(--muted);padding:8px 0;}
   .add-btn{
     width:100%;background:var(--ink);color:var(--bg);border:none;font-weight:800;font-size:14.5px;
     padding:14px;border-radius:14px;cursor:pointer;
@@ -206,6 +246,49 @@
     width:100%;background:none;border:none;color:var(--muted);font-weight:700;font-size:13px;
     padding:10px;cursor:pointer;
   }
+
+  .date-nav{display:flex;align-items:center;gap:8px;}
+  .date-arrow{
+    width:30px;height:30px;border-radius:50%;border:none;background:var(--card);
+    box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;
+  }
+  .date-arrow:disabled{opacity:.35;cursor:default;}
+  .date-arrow svg{width:14px;height:14px;}
+  .today-pill{
+    font-size:10.5px;font-weight:700;color:var(--a2);background:var(--fresh-soft);
+    border:none;padding:3px 9px;border-radius:20px;cursor:pointer;margin-left:6px;
+  }
+  .history-link{font-size:12px;color:var(--muted);font-weight:600;text-decoration:underline;background:none;border:none;cursor:pointer;margin-top:2px;}
+
+  .history-item{
+    background:var(--card);border-radius:16px;box-shadow:var(--shadow);
+    padding:13px 15px;display:flex;justify-content:space-between;align-items:center;
+    margin-bottom:9px;cursor:pointer;
+  }
+  .history-item .hd-date{font-size:14px;font-weight:700;text-transform:capitalize;}
+  .history-item .hd-sub{font-size:11px;color:var(--muted);font-weight:600;margin-top:1px;}
+  .history-item .hd-cal{font-size:15px;font-weight:800;color:var(--a2);}
+  .history-item .hd-cal.over{color:#D64545;}
+
+  .week-card{
+    background:var(--card);border-radius:22px;box-shadow:var(--shadow);
+    padding:16px 18px 14px;margin-bottom:18px;
+  }
+  .week-title{font-size:13px;font-weight:700;color:var(--muted);margin-bottom:12px;}
+  .week-bars{display:flex;justify-content:space-between;align-items:flex-end;gap:6px;}
+  .week-bar-col{display:flex;flex-direction:column;align-items:center;gap:6px;flex:1;}
+  .week-bar-track{
+    width:100%;max-width:20px;height:72px;background:var(--track);border-radius:8px;
+    display:flex;align-items:flex-end;overflow:hidden;
+  }
+  .week-bar-fill{
+    width:100%;border-radius:8px;
+    background:linear-gradient(180deg,var(--a1),var(--a2));
+    transition:height .5s ease;min-height:3px;
+  }
+  .week-bar-fill.over{background:#D64545;}
+  .week-bar-label{font-size:10px;font-weight:700;color:var(--muted-soft);text-transform:capitalize;}
+  .week-bar-label.active{color:var(--a2);}
 
   .goal-edit{background:var(--card);border-radius:20px;box-shadow:var(--shadow);padding:20px;}
   .goal-edit label{font-size:12.5px;font-weight:700;color:var(--muted);}
@@ -226,7 +309,17 @@
   <div class="header">
     <div>
       <div class="greeting">O teu registo</div>
-      <div class="datebig" id="dateBig">—</div>
+      <div class="date-nav">
+        <button class="date-arrow" id="prevDayBtn" aria-label="Dia anterior">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#172016" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <div class="datebig" id="dateBig">—</div>
+        <button class="date-arrow" id="nextDayBtn" aria-label="Dia seguinte">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#172016" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+        <button class="today-pill" id="todayPill" style="display:none;">hoje</button>
+      </div>
+      <button class="history-link" id="historyLink">Ver histórico</button>
     </div>
     <button class="gear" id="gearBtn" aria-label="Definir meta">
       <svg viewBox="0 0 24 24" fill="none" stroke="#172016" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
@@ -261,6 +354,11 @@
     </div>
   </div>
 
+  <div class="week-card">
+    <div class="week-title">Últimos 7 dias</div>
+    <div class="week-bars" id="weekBars"></div>
+  </div>
+
   <div class="section-title">
     <span>Refeições de hoje</span>
     <button class="clear-link" id="clearLink" style="display:none;">limpar</button>
@@ -284,6 +382,23 @@
     </label>
     <input type="file" id="fileInput" accept="image/*" capture="environment">
 
+    <div style="text-align:center;">
+      <button class="link-btn" id="manualToggleBtn">ou adicionar sem foto</button>
+    </div>
+
+    <div class="manual-form" id="manualForm" style="display:none;">
+      <label>Nome da refeição</label>
+      <input type="text" id="manualName" placeholder="ex: Sandes de fiambre">
+      <label>Calorias (kcal)</label>
+      <input type="number" id="manualCal" inputmode="numeric" placeholder="0">
+      <div class="macro-edit-grid" style="margin-top:12px;">
+        <div class="macro-edit"><label>Proteína (g)</label><input type="number" id="manualProtein" inputmode="numeric" placeholder="0"></div>
+        <div class="macro-edit"><label>Hidratos (g)</label><input type="number" id="manualCarbs" inputmode="numeric" placeholder="0"></div>
+        <div class="macro-edit"><label>Gordura (g)</label><input type="number" id="manualFat" inputmode="numeric" placeholder="0"></div>
+      </div>
+      <button class="add-btn" id="manualAddBtn" style="margin-top:16px;">Adicionar ao registo de hoje</button>
+    </div>
+
     <div class="preview-wrap" id="previewWrap" style="display:none;">
       <img id="previewImg" src="" alt="Pré-visualização">
       <button class="retake" id="retakeBtn">Trocar foto</button>
@@ -296,10 +411,11 @@
     <div id="errorBox" class="error" style="display:none;"></div>
 
     <div class="result-card" id="resultCard">
-      <div class="result-title" id="foodName">—</div>
+      <input type="text" id="foodName" class="edit-name" placeholder="Nome do prato">
       <div class="result-desc" id="foodDesc">—</div>
-      <div class="result-cal"><span class="n" id="calNum">0</span><span class="u">kcal</span></div>
-      <div class="chips">
+      <div class="result-cal"><span class="n" id="calNum">0</span><span class="u">kcal (total)</span></div>
+      <div class="items-list" id="itemsList"></div>
+      <div class="chips" id="totalChips">
         <span class="chip" id="chipProtein">Proteína — g</span>
         <span class="chip" id="chipCarbs">Hidratos — g</span>
         <span class="chip" id="chipFat">Gordura — g</span>
@@ -319,6 +435,14 @@
       <input type="number" id="goalInput" inputmode="numeric" min="0" step="50">
       <button class="goal-save" id="goalSaveBtn">Guardar</button>
     </div>
+  </div>
+</div>
+
+<div class="overlay" id="historyOverlay">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Histórico</div>
+    <div id="historyList"></div>
   </div>
 </div>
 
@@ -371,6 +495,22 @@ const els = {
   discardBtn: document.getElementById('discardBtn'),
   goalInput: document.getElementById('goalInput'),
   goalSaveBtn: document.getElementById('goalSaveBtn'),
+  prevDayBtn: document.getElementById('prevDayBtn'),
+  nextDayBtn: document.getElementById('nextDayBtn'),
+  todayPill: document.getElementById('todayPill'),
+  historyLink: document.getElementById('historyLink'),
+  historyOverlay: document.getElementById('historyOverlay'),
+  historyList: document.getElementById('historyList'),
+  weekBars: document.getElementById('weekBars'),
+  manualToggleBtn: document.getElementById('manualToggleBtn'),
+  manualForm: document.getElementById('manualForm'),
+  manualName: document.getElementById('manualName'),
+  manualCal: document.getElementById('manualCal'),
+  manualProtein: document.getElementById('manualProtein'),
+  manualCarbs: document.getElementById('manualCarbs'),
+  manualFat: document.getElementById('manualFat'),
+  manualAddBtn: document.getElementById('manualAddBtn'),
+  itemsList: document.getElementById('itemsList'),
 };
 
 els.ringProgress.setAttribute('stroke-dasharray', CIRC.toFixed(2));
@@ -380,8 +520,88 @@ function fmtDateBig(ds){
   return d.toLocaleDateString('pt-PT',{weekday:'long', day:'numeric', month:'long'});
 }
 
+function addDays(ds, delta){
+  const d = new Date(ds+'T00:00:00');
+  d.setDate(d.getDate() + delta);
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+
+function updateNavState(){
+  const isToday = currentDate === todayStr();
+  els.nextDayBtn.disabled = isToday;
+  els.todayPill.style.display = isToday ? 'none' : 'inline-block';
+}
+
+async function goToDate(ds){
+  currentDate = ds;
+  els.dateBig.textContent = fmtDateBig(currentDate);
+  updateNavState();
+  await loadDay();
+  render();
+}
+
+els.prevDayBtn.addEventListener('click', ()=> goToDate(addDays(currentDate, -1)));
+els.nextDayBtn.addEventListener('click', ()=>{
+  if(currentDate === todayStr()) return;
+  goToDate(addDays(currentDate, 1));
+});
+els.todayPill.addEventListener('click', ()=> goToDate(todayStr()));
+
+function getHistoryDays(){
+  const days = [];
+  for(let i=0;i<localStorage.length;i++){
+    const key = localStorage.key(i);
+    if(key && /^day:\d{4}-\d{2}-\d{2}$/.test(key)){
+      const ds = key.slice(4);
+      let data = { meals: [] };
+      try{ data = JSON.parse(localStorage.getItem(key)) || { meals: [] }; }catch(e){}
+      const cal = (data.meals||[]).reduce((sum,m)=> sum + (Number(m.calories)||0), 0);
+      days.push({ date: ds, cal, count: (data.meals||[]).length });
+    }
+  }
+  days.sort((a,b)=> b.date.localeCompare(a.date));
+  return days;
+}
+
+function renderHistory(){
+  const days = getHistoryDays().filter(d => d.count > 0);
+  const goal = Number(settings.goal)||2000;
+  els.historyList.innerHTML = '';
+  if(days.length === 0){
+    const empty = document.createElement('div');
+    empty.className = 'empty-state';
+    empty.textContent = 'Ainda não há dias registados.';
+    els.historyList.appendChild(empty);
+    return;
+  }
+  days.forEach(d=>{
+    const item = document.createElement('div');
+    item.className = 'history-item';
+    const over = d.cal > goal;
+    item.innerHTML = `
+      <div>
+        <div class="hd-date">${fmtDateBig(d.date)}</div>
+        <div class="hd-sub">${d.count} refeição${d.count===1?'':'ões'}</div>
+      </div>
+      <div class="hd-cal ${over?'over':''}">${Math.round(d.cal)} kcal</div>
+    `;
+    item.addEventListener('click', ()=>{
+      els.historyOverlay.classList.remove('show');
+      goToDate(d.date);
+    });
+    els.historyList.appendChild(item);
+  });
+}
+
+els.historyLink.addEventListener('click', ()=>{
+  renderHistory();
+  els.historyOverlay.classList.add('show');
+});
+els.historyOverlay.addEventListener('click', (e)=>{ if(e.target === els.historyOverlay) els.historyOverlay.classList.remove('show'); });
+
 async function init(){
   els.dateBig.textContent = fmtDateBig(currentDate);
+  updateNavState();
   await loadSettings();
   await loadDay();
   render();
@@ -419,6 +639,7 @@ function totals(){
 }
 
 function render(){
+  renderWeekChart();
   const t = totals();
   const goal = Number(settings.goal)||2000;
   const pct = Math.min(t.cal / goal, 1);
@@ -442,7 +663,9 @@ function render(){
     els.clearLink.style.display = 'none';
     const empty = document.createElement('div');
     empty.className = 'empty-state';
-    empty.textContent = 'Ainda não registaste nenhuma refeição hoje. Toca em + para adicionar a primeira.';
+    empty.textContent = currentDate === todayStr()
+      ? 'Ainda não registaste nenhuma refeição hoje. Toca em + para adicionar a primeira.'
+      : 'Não há refeições registadas neste dia.';
     els.mealList.appendChild(empty);
     return;
   }
@@ -500,6 +723,8 @@ function resetScan(){
   els.analyzeBtn.style.display = 'none';
   els.resultCard.classList.remove('show');
   els.errorBox.style.display = 'none';
+  els.manualForm.style.display = 'none';
+  els.manualToggleBtn.textContent = 'ou adicionar sem foto';
 }
 
 els.fileInput.addEventListener('change', (e)=>{
@@ -571,28 +796,124 @@ els.analyzeBtn.addEventListener('click', async ()=>{
   }
 });
 
+let workingItems = [];
+
+function gramsForItem(item){
+  const val = Number(item._val) || 0;
+  if(item._unit === 'tbsp'){
+    return val * (Number(item.grams_per_tbsp) || 15);
+  }
+  return val;
+}
+
+function statsForItem(item){
+  const g = gramsForItem(item);
+  const f = g / 100;
+  return {
+    grams: g,
+    calories: f * (Number(item.calories_per_100g)||0),
+    protein: f * (Number(item.protein_per_100g)||0),
+    carbs: f * (Number(item.carbs_per_100g)||0),
+    fat: f * (Number(item.fat_per_100g)||0),
+    fiber: f * (Number(item.fiber_per_100g)||0),
+  };
+}
+
+function renderItems(){
+  els.itemsList.innerHTML = '';
+  if(workingItems.length === 0){
+    els.itemsList.innerHTML = '<div class="items-empty">Nenhum alimento identificado.</div>';
+  }
+  workingItems.forEach((item, idx)=>{
+    const st = statsForItem(item);
+    const row = document.createElement('div');
+    row.className = 'item-row';
+    row.innerHTML = `
+      <div class="item-info">
+        <div class="item-name">${escapeHtml(item.name)}</div>
+        <div class="item-cal">${Math.round(st.calories)} kcal</div>
+      </div>
+      <input type="number" class="item-qty" data-idx="${idx}" value="${item._val}" min="0" step="${item._unit==='tbsp'?'0.5':'1'}">
+      <select class="item-unit" data-idx="${idx}">
+        <option value="g" ${item._unit==='g'?'selected':''}>g</option>
+        <option value="tbsp" ${item._unit==='tbsp'?'selected':''}>colher sopa</option>
+      </select>
+    `;
+    els.itemsList.appendChild(row);
+  });
+
+  els.itemsList.querySelectorAll('.item-qty').forEach(inp=>{
+    inp.addEventListener('input', ()=>{
+      const idx = Number(inp.getAttribute('data-idx'));
+      workingItems[idx]._val = inp.value === '' ? 0 : parseFloat(inp.value);
+      updateTotalsDisplay();
+      const st = statsForItem(workingItems[idx]);
+      const row = inp.closest('.item-row');
+      row.querySelector('.item-cal').textContent = Math.round(st.calories) + ' kcal';
+    });
+  });
+  els.itemsList.querySelectorAll('.item-unit').forEach(sel=>{
+    sel.addEventListener('change', ()=>{
+      const idx = Number(sel.getAttribute('data-idx'));
+      const item = workingItems[idx];
+      const currentGrams = gramsForItem(item);
+      const newUnit = sel.value;
+      const gpt = Number(item.grams_per_tbsp) || 15;
+      item._unit = newUnit;
+      item._val = newUnit === 'g' ? Math.round(currentGrams) : Math.round((currentGrams / gpt) * 2) / 2;
+      renderItems();
+      updateTotalsDisplay();
+    });
+  });
+
+  updateTotalsDisplay();
+}
+
+function computeTotals(){
+  return workingItems.reduce((acc, item)=>{
+    const st = statsForItem(item);
+    acc.calories += st.calories;
+    acc.protein += st.protein;
+    acc.carbs += st.carbs;
+    acc.fat += st.fat;
+    acc.fiber += st.fiber;
+    return acc;
+  }, {calories:0, protein:0, carbs:0, fat:0, fiber:0});
+}
+
+function updateTotalsDisplay(){
+  const t = computeTotals();
+  els.calNum.textContent = Math.round(t.calories);
+  els.chipProtein.textContent = 'Proteína ' + Math.round(t.protein) + 'g';
+  els.chipCarbs.textContent = 'Hidratos ' + Math.round(t.carbs) + 'g';
+  els.chipFat.textContent = 'Gordura ' + Math.round(t.fat) + 'g';
+}
+
 function showResult(d){
-  els.foodName.textContent = d.food_name || '—';
+  els.foodName.value = d.food_name || '';
   els.foodDesc.textContent = d.description || '';
-  els.calNum.textContent = d.calories ?? 0;
-  els.chipProtein.textContent = 'Proteína ' + (d.protein_g ?? '—') + 'g';
-  els.chipCarbs.textContent = 'Hidratos ' + (d.carbs_g ?? '—') + 'g';
-  els.chipFat.textContent = 'Gordura ' + (d.fat_g ?? '—') + 'g';
+  workingItems = (d.items || []).map(it => ({
+    ...it,
+    _val: Number(it.quantity_g) || 0,
+    _unit: 'g',
+  }));
+  renderItems();
   els.resultCard.classList.add('show');
   els.resultCard.scrollIntoView({behavior:'smooth', block:'nearest'});
 }
 
 els.addBtn.addEventListener('click', async ()=>{
   if(!pendingResult) return;
+  const t = computeTotals();
   const now = new Date();
   const meal = {
     id: Date.now(),
-    name: pendingResult.food_name || 'Refeição',
-    calories: pendingResult.calories || 0,
-    protein_g: pendingResult.protein_g || 0,
-    carbs_g: pendingResult.carbs_g || 0,
-    fat_g: pendingResult.fat_g || 0,
-    fiber_g: pendingResult.fiber_g || 0,
+    name: els.foodName.value.trim() || 'Refeição',
+    calories: Math.round(t.calories),
+    protein_g: Math.round(t.protein),
+    carbs_g: Math.round(t.carbs),
+    fat_g: Math.round(t.fat),
+    fiber_g: Math.round(t.fiber),
     emoji: pendingResult.emoji || '🍽️',
     time: now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0'),
   };
@@ -601,6 +922,67 @@ els.addBtn.addEventListener('click', async ()=>{
   render();
   closeScan();
 });
+
+els.manualToggleBtn.addEventListener('click', ()=>{
+  const opening = els.manualForm.style.display === 'none';
+  els.manualForm.style.display = opening ? 'block' : 'none';
+  els.dropzone.style.display = opening ? 'none' : 'block';
+  els.manualToggleBtn.textContent = opening ? 'ou tirar/carregar foto' : 'ou adicionar sem foto';
+  if(opening){
+    els.manualName.value = ''; els.manualCal.value = '';
+    els.manualProtein.value = ''; els.manualCarbs.value = ''; els.manualFat.value = '';
+  }
+});
+
+els.manualAddBtn.addEventListener('click', async ()=>{
+  const name = els.manualName.value.trim();
+  if(!name){ els.manualName.focus(); return; }
+  const now = new Date();
+  const meal = {
+    id: Date.now(),
+    name,
+    calories: Number(els.manualCal.value) || 0,
+    protein_g: Number(els.manualProtein.value) || 0,
+    carbs_g: Number(els.manualCarbs.value) || 0,
+    fat_g: Number(els.manualFat.value) || 0,
+    fiber_g: 0,
+    emoji: '🍽️',
+    time: now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0'),
+  };
+  dayData.meals.push(meal);
+  await saveDay();
+  render();
+  closeScan();
+});
+
+function renderWeekChart(){
+  const anchor = todayStr();
+  const days = [];
+  for(let i=6;i>=0;i--){ days.push(addDays(anchor, -i)); }
+  const goal = Number(settings.goal)||2000;
+  const totals = days.map(ds=>{
+    let data = { meals: [] };
+    try{ const raw = localStorage.getItem('day:'+ds); if(raw) data = JSON.parse(raw); }catch(e){}
+    return (data.meals||[]).reduce((s,m)=> s + (Number(m.calories)||0), 0);
+  });
+  const maxVal = Math.max(goal, ...totals, 1);
+  els.weekBars.innerHTML = '';
+  days.forEach((ds,i)=>{
+    const cal = totals[i];
+    const pct = Math.min(cal/maxVal, 1) * 100;
+    const d = new Date(ds+'T00:00:00');
+    const label = d.toLocaleDateString('pt-PT',{weekday:'narrow'});
+    const isToday = ds === anchor;
+    const col = document.createElement('div');
+    col.className = 'week-bar-col';
+    col.title = fmtDateBig(ds) + ': ' + Math.round(cal) + ' kcal';
+    col.innerHTML = `
+      <div class="week-bar-track"><div class="week-bar-fill ${cal>goal?'over':''}" style="height:${pct}%"></div></div>
+      <div class="week-bar-label ${isToday?'active':''}">${label}</div>
+    `;
+    els.weekBars.appendChild(col);
+  });
+}
 
 els.gearBtn.addEventListener('click', ()=>{
   els.goalInput.value = settings.goal || 2000;
