@@ -541,7 +541,8 @@ els.analyzeBtn.addEventListener('click', async ()=>{
 
     if(!response.ok){
       const errData = await response.json().catch(()=>({}));
-      throw new Error(errData.error || ("Falha na chamada à API (" + response.status + ")"));
+      const msg = (errData.error || ("Falha na chamada à API (" + response.status + ")")) + (errData.details ? " — " + errData.details : "");
+      throw new Error(msg);
     }
     const parsed = await response.json();
     pendingResult = parsed;
