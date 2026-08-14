@@ -58,7 +58,7 @@
 
   .header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;}
   .brand-row{display:flex;align-items:center;gap:10px;}
-  .brand-mark{width:34px;height:34px;border-radius:9px;flex-shrink:0;}
+  .brand-mark{width:44px;height:44px;border-radius:12px;flex-shrink:0;}
   .tabbar{display:flex;background:var(--track);border-radius:14px;padding:4px;margin-bottom:20px;gap:4px;}
   .tab-btn{
     flex:1;border:none;background:none;padding:10px;border-radius:11px;
@@ -115,7 +115,7 @@
   .datebig{font-size:26px;font-weight:800;letter-spacing:-.01em;margin-top:2px;text-transform:capitalize;}
   .gear{
     width:40px;height:40px;border-radius:50%;
-    background:var(--card);box-shadow:var(--shadow);
+    background:var(--card);box-shadow:var(--shadow);color:var(--ink);
     display:flex;align-items:center;justify-content:center;
     border:none;cursor:pointer;flex-shrink:0;
   }
@@ -172,7 +172,7 @@
   .meal-time{font-size:11px;color:var(--muted-soft);font-weight:600;margin-top:1px;}
   .meal-cal{font-size:15px;font-weight:800;color:var(--a2);white-space:nowrap;margin-left:6px;display:flex;align-items:center;}
   .meal-del{
-    width:28px;height:28px;border-radius:50%;border:none;background:var(--track);
+    width:28px;height:28px;border-radius:50%;border:none;background:var(--track);color:var(--ink);
     display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;margin-left:2px;
   }
   .meal-del svg{width:13px;height:13px;}
@@ -349,7 +349,7 @@
   }
   .item-name-input:focus{outline:none;border-bottom-color:var(--a2);}
   .item-remove{
-    width:26px;height:26px;border-radius:50%;border:none;background:var(--track);
+    width:26px;height:26px;border-radius:50%;border:none;background:var(--track);color:var(--ink);
     display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;
   }
   .item-remove svg{width:11px;height:11px;}
@@ -554,7 +554,7 @@
       </div>
     </div>
     <button class="gear" id="gearBtn" aria-label="Definir meta">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#172016" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
     </button>
   </div>
 
@@ -1257,7 +1257,7 @@ function render(){
       </div>
       <div class="meal-cal">${Math.round(m.calories)} kcal${hsColor ? `<span class="meal-health-dot" style="background:${hsColor};" title="Health Score ${hs}/10"></span>` : ''}</div>
       <button class="meal-del" data-id="${m.id}" aria-label="Remover">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#172016" stroke-width="2.4" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
       </button>
     `;
     els.mealList.appendChild(item);
@@ -1385,7 +1385,7 @@ function renderExercise(){
       <div class="exercise-mid"><div class="exercise-name">${escapeHtml(ex.name)}</div></div>
       <div class="exercise-cal">-${Math.round(ex.calories)} kcal</div>
       <button class="meal-del" data-id="${ex.id}" aria-label="Remover">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#172016" stroke-width="2.4" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
       </button>
     `;
     els.exerciseList.appendChild(row);
@@ -1669,7 +1669,7 @@ function renderItems(){
           </div>
         </div>
         <button class="item-remove" data-idx="${idx}" aria-label="Remover">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#172016" stroke-width="2.4" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
         </button>
       `;
     } else {
@@ -1685,7 +1685,7 @@ function renderItems(){
           <option value="tbsp" ${item._unit==='tbsp'?'selected':''}>colher sopa</option>
         </select>
         <button class="item-remove" data-idx="${idx}" aria-label="Remover">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#172016" stroke-width="2.4" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
         </button>
       `;
     }
