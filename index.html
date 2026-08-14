@@ -475,10 +475,10 @@
 </head>
 <body>
 <div class="splash" id="splashScreen">
-  <img src="/icons/logo-full.png" alt="Trinca">
+  <img src="/icons/logo-full.png" alt="Trinca" id="splashLogoImg">
 </div>
 <div class="onboard-overlay hide" id="onboardOverlay">
-  <img src="/icons/icon-192.png" alt="Trinca" class="onboard-logo">
+  <img src="/icons/icon-192.png" alt="Trinca" class="onboard-logo" id="onboardLogoImg">
   <div class="onboard-title">Bem-vindo ao Trinca</div>
   <div class="onboard-sub">Antes de começares, define alguns dados básicos. Podes alterá-los sempre que quiseres nas definições (ícone da engrenagem).</div>
 
@@ -547,7 +547,7 @@
 <div class="app">
   <div class="header">
     <div class="brand-row">
-      <img src="/icons/icon-192.png" alt="Trinca" class="brand-mark">
+      <img src="/icons/icon-192.png" alt="Trinca" class="brand-mark" id="brandMarkImg">
       <div>
         <div class="greeting">O teu registo</div>
         <div class="datebig" id="dateBig">—</div>
@@ -1032,6 +1032,14 @@ function applyTheme(){
     ? (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
     : mode;
   document.documentElement.setAttribute('data-theme', resolved);
+
+  const isDark = resolved === 'dark';
+  const splashImg = document.getElementById('splashLogoImg');
+  const onboardImg = document.getElementById('onboardLogoImg');
+  const brandImg = document.getElementById('brandMarkImg');
+  if(splashImg) splashImg.src = isDark ? '/icons/logo-full-dark.png' : '/icons/logo-full.png';
+  if(onboardImg) onboardImg.src = isDark ? '/icons/icon-192-dark.png' : '/icons/icon-192.png';
+  if(brandImg) brandImg.src = isDark ? '/icons/icon-192-dark.png' : '/icons/icon-192.png';
 }
 if(window.matchMedia){
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', ()=>{
