@@ -168,7 +168,7 @@
   .meal-mid{flex:1;min-width:0;}
   .meal-name{font-size:14.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .meal-time{font-size:11px;color:var(--muted-soft);font-weight:600;margin-top:1px;}
-  .meal-cal{font-size:15px;font-weight:800;color:var(--a2);white-space:nowrap;margin-left:6px;}
+  .meal-cal{font-size:15px;font-weight:800;color:var(--a2);white-space:nowrap;margin-left:6px;display:flex;align-items:center;}
   .meal-del{
     width:28px;height:28px;border-radius:50%;border:none;background:var(--track);
     display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;margin-left:2px;
@@ -268,6 +268,15 @@
     width:130px;height:130px;border-radius:50%;object-fit:cover;
     border:4px solid var(--bg);box-shadow:var(--shadow);
   }
+  .health-badge{
+    display:inline-flex;align-items:center;gap:6px;
+    background:var(--fresh-soft);color:var(--fresh);font-size:12.5px;font-weight:800;
+    padding:6px 12px;border-radius:20px;margin:6px 0 4px;
+  }
+  .health-badge.mid{background:#FFF3D6;color:#B8860B;}
+  .health-badge.low{background:#FFE2E2;color:#D64545;}
+  .health-heart{font-size:13px;}
+  .meal-health-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;margin-left:4px;}
   .edit-name{
     width:100%;font-size:19px;font-weight:800;border:none;border-bottom:2px solid var(--track);
     padding:4px 0;margin-bottom:2px;font-family:'Plus Jakarta Sans',sans-serif;color:var(--ink);background:none;
@@ -370,6 +379,27 @@
   .history-item .hd-sub{font-size:11px;color:var(--muted);font-weight:600;margin-top:1px;}
   .history-item .hd-cal{font-size:15px;font-weight:800;color:var(--a2);}
   .history-item .hd-cal.over{color:#D64545;}
+
+  .fast-card{
+    background:var(--card);border-radius:22px;box-shadow:var(--shadow-soft);
+    padding:16px 18px;margin-bottom:16px;
+  }
+  .fast-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;gap:10px;}
+  .fast-title{font-size:13px;font-weight:700;}
+  .fast-status{font-size:11.5px;color:var(--muted);font-weight:600;margin-top:2px;}
+  .fast-top select{
+    border:2px solid var(--track);border-radius:10px;padding:6px 8px;font-size:12px;font-weight:700;
+    font-family:'Plus Jakarta Sans',sans-serif;color:var(--ink);background:var(--card);flex-shrink:0;
+  }
+  .fast-track{width:100%;height:10px;background:var(--track);border-radius:8px;overflow:hidden;margin-bottom:12px;}
+  .fast-fill{height:100%;background:linear-gradient(90deg,#818CF8,#38BDF8);border-radius:8px;transition:width .4s ease;}
+  .fast-bottom{display:flex;justify-content:space-between;align-items:center;}
+  .fast-time{font-size:20px;font-weight:800;font-variant-numeric:tabular-nums;}
+  .fast-btn{
+    background:linear-gradient(135deg,var(--a1),var(--a2));color:#fff;border:none;
+    font-weight:800;font-size:12.5px;padding:10px 16px;border-radius:12px;cursor:pointer;
+  }
+  .fast-btn.stop{background:none;border:2px solid var(--track);color:var(--ink);}
 
   .water-card{
     background:var(--card);border-radius:22px;box-shadow:var(--shadow-soft);
@@ -481,6 +511,14 @@
     </select>
   </div>
 
+  <div class="onboard-field">
+    <label>Praticas ou queres praticar jejum intermitente?</label>
+    <select id="onFasting">
+      <option value="no" selected>Não</option>
+      <option value="yes">Sim</option>
+    </select>
+  </div>
+
   <button class="onboard-skip" id="onboardSuggestBtn" style="border:2px solid var(--track);border-radius:14px;color:var(--ink);margin-bottom:10px;">Sugerir meta de calorias</button>
 
   <div class="onboard-field">
@@ -566,6 +604,26 @@
         <span class="chip" id="totSodiumChip">Sódio <span id="totSodium">0mg</span></span>
       </div>
     </div>
+
+  <div class="fast-card" style="display:none;">
+    <div class="fast-top">
+      <div>
+        <div class="fast-title">⏱️ Jejum intermitente</div>
+        <div class="fast-status" id="fastStatus">Sem jejum ativo</div>
+      </div>
+      <select id="fastPlanSelect">
+        <option value="14">14:10</option>
+        <option value="16" selected>16:8</option>
+        <option value="18">18:6</option>
+        <option value="20">20:4</option>
+      </select>
+    </div>
+    <div class="fast-track"><div class="fast-fill" id="fastFill" style="width:0%;"></div></div>
+    <div class="fast-bottom">
+      <span class="fast-time" id="fastTime">00:00</span>
+      <button class="fast-btn" id="fastToggleBtn">Iniciar jejum</button>
+    </div>
+  </div>
 
   <div class="water-card">
     <div class="water-top">
@@ -678,6 +736,9 @@
       </div>
       <input type="text" id="foodName" class="edit-name" placeholder="Nome do prato">
       <div class="result-desc" id="foodDesc">—</div>
+      <div class="health-badge" id="healthBadge" style="display:none;">
+        <span class="health-heart">♥</span> Health Score <b id="healthScoreVal">—</b>/10
+      </div>
       <div class="result-cal"><span class="n" id="calNum">0</span><span class="u">kcal (total)</span></div>
       <div class="items-list" id="itemsList"></div>
       <button class="link-btn" id="addItemBtn" style="display:block;margin:0 auto 10px;">+ Adicionar alimento em falta</button>
@@ -715,6 +776,11 @@
         <option value="auto">Automático (segue o telemóvel)</option>
         <option value="light">Claro</option>
         <option value="dark">Escuro</option>
+      </select>
+      <label style="display:block;margin-top:16px;">Jejum intermitente</label>
+      <select id="fastingEnabledInput" style="width:100%;margin-top:8px;font-size:15px;font-weight:700;border:2px solid var(--track);border-radius:14px;padding:12px 14px;font-family:'Plus Jakarta Sans',sans-serif;color:var(--ink);">
+        <option value="no">Não mostrar</option>
+        <option value="yes">Mostrar</option>
       </select>
       <button class="goal-save" id="goalSaveBtn">Guardar</button>
     </div>
@@ -962,6 +1028,7 @@ async function init(){
   applyTheme();
   await loadDay();
   render();
+  startFastingTicker();
   if(!settings.onboarded){
     document.getElementById('onboardOverlay').classList.remove('hide');
   }
@@ -1016,6 +1083,7 @@ document.getElementById('onboardStartBtn').addEventListener('click', async ()=>{
   settings.activity = document.getElementById('onActivity').value;
   settings.goal = (!isNaN(g) && g > 0) ? g : 2000;
   settings.objective = document.getElementById('onObjective').value;
+  settings.fastingEnabled = document.getElementById('onFasting').value === 'yes';
   settings.onboarded = true;
   logWeight(settings.weight);
   await saveSettings();
@@ -1034,6 +1102,8 @@ async function loadSettings(){
     const raw = localStorage.getItem('settings');
     if(raw){ settings = JSON.parse(raw); }
   }catch(e){ /* ainda não definido, usa valor por omissão */ }
+  if(!settings.fasting) settings.fasting = { plan: 16, active: false, startTime: null };
+  if(typeof settings.fastingEnabled !== 'boolean') settings.fastingEnabled = false;
 }
 async function saveSettings(){
   try{ localStorage.setItem('settings', JSON.stringify(settings)); }
@@ -1101,6 +1171,7 @@ function render(){
   renderWeekChart();
   renderWater();
   renderExercise();
+  renderFasting();
   const t = totals();
   const exerciseBurned = (dayData.exercise||[]).reduce((s,ex)=> s + (Number(ex.calories)||0), 0);
   const goal = (Number(settings.goal)||2000) + exerciseBurned;
@@ -1151,13 +1222,15 @@ function render(){
     const item = document.createElement('div');
     item.className = 'meal-item';
     item.setAttribute('data-id', m.id);
+    const hs = m.health_score;
+    const hsColor = hs == null ? null : (hs >= 7 ? '#2FA66B' : hs >= 4 ? '#DDA015' : '#D64545');
     item.innerHTML = `
       <div class="meal-emoji">${m.emoji || '🍽️'}</div>
       <div class="meal-mid">
         <div class="meal-name">${escapeHtml(m.name)}</div>
         <div class="meal-time">${m.time || ''}</div>
       </div>
-      <div class="meal-cal">${Math.round(m.calories)} kcal</div>
+      <div class="meal-cal">${Math.round(m.calories)} kcal${hsColor ? `<span class="meal-health-dot" style="background:${hsColor};" title="Health Score ${hs}/10"></span>` : ''}</div>
       <button class="meal-del" data-id="${m.id}" aria-label="Remover">
         <svg viewBox="0 0 24 24" fill="none" stroke="#172016" stroke-width="2.4" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
       </button>
@@ -1180,6 +1253,75 @@ function render(){
     });
   });
 }
+
+function fmtHM(ms){
+  const totalMin = Math.max(0, Math.floor(ms/60000));
+  const h = Math.floor(totalMin/60);
+  const m = totalMin % 60;
+  return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');
+}
+
+function renderFasting(){
+  const fastCard = document.querySelector('.fast-card');
+  fastCard.style.display = settings.fastingEnabled ? 'block' : 'none';
+  if(!settings.fastingEnabled) return;
+  const f = settings.fasting || { plan: 16, active: false, startTime: null };
+  const planSelect = document.getElementById('fastPlanSelect');
+  if(document.activeElement !== planSelect) planSelect.value = f.plan;
+  const btn = document.getElementById('fastToggleBtn');
+  const statusEl = document.getElementById('fastStatus');
+  const timeEl = document.getElementById('fastTime');
+  const fillEl = document.getElementById('fastFill');
+
+  if(f.active && f.startTime){
+    const elapsed = Date.now() - f.startTime;
+    const planMs = f.plan * 3600000;
+    const pct = Math.min(elapsed/planMs, 1) * 100;
+    fillEl.style.width = pct + '%';
+    timeEl.textContent = fmtHM(elapsed);
+    if(elapsed >= planMs){
+      statusEl.textContent = 'Objetivo atingido — podes terminar';
+      fillEl.style.background = 'linear-gradient(90deg,#2FA66B,#38BDF8)';
+    } else {
+      statusEl.textContent = 'A jejuar · meta ' + f.plan + 'h';
+      fillEl.style.background = '';
+    }
+    btn.textContent = 'Terminar jejum';
+    btn.classList.add('stop');
+  } else {
+    fillEl.style.width = '0%';
+    timeEl.textContent = '00:00';
+    statusEl.textContent = 'Sem jejum ativo';
+    btn.textContent = 'Iniciar jejum';
+    btn.classList.remove('stop');
+  }
+}
+
+let fastingInterval = null;
+function startFastingTicker(){
+  if(fastingInterval) clearInterval(fastingInterval);
+  fastingInterval = setInterval(()=>{
+    if(settings.fasting && settings.fasting.active) renderFasting();
+  }, 30000);
+}
+
+document.getElementById('fastPlanSelect').addEventListener('change', async (e)=>{
+  settings.fasting.plan = Number(e.target.value);
+  await saveSettings();
+  renderFasting();
+});
+
+document.getElementById('fastToggleBtn').addEventListener('click', async ()=>{
+  if(settings.fasting.active){
+    settings.fasting.active = false;
+    settings.fasting.startTime = null;
+  } else {
+    settings.fasting.active = true;
+    settings.fasting.startTime = Date.now();
+  }
+  await saveSettings();
+  renderFasting();
+});
 
 function renderWater(){
   const goal = Number(settings.waterGoal) || 2000;
@@ -1624,6 +1766,15 @@ function showResult(d){
     _unit: 'g',
   }));
   renderItems();
+  const badge = document.getElementById('healthBadge');
+  const score = Number(d.health_score);
+  if(score >= 1 && score <= 10){
+    document.getElementById('healthScoreVal').textContent = score;
+    badge.className = 'health-badge' + (score >= 7 ? '' : score >= 4 ? ' mid' : ' low');
+    badge.style.display = 'inline-flex';
+  } else {
+    badge.style.display = 'none';
+  }
   els.resultCard.classList.add('show');
   els.resultCard.scrollIntoView({behavior:'smooth', block:'nearest'});
 }
@@ -1643,6 +1794,7 @@ els.addBtn.addEventListener('click', async ()=>{
     sugar_g: Math.round(t.sugar),
     sodium_mg: Math.round(t.sodium),
     emoji: pendingResult.emoji || '🍽️',
+    health_score: (Number(pendingResult.health_score) >= 1 && Number(pendingResult.health_score) <= 10) ? Number(pendingResult.health_score) : null,
     time: now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0'),
   };
   dayData.meals.push(meal);
@@ -1748,6 +1900,7 @@ els.gearBtn.addEventListener('click', ()=>{
   els.weightInput.value = settings.weight || '';
   document.getElementById('objectiveInput').value = settings.objective || 'manter';
   document.getElementById('themeInput').value = settings.theme || 'auto';
+  document.getElementById('fastingEnabledInput').value = settings.fastingEnabled ? 'yes' : 'no';
   els.goalOverlay.classList.add('show');
 });
 els.goalOverlay.addEventListener('click', (e)=>{ if(e.target === els.goalOverlay) els.goalOverlay.classList.remove('show'); });
@@ -1758,6 +1911,7 @@ els.goalSaveBtn.addEventListener('click', async ()=>{
   settings.weight = (!isNaN(w) && w > 0) ? w : settings.weight;
   settings.objective = document.getElementById('objectiveInput').value;
   settings.theme = document.getElementById('themeInput').value;
+  settings.fastingEnabled = document.getElementById('fastingEnabledInput').value === 'yes';
   logWeight(settings.weight);
   await saveSettings();
   applyTheme();
