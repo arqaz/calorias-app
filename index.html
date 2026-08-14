@@ -308,7 +308,7 @@
   .splash{
     position:fixed;inset:0;background:var(--bg);z-index:200;
     display:flex;align-items:center;justify-content:center;
-    transition:opacity .4s ease;
+    transition:opacity .6s ease;
   }
   .splash img{width:min(62vw,260px);height:auto;}
   .splash.fade-out{opacity:0;pointer-events:none;}
@@ -1959,9 +1959,9 @@ setTimeout(()=>{
   const splash = document.getElementById('splashScreen');
   if(splash){
     splash.classList.add('fade-out');
-    setTimeout(()=> splash.remove(), 450);
+    setTimeout(()=> splash.remove(), 650);
   }
-}, 1300);
+}, 2200);
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
