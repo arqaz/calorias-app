@@ -1,6 +1,6 @@
 {
-  "name": "Prato → Calorias",
-  "short_name": "Calorias",
+  "name": "Trinca",
+  "short_name": "Trinca",
   "description": "Estima calorias a partir de uma foto do prato e mantém um registo diário",
   "start_url": "/",
   "display": "standalone",

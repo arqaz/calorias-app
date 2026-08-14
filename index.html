@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Prato → Calorias</title>
+<title>Trinca</title>
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#FF3D68">
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
@@ -57,6 +57,8 @@
   .app{max-width:480px;margin:0 auto;padding:20px 16px 0;}
 
   .header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;}
+  .brand-row{display:flex;align-items:center;gap:10px;}
+  .brand-mark{width:34px;height:34px;border-radius:9px;flex-shrink:0;}
   .tabbar{display:flex;background:var(--track);border-radius:14px;padding:4px;margin-bottom:20px;gap:4px;}
   .tab-btn{
     flex:1;border:none;background:none;padding:10px;border-radius:11px;
@@ -311,6 +313,7 @@
   }
   .onboard-overlay.hide{display:none;}
   .onboard-emoji{font-size:44px;margin-bottom:6px;}
+  .onboard-logo{width:58px;height:58px;border-radius:16px;margin-bottom:10px;}
   .onboard-title{font-size:26px;font-weight:800;letter-spacing:-.01em;margin-bottom:6px;}
   .onboard-sub{font-size:13.5px;color:var(--muted);font-weight:500;margin-bottom:26px;line-height:1.5;}
   .onboard-field{margin-bottom:18px;}
@@ -464,8 +467,8 @@
 </head>
 <body>
 <div class="onboard-overlay hide" id="onboardOverlay">
-  <div class="onboard-emoji">🍽️</div>
-  <div class="onboard-title">Bem-vindo</div>
+  <img src="/icons/icon-192.png" alt="Trinca" class="onboard-logo">
+  <div class="onboard-title">Bem-vindo ao Trinca</div>
   <div class="onboard-sub">Antes de começares, define alguns dados básicos. Podes alterá-los sempre que quiseres nas definições (ícone da engrenagem).</div>
 
   <div class="onboard-field">
@@ -532,9 +535,12 @@
 
 <div class="app">
   <div class="header">
-    <div>
-      <div class="greeting">O teu registo</div>
-      <div class="datebig" id="dateBig">—</div>
+    <div class="brand-row">
+      <img src="/icons/icon-192.png" alt="Trinca" class="brand-mark">
+      <div>
+        <div class="greeting">O teu registo</div>
+        <div class="datebig" id="dateBig">—</div>
+      </div>
     </div>
     <button class="gear" id="gearBtn" aria-label="Definir meta">
       <svg viewBox="0 0 24 24" fill="none" stroke="#172016" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
