@@ -36,9 +36,15 @@ Responde APENAS com um objeto JSON válido, sem markdown, sem texto antes ou dep
     }
   ],
   "confidence": "alta" | "média" | "baixa",
-  "emoji": "um único emoji que represente o prato"
+  "emoji": "um único emoji que represente o prato",
+  "crop_box": {
+    "x": número entre 0 e 1 (posição horizontal do canto superior esquerdo da caixa que envolve o prato/comida, como fração da largura da imagem),
+    "y": número entre 0 e 1 (posição vertical do canto superior esquerdo, como fração da altura da imagem),
+    "width": número entre 0 e 1 (largura da caixa, como fração da largura da imagem),
+    "height": número entre 0 e 1 (altura da caixa, como fração da altura da imagem)
+  }
 }
-Lista cada alimento separadamente (não agregues tudo num só item), no máximo 6 itens. Se não conseguires identificar comida na imagem, devolve "items" como um array vazio e food_name como "Não foi possível identificar".`;
+Lista cada alimento separadamente (não agregues tudo num só item), no máximo 6 itens. O "crop_box" deve enquadrar apertadamente o prato/comida, excluindo o máximo possível de mesa, toalha ou fundo à volta. Se não conseguires identificar comida na imagem, devolve "items" como um array vazio, food_name como "Não foi possível identificar", e "crop_box" com x:0, y:0, width:1, height:1.`;
 
   try {
     const model = 'gemini-flash-latest';
