@@ -316,6 +316,33 @@
   .history-item .hd-cal{font-size:15px;font-weight:800;color:var(--a2);}
   .history-item .hd-cal.over{color:#D64545;}
 
+  .water-card{
+    background:var(--card);border-radius:22px;box-shadow:var(--shadow);
+    padding:16px 18px;margin-bottom:16px;
+  }
+  .water-top{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+  .water-emoji{font-size:24px;}
+  .water-info{flex:1;}
+  .water-title{font-size:12.5px;font-weight:700;color:var(--muted);}
+  .water-amount{font-size:16px;font-weight:800;margin-top:1px;}
+  .water-reset{background:none;border:none;color:var(--muted);font-size:11px;font-weight:600;text-decoration:underline;cursor:pointer;}
+  .water-track{width:100%;height:10px;background:var(--track);border-radius:8px;overflow:hidden;margin-bottom:12px;}
+  .water-fill{height:100%;background:linear-gradient(90deg,#38BDF8,#818CF8);border-radius:8px;transition:width .4s ease;}
+  .water-btns{display:flex;gap:10px;}
+  .water-btn{
+    flex:1;background:var(--fresh-soft);color:var(--fresh);border:none;font-weight:800;font-size:13px;
+    padding:11px;border-radius:12px;cursor:pointer;
+  }
+
+  .exercise-item{
+    background:var(--card);border-radius:16px;box-shadow:var(--shadow);
+    padding:12px 14px;display:flex;align-items:center;gap:10px;margin-bottom:9px;
+  }
+  .exercise-emoji{font-size:19px;flex-shrink:0;}
+  .exercise-mid{flex:1;min-width:0;}
+  .exercise-name{font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .exercise-cal{font-size:14px;font-weight:800;color:var(--fresh);white-space:nowrap;}
+
   .week-card{
     background:var(--card);border-radius:22px;box-shadow:var(--shadow);
     padding:16px 18px 14px;margin-bottom:18px;
@@ -455,9 +482,33 @@
         <div class="macro-row"><span class="macro-dot" style="background:#2FA66B;"></span>Proteína<span class="macro-val" id="totProtein">0g</span></div>
         <div class="macro-row"><span class="macro-dot" style="background:#FF7A45;"></span>Hidratos<span class="macro-val" id="totCarbs">0g</span></div>
         <div class="macro-row"><span class="macro-dot" style="background:#FF3D68;"></span>Gordura<span class="macro-val" id="totFat">0g</span></div>
+        <div class="macro-row"><span class="macro-dot" style="background:#A78BFA;"></span>Açúcar<span class="macro-val" id="totSugar">0g</span></div>
+        <div class="macro-row"><span class="macro-dot" style="background:#38BDF8;"></span>Sódio<span class="macro-val" id="totSodium">0mg</span></div>
       </div>
     </div>
   </div>
+
+  <div class="water-card">
+    <div class="water-top">
+      <div class="water-emoji">💧</div>
+      <div class="water-info">
+        <div class="water-title">Água</div>
+        <div class="water-amount"><span id="waterCurrent">0</span> / <span id="waterGoalTxt">2000</span> ml</div>
+      </div>
+      <button class="water-reset" id="waterResetBtn">reiniciar</button>
+    </div>
+    <div class="water-track"><div class="water-fill" id="waterFill" style="width:0%;"></div></div>
+    <div class="water-btns">
+      <button class="water-btn" id="water250Btn">+ 250ml</button>
+      <button class="water-btn" id="water500Btn">+ 500ml</button>
+    </div>
+  </div>
+
+  <div class="section-title" style="margin-top:0;">
+    <span>Exercício</span>
+    <button class="clear-link" id="addExerciseLink">+ adicionar</button>
+  </div>
+  <div id="exerciseList"></div>
 
   <div class="week-card">
     <div class="week-title">Últimos 7 dias</div>
@@ -525,6 +576,8 @@
         <span class="chip" id="chipProtein">Proteína — g</span>
         <span class="chip" id="chipCarbs">Hidratos — g</span>
         <span class="chip" id="chipFat">Gordura — g</span>
+        <span class="chip" id="chipSugar">Açúcar — g</span>
+        <span class="chip" id="chipSodium">Sódio — mg</span>
       </div>
       <button class="add-btn" id="addBtn">Adicionar ao registo de hoje</button>
       <button class="discard-btn" id="discardBtn">Descartar</button>
@@ -557,6 +610,10 @@
   <div class="sheet">
     <div class="sheet-handle"></div>
     <div class="sheet-title">Histórico</div>
+    <div class="week-card" id="weightCard" style="display:none;">
+      <div class="week-title">Peso (kg)</div>
+      <div class="week-bars" id="weightBars"></div>
+    </div>
     <div id="historyList"></div>
   </div>
 </div>
@@ -575,8 +632,26 @@
         <div class="macro-edit"><label>Hidratos (g)</label><input type="number" id="editCarbs" inputmode="numeric"></div>
         <div class="macro-edit"><label>Gordura (g)</label><input type="number" id="editFat" inputmode="numeric"></div>
       </div>
+      <div class="macro-edit-grid" style="margin-top:10px;">
+        <div class="macro-edit"><label>Açúcar (g)</label><input type="number" id="editSugar" inputmode="numeric"></div>
+        <div class="macro-edit"><label>Sódio (mg)</label><input type="number" id="editSodium" inputmode="numeric"></div>
+      </div>
       <button class="add-btn" id="editSaveBtn" style="margin-top:16px;">Guardar alterações</button>
       <button class="discard-btn" id="editDeleteBtn" style="color:#D64545;">Eliminar refeição</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="exerciseOverlay">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Adicionar exercício</div>
+    <div class="manual-form">
+      <label>Nome do exercício</label>
+      <input type="text" id="exName" placeholder="ex: Corrida, Ginásio">
+      <label>Calorias queimadas (kcal)</label>
+      <input type="number" id="exCal" inputmode="numeric" placeholder="0">
+      <button class="add-btn" id="exAddBtn" style="margin-top:16px;">Adicionar</button>
     </div>
   </div>
 </div>
@@ -606,6 +681,8 @@ const els = {
   totProtein: document.getElementById('totProtein'),
   totCarbs: document.getElementById('totCarbs'),
   totFat: document.getElementById('totFat'),
+  totSugar: document.getElementById('totSugar'),
+  totSodium: document.getElementById('totSodium'),
   mealList: document.getElementById('mealList'),
   clearLink: document.getElementById('clearLink'),
   fabBtn: document.getElementById('fabBtn'),
@@ -627,6 +704,8 @@ const els = {
   chipProtein: document.getElementById('chipProtein'),
   chipCarbs: document.getElementById('chipCarbs'),
   chipFat: document.getElementById('chipFat'),
+  chipSugar: document.getElementById('chipSugar'),
+  chipSodium: document.getElementById('chipSodium'),
   addBtn: document.getElementById('addBtn'),
   discardBtn: document.getElementById('discardBtn'),
   goalInput: document.getElementById('goalInput'),
@@ -655,6 +734,22 @@ const els = {
   editProtein: document.getElementById('editProtein'),
   editCarbs: document.getElementById('editCarbs'),
   editFat: document.getElementById('editFat'),
+  editSugar: document.getElementById('editSugar'),
+  editSodium: document.getElementById('editSodium'),
+  waterCurrent: document.getElementById('waterCurrent'),
+  waterGoalTxt: document.getElementById('waterGoalTxt'),
+  waterFill: document.getElementById('waterFill'),
+  waterResetBtn: document.getElementById('waterResetBtn'),
+  water250Btn: document.getElementById('water250Btn'),
+  water500Btn: document.getElementById('water500Btn'),
+  exerciseList: document.getElementById('exerciseList'),
+  addExerciseLink: document.getElementById('addExerciseLink'),
+  exerciseOverlay: document.getElementById('exerciseOverlay'),
+  exName: document.getElementById('exName'),
+  exCal: document.getElementById('exCal'),
+  exAddBtn: document.getElementById('exAddBtn'),
+  weightCard: document.getElementById('weightCard'),
+  weightBars: document.getElementById('weightBars'),
   editSaveBtn: document.getElementById('editSaveBtn'),
   editDeleteBtn: document.getElementById('editDeleteBtn'),
 };
@@ -741,6 +836,7 @@ function renderHistory(){
 
 els.historyLink.addEventListener('click', ()=>{
   renderHistory();
+  renderWeightChart();
   els.historyOverlay.classList.add('show');
 });
 els.historyOverlay.addEventListener('click', (e)=>{ if(e.target === els.historyOverlay) els.historyOverlay.classList.remove('show'); });
@@ -787,6 +883,12 @@ document.getElementById('onboardSuggestBtn').addEventListener('click', ()=>{
   }
 });
 
+function logWeight(weight){
+  if(!weight) return;
+  if(!settings.weightHistory) settings.weightHistory = {};
+  settings.weightHistory[todayStr()] = weight;
+}
+
 document.getElementById('onboardStartBtn').addEventListener('click', async ()=>{
   const w = parseFloat(document.getElementById('onWeight').value);
   const h = parseFloat(document.getElementById('onHeight').value);
@@ -800,6 +902,7 @@ document.getElementById('onboardStartBtn').addEventListener('click', async ()=>{
   settings.goal = (!isNaN(g) && g > 0) ? g : 2000;
   settings.objective = document.getElementById('onObjective').value;
   settings.onboarded = true;
+  logWeight(settings.weight);
   await saveSettings();
   render();
   finishOnboarding();
@@ -826,6 +929,9 @@ async function loadDay(){
     const raw = localStorage.getItem(dayKey(currentDate));
     dayData = raw ? JSON.parse(raw) : { meals: [] };
   }catch(e){ dayData = { meals: [] }; }
+  if(!Array.isArray(dayData.meals)) dayData.meals = [];
+  if(!Array.isArray(dayData.exercise)) dayData.exercise = [];
+  if(typeof dayData.water_ml !== 'number') dayData.water_ml = 0;
 }
 async function saveDay(){
   try{ localStorage.setItem(dayKey(currentDate), JSON.stringify(dayData)); }
@@ -838,14 +944,19 @@ function totals(){
     acc.protein += Number(m.protein_g)||0;
     acc.carbs += Number(m.carbs_g)||0;
     acc.fat += Number(m.fat_g)||0;
+    acc.sugar += Number(m.sugar_g)||0;
+    acc.sodium += Number(m.sodium_mg)||0;
     return acc;
-  }, {cal:0, protein:0, carbs:0, fat:0});
+  }, {cal:0, protein:0, carbs:0, fat:0, sugar:0, sodium:0});
 }
 
 function render(){
   renderWeekChart();
+  renderWater();
+  renderExercise();
   const t = totals();
-  const goal = Number(settings.goal)||2000;
+  const exerciseBurned = (dayData.exercise||[]).reduce((s,ex)=> s + (Number(ex.calories)||0), 0);
+  const goal = (Number(settings.goal)||2000) + exerciseBurned;
   const pct = Math.min(t.cal / goal, 1);
   const offset = CIRC * (1 - pct);
   els.ringProgress.style.transition = 'stroke-dashoffset .6s ease';
@@ -859,11 +970,13 @@ function render(){
   } else {
     els.goalRemainNum.textContent = Math.round(remain);
     els.goalRemainNum.style.color = '';
-    els.goalRemainLabel.textContent = 'kcal restantes';
+    els.goalRemainLabel.textContent = exerciseBurned > 0 ? ('kcal restantes (+' + exerciseBurned + ' do exercício)') : 'kcal restantes';
   }
   els.totProtein.textContent = Math.round(t.protein)+'g';
   els.totCarbs.textContent = Math.round(t.carbs)+'g';
   els.totFat.textContent = Math.round(t.fat)+'g';
+  els.totSugar.textContent = Math.round(t.sugar)+'g';
+  els.totSodium.textContent = Math.round(t.sodium)+'mg';
 
   els.mealList.innerHTML = '';
   if(dayData.meals.length === 0){
@@ -911,6 +1024,73 @@ function render(){
   });
 }
 
+function renderWater(){
+  const goal = Number(settings.waterGoal) || 2000;
+  const current = Number(dayData.water_ml) || 0;
+  els.waterCurrent.textContent = current;
+  els.waterGoalTxt.textContent = goal;
+  els.waterFill.style.width = Math.min((current/goal)*100, 100) + '%';
+}
+
+async function addWater(ml){
+  dayData.water_ml = Math.max(0, (Number(dayData.water_ml)||0) + ml);
+  await saveDay();
+  renderWater();
+}
+
+els.water250Btn.addEventListener('click', ()=> addWater(250));
+els.water500Btn.addEventListener('click', ()=> addWater(500));
+els.waterResetBtn.addEventListener('click', async ()=>{
+  dayData.water_ml = 0;
+  await saveDay();
+  renderWater();
+});
+
+function renderExercise(){
+  els.exerciseList.innerHTML = '';
+  const list = dayData.exercise || [];
+  if(list.length === 0){
+    els.exerciseList.innerHTML = '<div class="items-empty">Sem exercício registado hoje.</div>';
+    return;
+  }
+  list.slice().reverse().forEach(ex=>{
+    const row = document.createElement('div');
+    row.className = 'exercise-item';
+    row.innerHTML = `
+      <div class="exercise-emoji">🔥</div>
+      <div class="exercise-mid"><div class="exercise-name">${escapeHtml(ex.name)}</div></div>
+      <div class="exercise-cal">-${Math.round(ex.calories)} kcal</div>
+      <button class="meal-del" data-id="${ex.id}" aria-label="Remover">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#172016" stroke-width="2.4" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    `;
+    els.exerciseList.appendChild(row);
+  });
+  els.exerciseList.querySelectorAll('.meal-del').forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      const id = btn.getAttribute('data-id');
+      dayData.exercise = dayData.exercise.filter(ex => String(ex.id) !== String(id));
+      await saveDay();
+      render();
+    });
+  });
+}
+
+els.addExerciseLink.addEventListener('click', ()=>{
+  els.exName.value = '';
+  els.exCal.value = '';
+  els.exerciseOverlay.classList.add('show');
+});
+els.exerciseOverlay.addEventListener('click', (e)=>{ if(e.target === els.exerciseOverlay) els.exerciseOverlay.classList.remove('show'); });
+els.exAddBtn.addEventListener('click', async ()=>{
+  const name = els.exName.value.trim();
+  if(!name){ els.exName.focus(); return; }
+  dayData.exercise.push({ id: Date.now(), name, calories: Number(els.exCal.value) || 0 });
+  await saveDay();
+  render();
+  els.exerciseOverlay.classList.remove('show');
+});
+
 function escapeHtml(s){
   const d = document.createElement('div');
   d.textContent = s || '';
@@ -938,6 +1118,8 @@ function openEditMeal(id){
   els.editProtein.value = meal.protein_g || 0;
   els.editCarbs.value = meal.carbs_g || 0;
   els.editFat.value = meal.fat_g || 0;
+  els.editSugar.value = meal.sugar_g || 0;
+  els.editSodium.value = meal.sodium_mg || 0;
   els.editMealOverlay.classList.add('show');
 }
 els.editMealOverlay.addEventListener('click', (e)=>{ if(e.target === els.editMealOverlay) els.editMealOverlay.classList.remove('show'); });
@@ -951,6 +1133,8 @@ els.editSaveBtn.addEventListener('click', async ()=>{
   meal.protein_g = Number(els.editProtein.value) || 0;
   meal.carbs_g = Number(els.editCarbs.value) || 0;
   meal.fat_g = Number(els.editFat.value) || 0;
+  meal.sugar_g = Number(els.editSugar.value) || 0;
+  meal.sodium_mg = Number(els.editSodium.value) || 0;
   await saveDay();
   render();
   els.editMealOverlay.classList.remove('show');
@@ -1073,6 +1257,8 @@ function statsForItem(item){
       carbs: Number(item._carbs) || 0,
       fat: Number(item._fat) || 0,
       fiber: 0,
+      sugar: 0,
+      sodium: 0,
     };
   }
   const g = gramsForItem(item);
@@ -1084,6 +1270,8 @@ function statsForItem(item){
     carbs: f * (Number(item.carbs_per_100g)||0),
     fat: f * (Number(item.fat_per_100g)||0),
     fiber: f * (Number(item.fiber_per_100g)||0),
+    sugar: f * (Number(item.sugar_per_100g)||0),
+    sodium: f * (Number(item.sodium_per_100g_mg)||0),
   };
 }
 
@@ -1206,8 +1394,10 @@ function computeTotals(){
     acc.carbs += st.carbs;
     acc.fat += st.fat;
     acc.fiber += st.fiber;
+    acc.sugar += st.sugar;
+    acc.sodium += st.sodium;
     return acc;
-  }, {calories:0, protein:0, carbs:0, fat:0, fiber:0});
+  }, {calories:0, protein:0, carbs:0, fat:0, fiber:0, sugar:0, sodium:0});
 }
 
 function updateTotalsDisplay(){
@@ -1216,6 +1406,8 @@ function updateTotalsDisplay(){
   els.chipProtein.textContent = 'Proteína ' + Math.round(t.protein) + 'g';
   els.chipCarbs.textContent = 'Hidratos ' + Math.round(t.carbs) + 'g';
   els.chipFat.textContent = 'Gordura ' + Math.round(t.fat) + 'g';
+  els.chipSugar.textContent = 'Açúcar ' + Math.round(t.sugar) + 'g';
+  els.chipSodium.textContent = 'Sódio ' + Math.round(t.sodium) + 'mg';
 }
 
 function showResult(d){
@@ -1243,6 +1435,8 @@ els.addBtn.addEventListener('click', async ()=>{
     carbs_g: Math.round(t.carbs),
     fat_g: Math.round(t.fat),
     fiber_g: Math.round(t.fiber),
+    sugar_g: Math.round(t.sugar),
+    sodium_mg: Math.round(t.sodium),
     emoji: pendingResult.emoji || '🍽️',
     time: now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0'),
   };
@@ -1283,6 +1477,37 @@ els.manualAddBtn.addEventListener('click', async ()=>{
   render();
   closeScan();
 });
+
+function renderWeightChart(){
+  const history = settings.weightHistory || {};
+  const dates = Object.keys(history).sort();
+  if(dates.length === 0){
+    els.weightCard.style.display = 'none';
+    return;
+  }
+  els.weightCard.style.display = 'block';
+  const recentDates = dates.slice(-8);
+  const values = recentDates.map(ds => Number(history[ds]) || 0);
+  const minVal = Math.min(...values);
+  const maxVal = Math.max(...values);
+  const range = Math.max(maxVal - minVal, 1);
+  els.weightBars.innerHTML = '';
+  recentDates.forEach((ds, i)=>{
+    const v = values[i];
+    const pct = 15 + ((v - minVal) / range) * 85;
+    const d = new Date(ds+'T00:00:00');
+    const label = d.toLocaleDateString('pt-PT',{day:'2-digit', month:'2-digit'});
+    const isLast = i === recentDates.length - 1;
+    const col = document.createElement('div');
+    col.className = 'week-bar-col';
+    col.title = fmtDateBig(ds) + ': ' + v + ' kg';
+    col.innerHTML = `
+      <div class="week-bar-track"><div class="week-bar-fill" style="height:${pct}%;background:linear-gradient(180deg,#818CF8,#38BDF8);"></div></div>
+      <div class="week-bar-label ${isLast?'active':''}">${label}</div>
+    `;
+    els.weightBars.appendChild(col);
+  });
+}
 
 function renderWeekChart(){
   const anchor = todayStr();
@@ -1326,6 +1551,7 @@ els.goalSaveBtn.addEventListener('click', async ()=>{
   const w = parseFloat(els.weightInput.value);
   settings.weight = (!isNaN(w) && w > 0) ? w : settings.weight;
   settings.objective = document.getElementById('objectiveInput').value;
+  logWeight(settings.weight);
   await saveSettings();
   render();
   els.goalOverlay.classList.remove('show');
