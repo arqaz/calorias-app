@@ -37,6 +37,7 @@ Responde APENAS com um objeto JSON válido, sem markdown, sem texto antes ou dep
   ],
   "confidence": "alta" | "média" | "baixa",
   "emoji": "um único emoji que represente o prato",
+  "health_score": número inteiro de 1 a 10 (qualidade nutricional geral do prato: considera densidade nutricional, equilíbrio de macros, nível de processamento, açúcar e sódio; 10 = muito saudável, 1 = pouco saudável),
   "crop_box": {
     "x": número entre 0 e 1 (posição horizontal do canto superior esquerdo da caixa que envolve o prato/comida, como fração da largura da imagem),
     "y": número entre 0 e 1 (posição vertical do canto superior esquerdo, como fração da altura da imagem),
