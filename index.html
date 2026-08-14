@@ -21,7 +21,8 @@
     --fresh:#2FA66B;
     --fresh-soft:#E4F3EA;
     --track:#E9EEE1;
-    --shadow: 0 10px 30px rgba(23,32,22,.08);
+    --shadow: 0 10px 30px rgba(23,32,22,.07);
+    --shadow-soft: 0 4px 14px rgba(23,32,22,.05);
     --radius: 22px;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
@@ -31,11 +32,63 @@
     color:var(--ink);
     font-family:'Plus Jakarta Sans',system-ui,sans-serif;
     min-height:100vh;
-    padding-bottom:110px;
+    padding-bottom:96px;
   }
   .app{max-width:480px;margin:0 auto;padding:20px 16px 0;}
 
   .header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;}
+  .tabbar{display:flex;background:var(--track);border-radius:14px;padding:4px;margin-bottom:20px;gap:4px;}
+  .tab-btn{
+    flex:1;border:none;background:none;padding:10px;border-radius:11px;
+    font-weight:800;font-size:13.5px;color:var(--muted);cursor:pointer;
+    font-family:'Plus Jakarta Sans',sans-serif;transition:background .15s ease,color .15s ease;
+  }
+  .tab-btn.active{background:var(--card);color:var(--ink);box-shadow:0 3px 10px rgba(23,32,22,.08);}
+
+  .day-strip{display:flex;justify-content:space-between;gap:6px;margin-bottom:20px;}
+  .day-pill{
+    flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;
+    padding:9px 0;border-radius:14px;border:none;background:var(--card);box-shadow:var(--shadow-soft);
+    cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;position:relative;
+  }
+  .day-pill .dow{font-size:10px;font-weight:700;color:var(--muted);text-transform:capitalize;}
+  .day-pill .dom{font-size:14px;font-weight:800;color:var(--ink);}
+  .day-pill.selected{background:linear-gradient(135deg,var(--a1),var(--a2));}
+  .day-pill.selected .dow, .day-pill.selected .dom{color:#fff;}
+  .day-pill .dot{width:4px;height:4px;border-radius:50%;background:var(--a2);position:absolute;bottom:5px;}
+  .day-pill.selected .dot{background:#fff;}
+
+  .bottom-nav{
+    position:fixed;left:0;right:0;bottom:0;
+    background:var(--card);border-top:1px solid var(--track);
+    display:flex;align-items:center;justify-content:space-around;
+    padding:10px 18px calc(10px + env(safe-area-inset-bottom));
+    z-index:45;
+  }
+  .nav-btn{
+    background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:3px;
+    color:var(--muted-soft);font-size:10.5px;font-weight:700;cursor:pointer;
+    font-family:'Plus Jakarta Sans',sans-serif;padding:4px 10px;
+  }
+  .nav-btn svg{width:22px;height:22px;}
+  .nav-btn.active{color:var(--a2);}
+  .nav-cam{
+    width:54px;height:54px;border-radius:50%;flex-shrink:0;
+    background:linear-gradient(135deg,var(--a1),var(--a2));border:none;
+    display:flex;align-items:center;justify-content:center;cursor:pointer;
+    box-shadow:0 8px 18px rgba(255,61,104,.35);margin-top:-26px;
+    border:4px solid var(--bg);
+  }
+  .nav-cam svg{width:22px;height:22px;}
+
+  .ring-caption{text-align:center;font-size:12px;color:var(--muted);font-weight:600;margin-top:10px;}
+  .macro-rings{display:flex;justify-content:space-around;margin-top:20px;}
+  .macro-ring-col{display:flex;flex-direction:column;align-items:center;gap:5px;}
+  .macro-ring-wrap{position:relative;width:62px;height:62px;}
+  .macro-ring-wrap svg{position:absolute;top:0;left:0;}
+  .macro-ring-emoji{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:20px;}
+  .macro-ring-val{font-size:13px;font-weight:800;margin-top:2px;}
+  .macro-ring-label{font-size:10.5px;color:var(--muted);font-weight:600;}
   .greeting{font-size:13px;color:var(--muted);font-weight:600;letter-spacing:.01em;}
   .datebig{font-size:26px;font-weight:800;letter-spacing:-.01em;margin-top:2px;text-transform:capitalize;}
   .gear{
@@ -52,28 +105,18 @@
     box-shadow:var(--shadow);
     padding:26px 20px 22px;
     display:flex;
+    flex-direction:column;
     align-items:center;
-    gap:18px;
     margin-bottom:18px;
   }
-  .ring-wrap{position:relative;width:132px;height:132px;flex-shrink:0;}
+  .ring-wrap{position:relative;width:150px;height:150px;flex-shrink:0;}
   .ring-wrap svg{transform:rotate(-90deg);}
   .ring-center{
     position:absolute;inset:0;
     display:flex;flex-direction:column;align-items:center;justify-content:center;
   }
-  .ring-num{font-size:28px;font-weight:800;line-height:1;letter-spacing:-.02em;}
-  .ring-unit{font-size:10.5px;color:var(--muted);font-weight:600;margin-top:2px;}
-
-  .ring-info{flex:1;min-width:0;}
-  .ring-label{font-size:12px;color:var(--muted);font-weight:600;margin-bottom:6px;}
-  .ring-goal{font-size:14px;font-weight:700;margin-bottom:12px;}
-  .ring-goal b{color:var(--a2);}
-
-  .macro-mini{display:flex;flex-direction:column;gap:6px;}
-  .macro-row{display:flex;align-items:center;gap:8px;font-size:11.5px;font-weight:600;color:var(--muted);}
-  .macro-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
-  .macro-val{margin-left:auto;color:var(--ink);font-weight:700;}
+  .ring-num{font-size:38px;font-weight:800;line-height:1;letter-spacing:-.02em;}
+  .ring-unit{font-size:11px;color:var(--muted);font-weight:700;margin-top:2px;}
 
   .section-title{
     font-size:16px;font-weight:800;margin:22px 0 12px;
@@ -88,7 +131,7 @@
   .meal-item{
     background:var(--card);
     border-radius:18px;
-    box-shadow:var(--shadow);
+    box-shadow:var(--shadow-soft);
     padding:14px 14px;
     display:flex;align-items:center;gap:12px;
     margin-bottom:10px;
@@ -293,21 +336,8 @@
     padding:10px;cursor:pointer;
   }
 
-  .date-nav{display:flex;align-items:center;gap:8px;}
-  .date-arrow{
-    width:30px;height:30px;border-radius:50%;border:none;background:var(--card);
-    box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;
-  }
-  .date-arrow:disabled{opacity:.35;cursor:default;}
-  .date-arrow svg{width:14px;height:14px;}
-  .today-pill{
-    font-size:10.5px;font-weight:700;color:var(--a2);background:var(--fresh-soft);
-    border:none;padding:3px 9px;border-radius:20px;cursor:pointer;margin-left:6px;
-  }
-  .history-link{font-size:12px;color:var(--muted);font-weight:600;text-decoration:underline;background:none;border:none;cursor:pointer;margin-top:2px;}
-
   .history-item{
-    background:var(--card);border-radius:16px;box-shadow:var(--shadow);
+    background:var(--card);border-radius:16px;box-shadow:var(--shadow-soft);
     padding:13px 15px;display:flex;justify-content:space-between;align-items:center;
     margin-bottom:9px;cursor:pointer;
   }
@@ -317,7 +347,7 @@
   .history-item .hd-cal.over{color:#D64545;}
 
   .water-card{
-    background:var(--card);border-radius:22px;box-shadow:var(--shadow);
+    background:var(--card);border-radius:22px;box-shadow:var(--shadow-soft);
     padding:16px 18px;margin-bottom:16px;
   }
   .water-top{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
@@ -335,7 +365,7 @@
   }
 
   .exercise-item{
-    background:var(--card);border-radius:16px;box-shadow:var(--shadow);
+    background:var(--card);border-radius:16px;box-shadow:var(--shadow-soft);
     padding:12px 14px;display:flex;align-items:center;gap:10px;margin-bottom:9px;
   }
   .exercise-emoji{font-size:19px;flex-shrink:0;}
@@ -441,52 +471,76 @@
   <div class="header">
     <div>
       <div class="greeting">O teu registo</div>
-      <div class="date-nav">
-        <button class="date-arrow" id="prevDayBtn" aria-label="Dia anterior">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#172016" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-        </button>
-        <div class="datebig" id="dateBig">—</div>
-        <button class="date-arrow" id="nextDayBtn" aria-label="Dia seguinte">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#172016" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
-        </button>
-        <button class="today-pill" id="todayPill" style="display:none;">hoje</button>
-      </div>
-      <button class="history-link" id="historyLink">Ver histórico</button>
+      <div class="datebig" id="dateBig">—</div>
     </div>
     <button class="gear" id="gearBtn" aria-label="Definir meta">
       <svg viewBox="0 0 24 24" fill="none" stroke="#172016" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
     </button>
   </div>
 
-  <div class="ring-card">
-    <div class="ring-wrap">
-      <svg width="132" height="132" viewBox="0 0 132 132">
-        <circle cx="66" cy="66" r="56" fill="none" stroke="#E9EEE1" stroke-width="14"/>
-        <circle id="ringProgress" cx="66" cy="66" r="56" fill="none" stroke="url(#grad)" stroke-width="14" stroke-linecap="round" stroke-dasharray="351.86" stroke-dashoffset="351.86"/>
-        <defs>
-          <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#FF7A45"/>
-            <stop offset="100%" stop-color="#FF3D68"/>
-          </linearGradient>
-        </defs>
-      </svg>
-      <div class="ring-center">
-        <div class="ring-num" id="ringNum">0</div>
-        <div class="ring-unit">kcal hoje</div>
+  <div class="day-strip" id="dayStrip"></div>
+
+  <div id="tabHoje">
+    <div class="ring-card">
+      <div class="ring-wrap">
+        <svg width="150" height="150" viewBox="0 0 150 150">
+          <circle cx="75" cy="75" r="64" fill="none" stroke="#E9EEE1" stroke-width="13"/>
+          <circle id="ringProgress" cx="75" cy="75" r="64" fill="none" stroke="url(#grad)" stroke-width="13" stroke-linecap="round" stroke-dasharray="402.1" stroke-dashoffset="402.1"/>
+          <defs>
+            <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#FF7A45"/>
+              <stop offset="100%" stop-color="#FF3D68"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <div class="ring-center">
+          <div class="ring-num" id="goalRemainNum">2000</div>
+          <div class="ring-unit" id="goalRemainLabel">kcal restantes</div>
+        </div>
+      </div>
+      <div class="ring-caption"><span id="ringNum">0</span> kcal consumidas &middot; meta <span id="ringGoalTxt">2000</span> kcal</div>
+
+      <div class="macro-rings">
+        <div class="macro-ring-col">
+          <div class="macro-ring-wrap">
+            <svg width="62" height="62" viewBox="0 0 62 62">
+              <circle cx="31" cy="31" r="26" fill="none" stroke="#E9EEE1" stroke-width="7"/>
+              <circle id="proteinRing" cx="31" cy="31" r="26" fill="none" stroke="#2FA66B" stroke-width="7" stroke-linecap="round" transform="rotate(-90 31 31)"/>
+            </svg>
+            <div class="macro-ring-emoji">🥩</div>
+          </div>
+          <div class="macro-ring-val" id="totProtein">0g</div>
+          <div class="macro-ring-label">Proteína</div>
+        </div>
+        <div class="macro-ring-col">
+          <div class="macro-ring-wrap">
+            <svg width="62" height="62" viewBox="0 0 62 62">
+              <circle cx="31" cy="31" r="26" fill="none" stroke="#E9EEE1" stroke-width="7"/>
+              <circle id="carbsRing" cx="31" cy="31" r="26" fill="none" stroke="#FF7A45" stroke-width="7" stroke-linecap="round" transform="rotate(-90 31 31)"/>
+            </svg>
+            <div class="macro-ring-emoji">🌾</div>
+          </div>
+          <div class="macro-ring-val" id="totCarbs">0g</div>
+          <div class="macro-ring-label">Hidratos</div>
+        </div>
+        <div class="macro-ring-col">
+          <div class="macro-ring-wrap">
+            <svg width="62" height="62" viewBox="0 0 62 62">
+              <circle cx="31" cy="31" r="26" fill="none" stroke="#E9EEE1" stroke-width="7"/>
+              <circle id="fatRing" cx="31" cy="31" r="26" fill="none" stroke="#FF3D68" stroke-width="7" stroke-linecap="round" transform="rotate(-90 31 31)"/>
+            </svg>
+            <div class="macro-ring-emoji">🥑</div>
+          </div>
+          <div class="macro-ring-val" id="totFat">0g</div>
+          <div class="macro-ring-label">Gordura</div>
+        </div>
+      </div>
+
+      <div class="chips" style="justify-content:center;margin-top:14px;">
+        <span class="chip" id="totSugarChip">Açúcar <span id="totSugar">0g</span></span>
+        <span class="chip" id="totSodiumChip">Sódio <span id="totSodium">0mg</span></span>
       </div>
     </div>
-    <div class="ring-info">
-      <div class="ring-label">Meta diária</div>
-      <div class="ring-goal"><b id="goalRemainNum">2000</b> <span id="goalRemainLabel">kcal restantes</span></div>
-      <div class="macro-mini">
-        <div class="macro-row"><span class="macro-dot" style="background:#2FA66B;"></span>Proteína<span class="macro-val" id="totProtein">0g</span></div>
-        <div class="macro-row"><span class="macro-dot" style="background:#FF7A45;"></span>Hidratos<span class="macro-val" id="totCarbs">0g</span></div>
-        <div class="macro-row"><span class="macro-dot" style="background:#FF3D68;"></span>Gordura<span class="macro-val" id="totFat">0g</span></div>
-        <div class="macro-row"><span class="macro-dot" style="background:#A78BFA;"></span>Açúcar<span class="macro-val" id="totSugar">0g</span></div>
-        <div class="macro-row"><span class="macro-dot" style="background:#38BDF8;"></span>Sódio<span class="macro-val" id="totSodium">0mg</span></div>
-      </div>
-    </div>
-  </div>
 
   <div class="water-card">
     <div class="water-top">
@@ -505,25 +559,52 @@
   </div>
 
   <div class="section-title" style="margin-top:0;">
-    <span>Exercício</span>
+    <span>🔥 Exercício</span>
     <button class="clear-link" id="addExerciseLink">+ adicionar</button>
   </div>
   <div id="exerciseList"></div>
 
-  <div class="week-card">
-    <div class="week-title">Últimos 7 dias</div>
-    <div class="week-bars" id="weekBars"></div>
-  </div>
-
   <div class="section-title">
-    <span>Refeições de hoje</span>
+    <span>🍽️ Refeições de hoje</span>
     <button class="clear-link" id="clearLink" style="display:none;">limpar</button>
   </div>
   <div id="mealList"></div>
+  </div>
 
-  <button class="fab" id="fabBtn" aria-label="Adicionar refeição">
+  <div id="tabProgresso" style="display:none;">
+    <div class="week-card">
+      <div class="week-title">📊 Últimos 7 dias</div>
+      <div class="week-bars" id="weekBars"></div>
+    </div>
+
+    <div class="week-card" id="weightCard" style="display:none;">
+      <div class="week-title">⚖️ Peso (kg)</div>
+      <div class="week-bars" id="weightBars"></div>
+    </div>
+
+    <div class="section-title" style="margin-top:0;">
+      <span>Histórico de dias</span>
+    </div>
+    <div id="historyList"></div>
+  </div>
+
+  <button class="fab" id="fabBtn" aria-label="Adicionar refeição" style="display:none;">
     <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
   </button>
+
+  <div class="bottom-nav">
+    <button class="nav-btn active" id="tabBtnHoje">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
+      <span>Hoje</span>
+    </button>
+    <button class="nav-cam" id="navCamBtn" aria-label="Adicionar refeição">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8a2 2 0 0 1 2-2h1.5l1-1.5h7l1 1.5H18a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><circle cx="12" cy="13" r="3.5"/></svg>
+    </button>
+    <button class="nav-btn" id="tabBtnProgresso">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg>
+      <span>Progresso</span>
+    </button>
+  </div>
 </div>
 
 <div class="overlay" id="scanOverlay">
@@ -606,18 +687,6 @@
   </div>
 </div>
 
-<div class="overlay" id="historyOverlay">
-  <div class="sheet">
-    <div class="sheet-handle"></div>
-    <div class="sheet-title">Histórico</div>
-    <div class="week-card" id="weightCard" style="display:none;">
-      <div class="week-title">Peso (kg)</div>
-      <div class="week-bars" id="weightBars"></div>
-    </div>
-    <div id="historyList"></div>
-  </div>
-</div>
-
 <div class="overlay" id="editMealOverlay">
   <div class="sheet">
     <div class="sheet-handle"></div>
@@ -657,8 +726,10 @@
 </div>
 
 <script>
-const RADIUS = 56;
+const RADIUS = 64;
 const CIRC = 2 * Math.PI * RADIUS;
+const MACRO_RADIUS = 26;
+const MACRO_CIRC = 2 * Math.PI * MACRO_RADIUS;
 
 function todayStr(){
   const d = new Date();
@@ -711,11 +782,6 @@ const els = {
   goalInput: document.getElementById('goalInput'),
   weightInput: document.getElementById('weightInput'),
   goalSaveBtn: document.getElementById('goalSaveBtn'),
-  prevDayBtn: document.getElementById('prevDayBtn'),
-  nextDayBtn: document.getElementById('nextDayBtn'),
-  todayPill: document.getElementById('todayPill'),
-  historyLink: document.getElementById('historyLink'),
-  historyOverlay: document.getElementById('historyOverlay'),
   historyList: document.getElementById('historyList'),
   weekBars: document.getElementById('weekBars'),
   manualToggleBtn: document.getElementById('manualToggleBtn'),
@@ -767,26 +833,12 @@ function addDays(ds, delta){
   return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 }
 
-function updateNavState(){
-  const isToday = currentDate === todayStr();
-  els.nextDayBtn.disabled = isToday;
-  els.todayPill.style.display = isToday ? 'none' : 'inline-block';
-}
-
 async function goToDate(ds){
   currentDate = ds;
   els.dateBig.textContent = fmtDateBig(currentDate);
-  updateNavState();
   await loadDay();
   render();
 }
-
-els.prevDayBtn.addEventListener('click', ()=> goToDate(addDays(currentDate, -1)));
-els.nextDayBtn.addEventListener('click', ()=>{
-  if(currentDate === todayStr()) return;
-  goToDate(addDays(currentDate, 1));
-});
-els.todayPill.addEventListener('click', ()=> goToDate(todayStr()));
 
 function getHistoryDays(){
   const days = [];
@@ -827,23 +879,38 @@ function renderHistory(){
       <div class="hd-cal ${over?'over':''}">${Math.round(d.cal)} kcal</div>
     `;
     item.addEventListener('click', ()=>{
-      els.historyOverlay.classList.remove('show');
+      switchTab('hoje');
       goToDate(d.date);
     });
     els.historyList.appendChild(item);
   });
 }
 
-els.historyLink.addEventListener('click', ()=>{
-  renderHistory();
-  renderWeightChart();
-  els.historyOverlay.classList.add('show');
-});
-els.historyOverlay.addEventListener('click', (e)=>{ if(e.target === els.historyOverlay) els.historyOverlay.classList.remove('show'); });
+function switchTab(tab){
+  const tabHoje = document.getElementById('tabHoje');
+  const tabProgresso = document.getElementById('tabProgresso');
+  const btnHoje = document.getElementById('tabBtnHoje');
+  const btnProgresso = document.getElementById('tabBtnProgresso');
+  if(tab === 'progresso'){
+    tabHoje.style.display = 'none';
+    tabProgresso.style.display = 'block';
+    btnHoje.classList.remove('active');
+    btnProgresso.classList.add('active');
+    renderHistory();
+    renderWeightChart();
+  } else {
+    tabHoje.style.display = 'block';
+    tabProgresso.style.display = 'none';
+    btnProgresso.classList.remove('active');
+    btnHoje.classList.add('active');
+  }
+}
+
+document.getElementById('tabBtnHoje').addEventListener('click', ()=> switchTab('hoje'));
+document.getElementById('tabBtnProgresso').addEventListener('click', ()=> switchTab('progresso'));
 
 async function init(){
   els.dateBig.textContent = fmtDateBig(currentDate);
-  updateNavState();
   await loadSettings();
   await loadDay();
   render();
@@ -950,6 +1017,38 @@ function totals(){
   }, {cal:0, protein:0, carbs:0, fat:0, sugar:0, sodium:0});
 }
 
+function fillMacroRing(id, value, target){
+  const el = document.getElementById(id);
+  if(!el) return;
+  if(!el.getAttribute('stroke-dasharray')){
+    el.setAttribute('stroke-dasharray', MACRO_CIRC.toFixed(2));
+  }
+  const pct = Math.min(value / Math.max(target,1), 1);
+  const offset = MACRO_CIRC * (1 - pct);
+  el.style.transition = 'stroke-dashoffset .5s ease';
+  el.setAttribute('stroke-dashoffset', offset.toFixed(2));
+}
+
+function renderDayStrip(){
+  const strip = document.getElementById('dayStrip');
+  strip.innerHTML = '';
+  const anchor = todayStr();
+  const days = [];
+  for(let i=6;i>=0;i--){ days.push(addDays(anchor, -i)); }
+  days.forEach(ds=>{
+    const d = new Date(ds+'T00:00:00');
+    const dow = d.toLocaleDateString('pt-PT',{weekday:'short'}).replace('.','');
+    const dom = d.getDate();
+    const isSelected = ds === currentDate;
+    const isToday = ds === anchor;
+    const btn = document.createElement('button');
+    btn.className = 'day-pill' + (isSelected ? ' selected' : '');
+    btn.innerHTML = `<span class="dow">${dow}</span><span class="dom">${dom}</span>${isToday && !isSelected ? '<span class="dot"></span>' : ''}`;
+    btn.addEventListener('click', ()=> goToDate(ds));
+    strip.appendChild(btn);
+  });
+}
+
 function render(){
   renderWeekChart();
   renderWater();
@@ -977,6 +1076,16 @@ function render(){
   els.totFat.textContent = Math.round(t.fat)+'g';
   els.totSugar.textContent = Math.round(t.sugar)+'g';
   els.totSodium.textContent = Math.round(t.sodium)+'mg';
+  document.getElementById('ringGoalTxt').textContent = Math.round(goal);
+
+  const weight = Number(settings.weight) || 70;
+  const proteinTarget = Math.round(weight * 1.6);
+  const carbsTarget = Math.round((goal * 0.45) / 4);
+  const fatTarget = Math.round((goal * 0.25) / 9);
+  fillMacroRing('proteinRing', t.protein, proteinTarget);
+  fillMacroRing('carbsRing', t.carbs, carbsTarget);
+  fillMacroRing('fatRing', t.fat, fatTarget);
+  renderDayStrip();
 
   els.mealList.innerHTML = '';
   if(dayData.meals.length === 0){
@@ -1151,6 +1260,10 @@ els.editDeleteBtn.addEventListener('click', async ()=>{
 });
 
 els.fabBtn.addEventListener('click', ()=>{
+  resetScan();
+  els.scanOverlay.classList.add('show');
+});
+document.getElementById('navCamBtn').addEventListener('click', ()=>{
   resetScan();
   els.scanOverlay.classList.add('show');
 });
