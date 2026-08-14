@@ -30,7 +30,9 @@ Responde APENAS com um objeto JSON válido, sem markdown, sem texto antes ou dep
       "protein_per_100g": número,
       "carbs_per_100g": número,
       "fat_per_100g": número,
-      "fiber_per_100g": número
+      "fiber_per_100g": número,
+      "sugar_per_100g": número,
+      "sodium_per_100g_mg": número (miligramas de sódio por 100g)
     }
   ],
   "confidence": "alta" | "média" | "baixa",
