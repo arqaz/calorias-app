@@ -25,6 +25,26 @@
     --shadow-soft: 0 4px 14px rgba(23,32,22,.05);
     --radius: 22px;
   }
+  html[data-theme="dark"]{
+    --bg:#14170F;
+    --card:#1E241A;
+    --ink:#F2F5EC;
+    --muted:#98A08F;
+    --muted-soft:#69705F;
+    --fresh-soft:rgba(47,166,107,.20);
+    --track:#2C3324;
+    --shadow: 0 10px 30px rgba(0,0,0,.35);
+    --shadow-soft: 0 4px 14px rgba(0,0,0,.28);
+  }
+  html{background:var(--bg);transition:background .2s ease;}
+  body{transition:background .2s ease,color .2s ease;}
+  .ring-track{stroke:var(--track);transition:stroke .2s ease;}
+  [data-theme="dark"] .dropzone{background:var(--card);}
+  [data-theme="dark"] .goal-edit input,[data-theme="dark"] .manual-form input,
+  [data-theme="dark"] .onboard-field input,[data-theme="dark"] .onboard-field select,
+  [data-theme="dark"] #objectiveInput,[data-theme="dark"] #themeInput{
+    background:var(--card);color:var(--ink);
+  }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html,body{margin:0;padding:0;}
   body{
@@ -242,6 +262,11 @@
   .chip{
     background:var(--fresh-soft);color:var(--fresh);font-size:11.5px;font-weight:700;
     padding:6px 11px;border-radius:20px;
+  }
+  .result-photo-wrap{display:flex;justify-content:center;margin-bottom:14px;}
+  .result-photo-wrap img{
+    width:130px;height:130px;border-radius:50%;object-fit:cover;
+    border:4px solid var(--bg);box-shadow:var(--shadow);
   }
   .edit-name{
     width:100%;font-size:19px;font-weight:800;border:none;border-bottom:2px solid var(--track);
@@ -484,7 +509,7 @@
     <div class="ring-card">
       <div class="ring-wrap">
         <svg width="150" height="150" viewBox="0 0 150 150">
-          <circle cx="75" cy="75" r="64" fill="none" stroke="#E9EEE1" stroke-width="13"/>
+          <circle cx="75" cy="75" r="64" fill="none" class="ring-track" stroke="#E9EEE1" stroke-width="13"/>
           <circle id="ringProgress" cx="75" cy="75" r="64" fill="none" stroke="url(#grad)" stroke-width="13" stroke-linecap="round" stroke-dasharray="402.1" stroke-dashoffset="402.1"/>
           <defs>
             <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -504,7 +529,7 @@
         <div class="macro-ring-col">
           <div class="macro-ring-wrap">
             <svg width="62" height="62" viewBox="0 0 62 62">
-              <circle cx="31" cy="31" r="26" fill="none" stroke="#E9EEE1" stroke-width="7"/>
+              <circle cx="31" cy="31" r="26" fill="none" class="ring-track" stroke="#E9EEE1" stroke-width="7"/>
               <circle id="proteinRing" cx="31" cy="31" r="26" fill="none" stroke="#2FA66B" stroke-width="7" stroke-linecap="round" transform="rotate(-90 31 31)"/>
             </svg>
             <div class="macro-ring-emoji">🥩</div>
@@ -515,7 +540,7 @@
         <div class="macro-ring-col">
           <div class="macro-ring-wrap">
             <svg width="62" height="62" viewBox="0 0 62 62">
-              <circle cx="31" cy="31" r="26" fill="none" stroke="#E9EEE1" stroke-width="7"/>
+              <circle cx="31" cy="31" r="26" fill="none" class="ring-track" stroke="#E9EEE1" stroke-width="7"/>
               <circle id="carbsRing" cx="31" cy="31" r="26" fill="none" stroke="#FF7A45" stroke-width="7" stroke-linecap="round" transform="rotate(-90 31 31)"/>
             </svg>
             <div class="macro-ring-emoji">🌾</div>
@@ -526,7 +551,7 @@
         <div class="macro-ring-col">
           <div class="macro-ring-wrap">
             <svg width="62" height="62" viewBox="0 0 62 62">
-              <circle cx="31" cy="31" r="26" fill="none" stroke="#E9EEE1" stroke-width="7"/>
+              <circle cx="31" cy="31" r="26" fill="none" class="ring-track" stroke="#E9EEE1" stroke-width="7"/>
               <circle id="fatRing" cx="31" cy="31" r="26" fill="none" stroke="#FF3D68" stroke-width="7" stroke-linecap="round" transform="rotate(-90 31 31)"/>
             </svg>
             <div class="macro-ring-emoji">🥑</div>
@@ -648,6 +673,9 @@
     <div id="errorBox" class="error" style="display:none;"></div>
 
     <div class="result-card" id="resultCard">
+      <div class="result-photo-wrap" id="resultPhotoWrap" style="display:none;">
+        <img id="resultPhoto" src="" alt="Prato recortado">
+      </div>
       <input type="text" id="foodName" class="edit-name" placeholder="Nome do prato">
       <div class="result-desc" id="foodDesc">—</div>
       <div class="result-cal"><span class="n" id="calNum">0</span><span class="u">kcal (total)</span></div>
@@ -682,6 +710,12 @@
       <button class="onboard-skip" id="recalcGoalBtn" style="border:2px solid var(--track);border-radius:14px;color:var(--ink);margin-top:14px;width:100%;">Sugerir meta com base nestes dados</button>
       <label style="display:block;margin-top:16px;">Objetivo de calorias (kcal)</label>
       <input type="number" id="goalInput" inputmode="numeric" min="0" step="50">
+      <label style="display:block;margin-top:16px;">Aparência</label>
+      <select id="themeInput" style="width:100%;margin-top:8px;font-size:15px;font-weight:700;border:2px solid var(--track);border-radius:14px;padding:12px 14px;font-family:'Plus Jakarta Sans',sans-serif;color:var(--ink);">
+        <option value="auto">Automático (segue o telemóvel)</option>
+        <option value="light">Claro</option>
+        <option value="dark">Escuro</option>
+      </select>
       <button class="goal-save" id="goalSaveBtn">Guardar</button>
     </div>
   </div>
@@ -909,9 +943,23 @@ function switchTab(tab){
 document.getElementById('tabBtnHoje').addEventListener('click', ()=> switchTab('hoje'));
 document.getElementById('tabBtnProgresso').addEventListener('click', ()=> switchTab('progresso'));
 
+function applyTheme(){
+  const mode = settings.theme || 'auto';
+  const resolved = mode === 'auto'
+    ? (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+    : mode;
+  document.documentElement.setAttribute('data-theme', resolved);
+}
+if(window.matchMedia){
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', ()=>{
+    if((settings.theme || 'auto') === 'auto') applyTheme();
+  });
+}
+
 async function init(){
   els.dateBig.textContent = fmtDateBig(currentDate);
   await loadSettings();
+  applyTheme();
   await loadDay();
   render();
   if(!settings.onboarded){
@@ -1210,6 +1258,48 @@ function escapeAttr(s){
   return (s || '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
+function cropToPlate(cropBox){
+  return new Promise((resolve)=>{
+    const resultPhoto = document.getElementById('resultPhoto');
+    const resultPhotoWrap = document.getElementById('resultPhotoWrap');
+    if(!base64Data || !cropBox){
+      resultPhotoWrap.style.display = 'none';
+      resolve();
+      return;
+    }
+    const img = new Image();
+    img.onload = ()=>{
+      try{
+        const iw = img.width, ih = img.height;
+        let bx = Math.max(0, Math.min(cropBox.x||0, 1));
+        let by = Math.max(0, Math.min(cropBox.y||0, 1));
+        let bw = Math.max(0.05, Math.min(cropBox.width||1, 1-bx));
+        let bh = Math.max(0.05, Math.min(cropBox.height||1, 1-by));
+
+        const boxPx = { x: bx*iw, y: by*ih, w: bw*iw, h: bh*ih };
+        const side = Math.max(boxPx.w, boxPx.h);
+        let cx = boxPx.x + boxPx.w/2 - side/2;
+        let cy = boxPx.y + boxPx.h/2 - side/2;
+        cx = Math.max(0, Math.min(cx, iw - side));
+        cy = Math.max(0, Math.min(cy, ih - side));
+        const clampedSide = Math.min(side, iw - cx, ih - cy);
+
+        const canvas = document.createElement('canvas');
+        canvas.width = 260; canvas.height = 260;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, cx, cy, clampedSide, clampedSide, 0, 0, 260, 260);
+        resultPhoto.src = canvas.toDataURL('image/jpeg', 0.85);
+        resultPhotoWrap.style.display = 'flex';
+      }catch(e){
+        resultPhotoWrap.style.display = 'none';
+      }
+      resolve();
+    };
+    img.onerror = ()=>{ resultPhotoWrap.style.display = 'none'; resolve(); };
+    img.src = 'data:' + mediaType + ';base64,' + base64Data;
+  });
+}
+
 els.clearLink.addEventListener('click', async ()=>{
   dayData.meals = [];
   await saveDay();
@@ -1280,6 +1370,7 @@ function resetScan(){
   els.errorBox.style.display = 'none';
   els.manualForm.style.display = 'none';
   els.manualToggleBtn.textContent = 'ou adicionar sem foto';
+  document.getElementById('resultPhotoWrap').style.display = 'none';
 }
 
 els.fileInput.addEventListener('change', (e)=>{
@@ -1338,6 +1429,7 @@ els.analyzeBtn.addEventListener('click', async ()=>{
     }
     const parsed = await response.json();
     pendingResult = parsed;
+    await cropToPlate(parsed.crop_box);
     showResult(parsed);
   }catch(err){
     console.error(err);
@@ -1655,6 +1747,7 @@ els.gearBtn.addEventListener('click', ()=>{
   els.goalInput.value = settings.goal || 2000;
   els.weightInput.value = settings.weight || '';
   document.getElementById('objectiveInput').value = settings.objective || 'manter';
+  document.getElementById('themeInput').value = settings.theme || 'auto';
   els.goalOverlay.classList.add('show');
 });
 els.goalOverlay.addEventListener('click', (e)=>{ if(e.target === els.goalOverlay) els.goalOverlay.classList.remove('show'); });
@@ -1664,8 +1757,10 @@ els.goalSaveBtn.addEventListener('click', async ()=>{
   const w = parseFloat(els.weightInput.value);
   settings.weight = (!isNaN(w) && w > 0) ? w : settings.weight;
   settings.objective = document.getElementById('objectiveInput').value;
+  settings.theme = document.getElementById('themeInput').value;
   logWeight(settings.weight);
   await saveSettings();
+  applyTheme();
   render();
   els.goalOverlay.classList.remove('show');
 });
