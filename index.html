@@ -305,6 +305,14 @@
     padding:11px 12px;font-family:'Plus Jakarta Sans',sans-serif;color:var(--ink);
   }
   .manual-form input:focus{outline:none;border-color:var(--a2);}
+  .splash{
+    position:fixed;inset:0;background:var(--bg);z-index:200;
+    display:flex;align-items:center;justify-content:center;
+    transition:opacity .4s ease;
+  }
+  .splash img{width:min(62vw,260px);height:auto;}
+  .splash.fade-out{opacity:0;pointer-events:none;}
+
   .onboard-overlay{
     position:fixed;inset:0;background:var(--bg);z-index:100;
     overflow-y:auto;
@@ -466,6 +474,9 @@
 </style>
 </head>
 <body>
+<div class="splash" id="splashScreen">
+  <img src="/icons/logo-full.png" alt="Trinca">
+</div>
 <div class="onboard-overlay hide" id="onboardOverlay">
   <img src="/icons/icon-192.png" alt="Trinca" class="onboard-logo">
   <div class="onboard-title">Bem-vindo ao Trinca</div>
@@ -1943,6 +1954,14 @@ document.getElementById('recalcGoalBtn').addEventListener('click', ()=>{
 });
 
 init();
+
+setTimeout(()=>{
+  const splash = document.getElementById('splashScreen');
+  if(splash){
+    splash.classList.add('fade-out');
+    setTimeout(()=> splash.remove(), 450);
+  }
+}, 1300);
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
