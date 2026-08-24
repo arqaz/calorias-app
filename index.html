@@ -471,6 +471,19 @@
     width:100%;margin-top:14px;background:linear-gradient(135deg,var(--a1),var(--a2));
     color:#fff;border:none;font-weight:800;font-size:14.5px;padding:13px;border-radius:14px;cursor:pointer;
   }
+
+  .offline-banner{
+    display:none;align-items:center;gap:8px;
+    background:#FFF3D6;color:#8A6D1F;font-size:12px;font-weight:700;line-height:1.4;
+    padding:10px 14px;border-radius:14px;margin-bottom:14px;
+  }
+  html[data-theme="dark"] .offline-banner{background:rgba(255,214,79,.14);color:#FFD64F;}
+  .scan-offline-notice{
+    display:none;margin-bottom:14px;border:1.5px solid #E8C877;background:#FFF3D6;color:#8A6D1F;
+    font-size:12.5px;font-weight:600;padding:10px 12px;border-radius:14px;
+  }
+  html[data-theme="dark"] .scan-offline-notice{background:rgba(255,214,79,.14);color:#FFD64F;border-color:rgba(255,214,79,.35);}
+  .dropzone.is-disabled{opacity:.5;pointer-events:none;}
 </style>
 </head>
 <body>
@@ -556,6 +569,11 @@
     <button class="gear" id="gearBtn" aria-label="Definir meta">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
     </button>
+  </div>
+
+  <div class="offline-banner" id="offlineBanner">
+    <span>📡</span>
+    <span>Estás offline — os teus dados continuam guardados no aparelho. A identificação de pratos por foto (IA) fica indisponível até teres ligação.</span>
   </div>
 
   <div class="day-strip" id="dayStrip"></div>
@@ -711,6 +729,8 @@
   <div class="sheet">
     <div class="sheet-handle"></div>
     <div class="sheet-title">Adicionar refeição</div>
+
+    <div class="scan-offline-notice" id="scanOfflineNotice">📡 Estás offline: a identificação de pratos por foto (IA) precisa de ligação à internet. Usa o registo manual abaixo.</div>
 
     <label for="fileInput" id="dropzone" class="dropzone">
       <div class="camicon">📷</div>
@@ -935,6 +955,8 @@ const els = {
   weightBars: document.getElementById('weightBars'),
   editSaveBtn: document.getElementById('editSaveBtn'),
   editDeleteBtn: document.getElementById('editDeleteBtn'),
+  offlineBanner: document.getElementById('offlineBanner'),
+  scanOfflineNotice: document.getElementById('scanOfflineNotice'),
 };
 
 els.ringProgress.setAttribute('stroke-dasharray', CIRC.toFixed(2));
@@ -1047,6 +1069,24 @@ if(window.matchMedia){
   });
 }
 
+function isOffline(){
+  return !navigator.onLine;
+}
+
+// Só a funcionalidade que depende de rede (identificação de pratos por foto
+// via IA) fica indisponível offline — o resto da app corre inteiramente a
+// partir dos dados guardados no aparelho (localStorage).
+function updateOfflineUI(){
+  const offline = isOffline();
+  if(els.offlineBanner) els.offlineBanner.style.display = offline ? 'flex' : 'none';
+  if(els.scanOfflineNotice) els.scanOfflineNotice.style.display = offline ? 'block' : 'none';
+  if(els.dropzone) els.dropzone.classList.toggle('is-disabled', offline);
+  if(els.manualToggleBtn) els.manualToggleBtn.style.display = offline ? 'none' : 'inline';
+}
+
+window.addEventListener('online', updateOfflineUI);
+window.addEventListener('offline', updateOfflineUI);
+
 async function init(){
   els.dateBig.textContent = fmtDateBig(currentDate);
   await loadSettings();
@@ -1054,6 +1094,7 @@ async function init(){
   await loadDay();
   render();
   startFastingTicker();
+  updateOfflineUI();
   if(!settings.onboarded){
     document.getElementById('onboardOverlay').classList.remove('hide');
   }
@@ -1530,12 +1571,14 @@ function closeScan(){ els.scanOverlay.classList.remove('show'); }
 function resetScan(){
   els.fileInput.value = '';
   base64Data = null; pendingResult = null;
-  els.dropzone.style.display = 'block';
+  updateOfflineUI();
+  const offline = isOffline();
+  els.dropzone.style.display = offline ? 'none' : 'block';
   els.previewWrap.style.display = 'none';
   els.analyzeBtn.style.display = 'none';
   els.resultCard.classList.remove('show');
   els.errorBox.style.display = 'none';
-  els.manualForm.style.display = 'none';
+  els.manualForm.style.display = offline ? 'block' : 'none';
   els.manualToggleBtn.textContent = 'ou adicionar sem foto';
   document.getElementById('resultPhotoWrap').style.display = 'none';
 }
@@ -1574,6 +1617,11 @@ els.discardBtn.addEventListener('click', closeScan);
 
 els.analyzeBtn.addEventListener('click', async ()=>{
   if(!base64Data) return;
+  if(isOffline()){
+    els.errorBox.textContent = 'Estás offline — a identificação por foto (IA) precisa de ligação à internet. Usa "adicionar sem foto".';
+    els.errorBox.style.display = 'block';
+    return;
+  }
   els.analyzeBtn.disabled = true;
   els.errorBox.style.display = 'none';
   els.btnLabel.textContent = '';
