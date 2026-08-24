@@ -484,6 +484,47 @@
   }
   html[data-theme="dark"] .scan-offline-notice{background:rgba(255,214,79,.14);color:#FFD64F;border-color:rgba(255,214,79,.35);}
   .dropzone.is-disabled{opacity:.5;pointer-events:none;}
+
+  .body-card{background:var(--card);border-radius:22px;box-shadow:var(--shadow);padding:16px 18px 18px;margin-bottom:18px;}
+  .body-top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:4px;}
+  .body-title{font-size:13px;font-weight:700;color:var(--muted);}
+  .body-status{font-size:12px;color:var(--muted);font-weight:600;margin-top:2px;}
+  .body-status.due{color:var(--a2);}
+  .body-checkin-btn{
+    flex-shrink:0;background:linear-gradient(135deg,var(--a1),var(--a2));color:#fff;border:none;
+    font-weight:800;font-size:12px;padding:9px 14px;border-radius:12px;cursor:pointer;white-space:nowrap;
+  }
+  .body-timeline{display:flex;gap:10px;overflow-x:auto;padding:12px 0 2px;-webkit-overflow-scrolling:touch;}
+  .body-thumb-col{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;}
+  .body-thumb{width:64px;height:86px;border-radius:14px;object-fit:cover;background:var(--track);box-shadow:var(--shadow-soft);}
+  .body-thumb-date{font-size:9.5px;color:var(--muted-soft);font-weight:700;}
+  .body-empty{font-size:12.5px;color:var(--muted);padding:6px 0 2px;}
+  .body-projection{
+    margin-top:14px;padding:12px 13px;border-radius:16px;background:var(--fresh-soft);color:var(--fresh);
+    font-size:12.5px;font-weight:600;line-height:1.5;
+  }
+  .body-projection.neutral{background:var(--track);color:var(--muted);}
+
+  .lightbox-overlay{
+    position:fixed;inset:0;background:rgba(10,14,8,.9);z-index:60;
+    display:none;align-items:center;justify-content:center;flex-direction:column;padding:24px;
+  }
+  .lightbox-overlay.show{display:flex;}
+  .lightbox-overlay img{max-width:100%;max-height:64vh;border-radius:18px;object-fit:contain;}
+  .lightbox-caption{color:#fff;font-size:13px;font-weight:700;margin-top:14px;text-align:center;}
+  .lightbox-sub{color:rgba(255,255,255,.65);font-size:11.5px;font-weight:600;margin-top:3px;}
+  .lightbox-actions{display:flex;gap:10px;margin-top:20px;}
+  .lightbox-btn{border:none;font-weight:800;font-size:12.5px;padding:10px 18px;border-radius:12px;cursor:pointer;}
+  .lightbox-close{background:rgba(255,255,255,.14);color:#fff;}
+  .lightbox-delete{background:#D64545;color:#fff;}
+
+  .body-weight-row{display:flex;align-items:center;gap:10px;margin:14px 0 4px;}
+  .body-weight-row input{
+    flex:1;font-size:15px;font-weight:700;border:2px solid var(--track);border-radius:12px;
+    padding:10px 12px;font-family:'Plus Jakarta Sans',sans-serif;color:var(--ink);
+  }
+  .body-weight-row input:focus{outline:none;border-color:var(--a2);}
+  .body-photo-skip{width:100%;background:none;border:none;color:var(--muted);font-weight:700;font-size:12.5px;text-decoration:underline;cursor:pointer;padding:8px 0;}
 </style>
 </head>
 <body>
@@ -551,6 +592,34 @@
   <div class="onboard-field">
     <label>Meta diária de calorias (kcal)</label>
     <input type="number" id="onGoal" inputmode="numeric" placeholder="2000" value="2000">
+  </div>
+
+  <div class="onboard-field">
+    <label>Peso objetivo (kg) — opcional</label>
+    <input type="number" id="onTargetWeight" inputmode="numeric" step="0.5" placeholder="ex: 68">
+  </div>
+
+  <div class="onboard-field">
+    <label>Queres manter um registo de progresso corporal (fotos)?</label>
+    <select id="onBodyCheckin">
+      <option value="no" selected>Não, obrigado</option>
+      <option value="weekly">Sim — semanalmente</option>
+      <option value="biweekly">Sim — quinzenalmente</option>
+    </select>
+  </div>
+
+  <div class="onboard-field" id="onBodyPhotoField" style="display:none;">
+    <label>Foto de corpo inteiro, de frente (opcional)</label>
+    <label for="onBodyPhotoInput" id="onBodyPhotoDropzone" class="dropzone" style="padding:22px 16px;display:block;">
+      <div class="camicon">🧍</div>
+      <p>Tirar ou carregar foto</p>
+      <small>Fica guardada só neste aparelho · podes saltar este passo</small>
+    </label>
+    <input type="file" id="onBodyPhotoInput" accept="image/*" capture="environment">
+    <div id="onBodyPhotoPreviewWrap" style="display:none;margin-top:10px;">
+      <img id="onBodyPhotoPreview" style="width:100%;max-height:240px;object-fit:cover;border-radius:18px;display:block;" alt="Pré-visualização">
+      <button type="button" class="body-photo-skip" id="onBodyPhotoRetakeBtn">Trocar foto</button>
+    </div>
   </div>
 
   <button class="onboard-start" id="onboardStartBtn">Começar</button>
@@ -700,6 +769,18 @@
       <div class="week-bars" id="weightBars"></div>
     </div>
 
+    <div class="body-card" id="bodyCard" style="display:none;">
+      <div class="body-top">
+        <div>
+          <div class="body-title">📸 Progresso corporal</div>
+          <div class="body-status" id="bodyStatus">—</div>
+        </div>
+        <button class="body-checkin-btn" id="bodyCheckinBtn">Registar</button>
+      </div>
+      <div class="body-timeline" id="bodyTimeline"></div>
+      <div class="body-projection" id="bodyProjection" style="display:none;"></div>
+    </div>
+
     <div class="section-title" style="margin-top:0;">
       <span>Histórico de dias</span>
     </div>
@@ -808,6 +889,14 @@
       <button class="onboard-skip" id="recalcGoalBtn" style="border:2px solid var(--track);border-radius:14px;color:var(--ink);margin-top:14px;width:100%;">Sugerir meta com base nestes dados</button>
       <label style="display:block;margin-top:16px;">Objetivo de calorias (kcal)</label>
       <input type="number" id="goalInput" inputmode="numeric" min="0" step="50">
+      <label style="display:block;margin-top:16px;">Peso objetivo (kg) — opcional</label>
+      <input type="number" id="targetWeightInput" inputmode="numeric" min="0" step="0.5">
+      <label style="display:block;margin-top:16px;">Registo de progresso corporal (fotos)</label>
+      <select id="bodyCheckinInput" style="width:100%;margin-top:8px;font-size:15px;font-weight:700;border:2px solid var(--track);border-radius:14px;padding:12px 14px;font-family:'Plus Jakarta Sans',sans-serif;color:var(--ink);">
+        <option value="no">Desativado</option>
+        <option value="weekly">Semanal</option>
+        <option value="biweekly">Quinzenal</option>
+      </select>
       <label style="display:block;margin-top:16px;">Aparência</label>
       <select id="themeInput" style="width:100%;margin-top:8px;font-size:15px;font-weight:700;border:2px solid var(--track);border-radius:14px;padding:12px 14px;font-family:'Plus Jakarta Sans',sans-serif;color:var(--ink);">
         <option value="auto">Automático (segue o telemóvel)</option>
@@ -859,6 +948,50 @@
       <input type="number" id="exCal" inputmode="numeric" placeholder="0">
       <button class="add-btn" id="exAddBtn" style="margin-top:16px;">Adicionar</button>
     </div>
+  </div>
+</div>
+
+<div class="overlay" id="bodyCheckinOverlay">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Registo de progresso corporal</div>
+
+    <div class="scan-offline-notice" id="bodyOfflineNotice">📡 Estás offline: a foto fica guardada, mas sem verificação de enquadramento por IA.</div>
+
+    <label for="bodyFileInput" id="bodyDropzone" class="dropzone">
+      <div class="camicon">🧍</div>
+      <p>Tirar ou carregar foto de corpo inteiro</p>
+      <small>de frente, de pé, boa iluminação</small>
+    </label>
+    <input type="file" id="bodyFileInput" accept="image/*" capture="environment">
+
+    <div style="text-align:center;">
+      <button type="button" class="body-photo-skip" id="bodySkipPhotoBtn">registar só o peso, sem foto</button>
+    </div>
+
+    <div class="preview-wrap" id="bodyPreviewWrap" style="display:none;">
+      <img id="bodyPreviewImg" src="" alt="Pré-visualização">
+      <button class="retake" id="bodyRetakeBtn">Trocar foto</button>
+    </div>
+
+    <div id="bodyCheckErrorBox" class="error" style="display:none;"></div>
+
+    <div class="body-weight-row">
+      <input type="number" id="bodyWeightInput" inputmode="numeric" step="0.5" placeholder="Peso atual (kg) — opcional">
+    </div>
+
+    <button class="add-btn" id="bodyCheckinSaveBtn" style="margin-top:14px;">Guardar registo</button>
+    <button class="discard-btn" id="bodyCheckinCancelBtn">Cancelar</button>
+  </div>
+</div>
+
+<div class="lightbox-overlay" id="bodyLightbox">
+  <img id="bodyLightboxImg" src="" alt="Registo de progresso corporal">
+  <div class="lightbox-caption" id="bodyLightboxDate">—</div>
+  <div class="lightbox-sub" id="bodyLightboxWeight"></div>
+  <div class="lightbox-actions">
+    <button class="lightbox-btn lightbox-close" id="bodyLightboxCloseBtn">Fechar</button>
+    <button class="lightbox-btn lightbox-delete" id="bodyLightboxDeleteBtn">Eliminar</button>
   </div>
 </div>
 
@@ -957,6 +1090,31 @@ const els = {
   editDeleteBtn: document.getElementById('editDeleteBtn'),
   offlineBanner: document.getElementById('offlineBanner'),
   scanOfflineNotice: document.getElementById('scanOfflineNotice'),
+  bodyCard: document.getElementById('bodyCard'),
+  bodyStatus: document.getElementById('bodyStatus'),
+  bodyCheckinBtn: document.getElementById('bodyCheckinBtn'),
+  bodyTimeline: document.getElementById('bodyTimeline'),
+  bodyProjection: document.getElementById('bodyProjection'),
+  bodyCheckinOverlay: document.getElementById('bodyCheckinOverlay'),
+  bodyOfflineNotice: document.getElementById('bodyOfflineNotice'),
+  bodyDropzone: document.getElementById('bodyDropzone'),
+  bodyFileInput: document.getElementById('bodyFileInput'),
+  bodySkipPhotoBtn: document.getElementById('bodySkipPhotoBtn'),
+  bodyPreviewWrap: document.getElementById('bodyPreviewWrap'),
+  bodyPreviewImg: document.getElementById('bodyPreviewImg'),
+  bodyRetakeBtn: document.getElementById('bodyRetakeBtn'),
+  bodyCheckErrorBox: document.getElementById('bodyCheckErrorBox'),
+  bodyWeightInput: document.getElementById('bodyWeightInput'),
+  bodyCheckinSaveBtn: document.getElementById('bodyCheckinSaveBtn'),
+  bodyCheckinCancelBtn: document.getElementById('bodyCheckinCancelBtn'),
+  bodyLightbox: document.getElementById('bodyLightbox'),
+  bodyLightboxImg: document.getElementById('bodyLightboxImg'),
+  bodyLightboxDate: document.getElementById('bodyLightboxDate'),
+  bodyLightboxWeight: document.getElementById('bodyLightboxWeight'),
+  bodyLightboxCloseBtn: document.getElementById('bodyLightboxCloseBtn'),
+  bodyLightboxDeleteBtn: document.getElementById('bodyLightboxDeleteBtn'),
+  targetWeightInput: document.getElementById('targetWeightInput'),
+  bodyCheckinInput: document.getElementById('bodyCheckinInput'),
 };
 
 els.ringProgress.setAttribute('stroke-dasharray', CIRC.toFixed(2));
@@ -1037,6 +1195,7 @@ function switchTab(tab){
     btnProgresso.classList.add('active');
     renderHistory();
     renderWeightChart();
+    renderBodyCard();
   } else {
     tabHoje.style.display = 'block';
     tabProgresso.style.display = 'none';
@@ -1082,6 +1241,10 @@ function updateOfflineUI(){
   if(els.scanOfflineNotice) els.scanOfflineNotice.style.display = offline ? 'block' : 'none';
   if(els.dropzone) els.dropzone.classList.toggle('is-disabled', offline);
   if(els.manualToggleBtn) els.manualToggleBtn.style.display = offline ? 'none' : 'inline';
+  // O registo corporal continua a funcionar offline (a foto fica guardada de
+  // qualquer forma) — só o enquadramento/validação por IA fica indisponível,
+  // por isso a dropzone em si não é desativada, apenas mostramos um aviso.
+  if(els.bodyOfflineNotice) els.bodyOfflineNotice.style.display = offline ? 'block' : 'none';
 }
 
 window.addEventListener('online', updateOfflineUI);
@@ -1092,6 +1255,7 @@ async function init(){
   await loadSettings();
   applyTheme();
   await loadDay();
+  loadBodyCheckins();
   render();
   startFastingTicker();
   updateOfflineUI();
@@ -1150,10 +1314,17 @@ document.getElementById('onboardStartBtn').addEventListener('click', async ()=>{
   settings.goal = (!isNaN(g) && g > 0) ? g : 2000;
   settings.objective = document.getElementById('onObjective').value;
   settings.fastingEnabled = document.getElementById('onFasting').value === 'yes';
+  const tw = parseFloat(document.getElementById('onTargetWeight').value);
+  settings.targetWeight = (!isNaN(tw) && tw > 0) ? tw : null;
+  settings.bodyCheckinFreq = document.getElementById('onBodyCheckin').value;
   settings.onboarded = true;
   logWeight(settings.weight);
   await saveSettings();
+  if(onboardBodyPhotoDataUrl){
+    await commitBodyCheckin({ photoDataUrl: onboardBodyPhotoDataUrl, mediaType: 'image/jpeg', weight: null });
+  }
   render();
+  renderBodyCard();
   finishOnboarding();
 });
 
@@ -1170,10 +1341,42 @@ async function loadSettings(){
   }catch(e){ /* ainda não definido, usa valor por omissão */ }
   if(!settings.fasting) settings.fasting = { plan: 16, active: false, startTime: null };
   if(typeof settings.fastingEnabled !== 'boolean') settings.fastingEnabled = false;
+  if(typeof settings.bodyCheckinFreq !== 'string') settings.bodyCheckinFreq = 'no';
 }
 async function saveSettings(){
   try{ localStorage.setItem('settings', JSON.stringify(settings)); }
   catch(e){ console.error('Erro ao guardar definições', e); }
+}
+
+function bodyCheckinFreqDays(){
+  return settings.bodyCheckinFreq === 'weekly' ? 7 : 14;
+}
+
+let bodyCheckins = [];
+
+function loadBodyCheckins(){
+  try{
+    const raw = localStorage.getItem('bodyCheckins');
+    bodyCheckins = raw ? JSON.parse(raw) : [];
+  }catch(e){ bodyCheckins = []; }
+  if(!Array.isArray(bodyCheckins)) bodyCheckins = [];
+  bodyCheckins.sort((a,b)=> a.date.localeCompare(b.date));
+}
+
+function saveBodyCheckins(){
+  try{
+    localStorage.setItem('bodyCheckins', JSON.stringify(bodyCheckins));
+    return true;
+  }catch(e){
+    // Provavelmente excedeu a quota do localStorage (fotos ocupam espaço).
+    // Descarta a foto mais antiga e tenta novamente, para não perder o registo novo.
+    if(bodyCheckins.length > 1){
+      bodyCheckins.shift();
+      return saveBodyCheckins();
+    }
+    console.error('Erro ao guardar registo corporal', e);
+    return false;
+  }
 }
 async function loadDay(){
   try{
@@ -1454,6 +1657,350 @@ els.exAddBtn.addEventListener('click', async ()=>{
   await saveDay();
   render();
   els.exerciseOverlay.classList.remove('show');
+});
+
+// ---- Registo de progresso corporal ----------------------------------------
+// Nota de conceção: a IA aqui é usada apenas para (a) confirmar que a foto é
+// tecnicamente adequada para comparação (corpo inteiro visível) e (b) sugerir
+// um enquadramento consistente entre registos. Não avalia nem comenta a
+// aparência física da pessoa. A "projeção" mostrada ao utilizador é sempre
+// calculada a partir dos números que a própria pessoa registou (peso ao
+// longo do tempo), nunca uma imagem gerada/alterada do corpo — ver api/body-checkin.js.
+
+function resizeImageFile(file, maxDim){
+  return new Promise((resolve, reject)=>{
+    const reader = new FileReader();
+    reader.onload = ()=>{
+      const img = new Image();
+      img.onload = ()=>{
+        let w = img.width, h = img.height;
+        if(w > h && w > maxDim){ h = Math.round(h * maxDim / w); w = maxDim; }
+        else if(h > maxDim){ w = Math.round(w * maxDim / h); h = maxDim; }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', 0.8));
+      };
+      img.onerror = reject;
+      img.src = reader.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function processBodyPhotoCapture(file){
+  const dataUrl = await resizeImageFile(file, 1024);
+  return { dataUrl, mediaType: 'image/jpeg' };
+}
+
+function cropBodyPhoto(dataUrl, cropBox){
+  return new Promise((resolve)=>{
+    if(!cropBox){ resolve(dataUrl); return; }
+    const img = new Image();
+    img.onload = ()=>{
+      try{
+        const iw = img.width, ih = img.height;
+        const bx = Math.max(0, Math.min(cropBox.x||0, 1));
+        const by = Math.max(0, Math.min(cropBox.y||0, 1));
+        const bw = Math.max(0.05, Math.min(cropBox.width||1, 1-bx));
+        const bh = Math.max(0.05, Math.min(cropBox.height||1, 1-by));
+        let sx = bx*iw, sy = by*ih, sw = bw*iw, sh = bh*ih;
+
+        const OUT_W = 360, OUT_H = 480; // proporção 3:4, retrato — consistente entre registos
+        const targetRatio = OUT_W / OUT_H;
+        const boxRatio = sw / sh;
+        if(boxRatio > targetRatio){
+          const newW = sh * targetRatio;
+          sx += (sw - newW) / 2;
+          sw = newW;
+        } else {
+          const newH = sw / targetRatio;
+          sy += (sh - newH) / 2;
+          sh = newH;
+        }
+        sx = Math.max(0, Math.min(sx, iw - sw));
+        sy = Math.max(0, Math.min(sy, ih - sh));
+
+        const canvas = document.createElement('canvas');
+        canvas.width = OUT_W; canvas.height = OUT_H;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, sx, sy, sw, sh, 0, 0, OUT_W, OUT_H);
+        resolve(canvas.toDataURL('image/jpeg', 0.7));
+      }catch(e){ resolve(dataUrl); }
+    };
+    img.onerror = ()=> resolve(dataUrl);
+    img.src = dataUrl;
+  });
+}
+
+async function analyzeBodyPhoto(base64, mediaType){
+  const response = await fetch('/api/body-checkin', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ image: base64, mediaType }),
+  });
+  if(!response.ok) throw new Error('Falha na chamada à API (' + response.status + ')');
+  return response.json();
+}
+
+// Guarda um registo (foto e/ou peso) para o dia de hoje, partilhado entre a
+// folha de registo e o onboarding. Tenta o enquadramento por IA quando há
+// ligação; offline (ou em caso de erro), guarda a foto tal como capturada.
+async function commitBodyCheckin({ photoDataUrl, mediaType, weight }){
+  let finalPhoto = photoDataUrl || null;
+  let validPhoto = null;
+  let note = '';
+
+  if(photoDataUrl && !isOffline()){
+    try{
+      const base64 = photoDataUrl.split(',')[1];
+      const result = await analyzeBodyPhoto(base64, mediaType || 'image/jpeg');
+      validPhoto = !!result.valid;
+      note = result.valid ? '' : (result.reason || '');
+      if(result.crop_box){
+        finalPhoto = await cropBodyPhoto(photoDataUrl, result.crop_box);
+      }
+    }catch(err){
+      console.error('Falha ao analisar foto de progresso', err);
+    }
+  }
+
+  const entry = {
+    id: Date.now(),
+    date: todayStr(),
+    photo: finalPhoto,
+    weight: (typeof weight === 'number' && weight > 0) ? weight : null,
+    validPhoto,
+    note,
+  };
+  // um registo por dia — um novo registo no mesmo dia substitui o anterior
+  bodyCheckins = bodyCheckins.filter(c => c.date !== entry.date);
+  bodyCheckins.push(entry);
+  bodyCheckins.sort((a,b)=> a.date.localeCompare(b.date));
+
+  let saved = saveBodyCheckins();
+  if(!saved && entry.photo){
+    // sem espaço no aparelho mesmo depois de descartar fotos antigas — guarda
+    // pelo menos a data/peso, sem a foto
+    entry.photo = null;
+    saved = saveBodyCheckins();
+  }
+  if(!saved){
+    bodyCheckins = bodyCheckins.filter(c => c.id !== entry.id);
+  }
+
+  if(entry.weight){
+    settings.weight = entry.weight;
+    logWeight(entry.weight);
+    await saveSettings();
+  }
+
+  return { entry, saved };
+}
+
+function renderBodyProjection(){
+  const history = settings.weightHistory || {};
+  const dates = Object.keys(history).sort();
+  els.bodyProjection.style.display = 'block';
+
+  if(dates.length < 2){
+    els.bodyProjection.className = 'body-projection neutral';
+    els.bodyProjection.textContent = 'Regista o teu peso ao longo do tempo (no registo corporal ou nas definições) para veres aqui uma projeção baseada no teu progresso real.';
+    return;
+  }
+
+  const first = dates[0], last = dates[dates.length-1];
+  const firstVal = Number(history[first]);
+  const lastVal = Number(history[last]);
+  const daysBetween = Math.max(1, (new Date(last) - new Date(first)) / 86400000);
+  const weeksBetween = daysBetween / 7;
+  const ratePerWeek = weeksBetween > 0 ? (lastVal - firstVal) / weeksBetween : 0;
+  const target = Number(settings.targetWeight) || null;
+
+  if(Math.abs(ratePerWeek) < 0.05 || weeksBetween < 1){
+    els.bodyProjection.className = 'body-projection neutral';
+    els.bodyProjection.textContent = 'O teu peso tem-se mantido estável até agora. Continua a registar para veres aqui uma tendência e projeção.';
+    return;
+  }
+
+  els.bodyProjection.className = 'body-projection';
+  const in4 = (lastVal + ratePerWeek * 4).toFixed(1);
+  const in8 = (lastVal + ratePerWeek * 8).toFixed(1);
+  let msg = `A um ritmo de ${ratePerWeek > 0 ? '+' : ''}${ratePerWeek.toFixed(2)} kg/semana, é expectável estares por volta de ${in4} kg daqui a 4 semanas e ${in8} kg daqui a 8 semanas, mantendo o plano atual.`;
+
+  if(target){
+    const diff = target - lastVal;
+    const weeksToTarget = ratePerWeek !== 0 ? diff / ratePerWeek : Infinity;
+    if(weeksToTarget > 0 && weeksToTarget < 104){
+      msg += ` A este ritmo, chegas ao peso objetivo (${target} kg) em cerca de ${Math.round(weeksToTarget)} semanas.`;
+    }
+  }
+  els.bodyProjection.textContent = msg;
+}
+
+function renderBodyCard(){
+  if(!els.bodyCard) return;
+  const enabled = settings.bodyCheckinFreq && settings.bodyCheckinFreq !== 'no';
+  const hasHistory = bodyCheckins.length > 0;
+  if(!enabled && !hasHistory){
+    els.bodyCard.style.display = 'none';
+    return;
+  }
+  els.bodyCard.style.display = 'block';
+
+  if(bodyCheckins.length === 0){
+    els.bodyStatus.textContent = 'Ainda sem registos — começa quando quiseres.';
+    els.bodyStatus.classList.remove('due');
+  } else {
+    const last = bodyCheckins[bodyCheckins.length - 1];
+    if(enabled){
+      const nextDue = addDays(last.date, bodyCheckinFreqDays());
+      const isDue = nextDue <= todayStr();
+      els.bodyStatus.textContent = isDue
+        ? 'Registo em atraso — regista o teu progresso.'
+        : ('Último registo: ' + fmtDateBig(last.date) + ' · próximo: ' + fmtDateBig(nextDue));
+      els.bodyStatus.classList.toggle('due', isDue);
+    } else {
+      els.bodyStatus.textContent = 'Último registo: ' + fmtDateBig(last.date);
+      els.bodyStatus.classList.remove('due');
+    }
+  }
+
+  els.bodyTimeline.innerHTML = '';
+  if(bodyCheckins.length === 0){
+    const empty = document.createElement('div');
+    empty.className = 'body-empty';
+    empty.textContent = 'Sem registos ainda.';
+    els.bodyTimeline.appendChild(empty);
+  } else {
+    bodyCheckins.slice(-12).forEach(entry=>{
+      const col = document.createElement('div');
+      col.className = 'body-thumb-col';
+      const d = new Date(entry.date+'T00:00:00');
+      const label = d.toLocaleDateString('pt-PT',{day:'2-digit', month:'2-digit'});
+      const thumb = entry.photo
+        ? `<img class="body-thumb" src="${escapeAttr(entry.photo)}" alt="Registo de ${label}">`
+        : `<div class="body-thumb" style="display:flex;align-items:center;justify-content:center;font-size:20px;">⚖️</div>`;
+      col.innerHTML = thumb + `<span class="body-thumb-date">${label}</span>`;
+      col.addEventListener('click', ()=> openBodyLightbox(entry));
+      els.bodyTimeline.appendChild(col);
+    });
+  }
+
+  renderBodyProjection();
+}
+
+let lightboxEntryId = null;
+function openBodyLightbox(entry){
+  lightboxEntryId = entry.id;
+  if(entry.photo){
+    els.bodyLightboxImg.src = entry.photo;
+    els.bodyLightboxImg.style.display = 'block';
+  } else {
+    els.bodyLightboxImg.removeAttribute('src');
+    els.bodyLightboxImg.style.display = 'none';
+  }
+  els.bodyLightboxDate.textContent = fmtDateBig(entry.date);
+  els.bodyLightboxWeight.textContent = entry.weight ? (entry.weight + ' kg') : (entry.note || '');
+  els.bodyLightbox.classList.add('show');
+}
+els.bodyLightboxCloseBtn.addEventListener('click', ()=> els.bodyLightbox.classList.remove('show'));
+els.bodyLightbox.addEventListener('click', (e)=>{ if(e.target === els.bodyLightbox) els.bodyLightbox.classList.remove('show'); });
+els.bodyLightboxDeleteBtn.addEventListener('click', ()=>{
+  if(lightboxEntryId == null) return;
+  if(!confirm('Eliminar este registo (foto e peso) permanentemente?')) return;
+  bodyCheckins = bodyCheckins.filter(c => c.id !== lightboxEntryId);
+  saveBodyCheckins();
+  els.bodyLightbox.classList.remove('show');
+  renderBodyCard();
+});
+
+let bodyPhotoDataUrl = null, bodyPhotoMediaType = null;
+
+function resetBodyCheckinSheet(){
+  els.bodyFileInput.value = '';
+  bodyPhotoDataUrl = null; bodyPhotoMediaType = null;
+  els.bodyDropzone.style.display = 'block';
+  els.bodyPreviewWrap.style.display = 'none';
+  els.bodyCheckErrorBox.style.display = 'none';
+  els.bodyWeightInput.value = settings.weight || '';
+  updateOfflineUI();
+}
+
+els.bodyCheckinBtn.addEventListener('click', ()=>{
+  resetBodyCheckinSheet();
+  els.bodyCheckinOverlay.classList.add('show');
+});
+els.bodyCheckinCancelBtn.addEventListener('click', ()=> els.bodyCheckinOverlay.classList.remove('show'));
+els.bodyCheckinOverlay.addEventListener('click', (e)=>{ if(e.target === els.bodyCheckinOverlay) els.bodyCheckinOverlay.classList.remove('show'); });
+
+els.bodyFileInput.addEventListener('change', async (e)=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  const { dataUrl, mediaType } = await processBodyPhotoCapture(file);
+  bodyPhotoDataUrl = dataUrl; bodyPhotoMediaType = mediaType;
+  els.bodyPreviewImg.src = dataUrl;
+  els.bodyDropzone.style.display = 'none';
+  els.bodyPreviewWrap.style.display = 'block';
+  els.bodyCheckErrorBox.style.display = 'none';
+});
+els.bodyRetakeBtn.addEventListener('click', resetBodyCheckinSheet);
+els.bodySkipPhotoBtn.addEventListener('click', ()=> els.bodyWeightInput.focus());
+
+els.bodyCheckinSaveBtn.addEventListener('click', async ()=>{
+  const weightVal = parseFloat(els.bodyWeightInput.value);
+  const hasWeight = !isNaN(weightVal) && weightVal > 0;
+  if(!bodyPhotoDataUrl && !hasWeight){
+    els.bodyCheckErrorBox.textContent = 'Adiciona uma foto ou o peso atual para guardar o registo.';
+    els.bodyCheckErrorBox.style.display = 'block';
+    return;
+  }
+  els.bodyCheckErrorBox.style.display = 'none';
+  els.bodyCheckinSaveBtn.disabled = true;
+  const origLabel = els.bodyCheckinSaveBtn.textContent;
+  els.bodyCheckinSaveBtn.textContent = 'A guardar…';
+
+  const { saved } = await commitBodyCheckin({
+    photoDataUrl: bodyPhotoDataUrl,
+    mediaType: bodyPhotoMediaType,
+    weight: hasWeight ? weightVal : null,
+  });
+
+  els.bodyCheckinSaveBtn.disabled = false;
+  els.bodyCheckinSaveBtn.textContent = origLabel;
+
+  if(!saved){
+    els.bodyCheckErrorBox.textContent = 'Não foi possível guardar o registo (sem espaço disponível no aparelho).';
+    els.bodyCheckErrorBox.style.display = 'block';
+    return;
+  }
+
+  els.bodyCheckinOverlay.classList.remove('show');
+  render();
+  renderBodyCard();
+});
+
+// ---- Onboarding: registo corporal ------------------------------------------
+let onboardBodyPhotoDataUrl = null;
+document.getElementById('onBodyCheckin').addEventListener('change', (e)=>{
+  document.getElementById('onBodyPhotoField').style.display = e.target.value === 'no' ? 'none' : 'block';
+});
+document.getElementById('onBodyPhotoInput').addEventListener('change', async (e)=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  const { dataUrl } = await processBodyPhotoCapture(file);
+  onboardBodyPhotoDataUrl = dataUrl;
+  document.getElementById('onBodyPhotoPreview').src = dataUrl;
+  document.getElementById('onBodyPhotoDropzone').style.display = 'none';
+  document.getElementById('onBodyPhotoPreviewWrap').style.display = 'block';
+});
+document.getElementById('onBodyPhotoRetakeBtn').addEventListener('click', ()=>{
+  onboardBodyPhotoDataUrl = null;
+  document.getElementById('onBodyPhotoInput').value = '';
+  document.getElementById('onBodyPhotoDropzone').style.display = 'block';
+  document.getElementById('onBodyPhotoPreviewWrap').style.display = 'none';
 });
 
 function escapeHtml(s){
@@ -1972,6 +2519,8 @@ els.gearBtn.addEventListener('click', ()=>{
   els.goalInput.value = settings.goal || 2000;
   els.weightInput.value = settings.weight || '';
   document.getElementById('objectiveInput').value = settings.objective || 'manter';
+  els.targetWeightInput.value = settings.targetWeight || '';
+  els.bodyCheckinInput.value = settings.bodyCheckinFreq || 'no';
   document.getElementById('themeInput').value = settings.theme || 'auto';
   document.getElementById('fastingEnabledInput').value = settings.fastingEnabled ? 'yes' : 'no';
   els.goalOverlay.classList.add('show');
@@ -1983,10 +2532,14 @@ els.goalSaveBtn.addEventListener('click', async ()=>{
   const w = parseFloat(els.weightInput.value);
   settings.weight = (!isNaN(w) && w > 0) ? w : settings.weight;
   settings.objective = document.getElementById('objectiveInput').value;
+  const tw = parseFloat(els.targetWeightInput.value);
+  settings.targetWeight = (!isNaN(tw) && tw > 0) ? tw : null;
+  settings.bodyCheckinFreq = els.bodyCheckinInput.value;
   settings.theme = document.getElementById('themeInput').value;
   settings.fastingEnabled = document.getElementById('fastingEnabledInput').value === 'yes';
   logWeight(settings.weight);
   await saveSettings();
+  renderBodyCard();
   applyTheme();
   render();
   els.goalOverlay.classList.remove('show');
