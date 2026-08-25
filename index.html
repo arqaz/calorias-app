@@ -471,6 +471,106 @@
     width:100%;margin-top:14px;background:linear-gradient(135deg,var(--a1),var(--a2));
     color:#fff;border:none;font-weight:800;font-size:14.5px;padding:13px;border-radius:14px;cursor:pointer;
   }
+
+  .offline-banner{
+    display:none;align-items:center;gap:8px;
+    background:#FFF3D6;color:#8A6D1F;font-size:12px;font-weight:700;line-height:1.4;
+    padding:10px 14px;border-radius:14px;margin-bottom:14px;
+  }
+  html[data-theme="dark"] .offline-banner{background:rgba(255,214,79,.14);color:#FFD64F;}
+  .scan-offline-notice{
+    display:none;margin-bottom:14px;border:1.5px solid #E8C877;background:#FFF3D6;color:#8A6D1F;
+    font-size:12.5px;font-weight:600;padding:10px 12px;border-radius:14px;
+  }
+  html[data-theme="dark"] .scan-offline-notice{background:rgba(255,214,79,.14);color:#FFD64F;border-color:rgba(255,214,79,.35);}
+  .dropzone.is-disabled{opacity:.5;pointer-events:none;}
+
+  .body-card{background:var(--card);border-radius:22px;box-shadow:var(--shadow);padding:16px 18px 18px;margin-bottom:18px;}
+  .body-top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:4px;}
+  .body-title{font-size:13px;font-weight:700;color:var(--muted);}
+  .body-status{font-size:12px;color:var(--muted);font-weight:600;margin-top:2px;}
+  .body-status.due{color:var(--a2);}
+  .body-checkin-btn{
+    flex-shrink:0;background:linear-gradient(135deg,var(--a1),var(--a2));color:#fff;border:none;
+    font-weight:800;font-size:12px;padding:9px 14px;border-radius:12px;cursor:pointer;white-space:nowrap;
+  }
+  .body-timeline{display:flex;gap:10px;overflow-x:auto;padding:12px 0 2px;-webkit-overflow-scrolling:touch;}
+  .body-thumb-col{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;}
+  .body-thumb{width:64px;height:86px;border-radius:14px;object-fit:cover;background:var(--track);box-shadow:var(--shadow-soft);}
+  .body-thumb-date{font-size:9.5px;color:var(--muted-soft);font-weight:700;}
+  .body-empty{font-size:12.5px;color:var(--muted);padding:6px 0 2px;}
+  .body-projection{
+    margin-top:14px;padding:12px 13px;border-radius:16px;background:var(--fresh-soft);color:var(--fresh);
+    font-size:12.5px;font-weight:600;line-height:1.5;
+  }
+  .body-projection.neutral{background:var(--track);color:var(--muted);}
+
+  .lightbox-overlay{
+    position:fixed;inset:0;background:rgba(10,14,8,.9);z-index:60;
+    display:none;align-items:center;justify-content:center;flex-direction:column;padding:24px;
+  }
+  .lightbox-overlay.show{display:flex;}
+  .lightbox-overlay img{max-width:100%;max-height:64vh;border-radius:18px;object-fit:contain;}
+  .lightbox-caption{color:#fff;font-size:13px;font-weight:700;margin-top:14px;text-align:center;}
+  .lightbox-sub{color:rgba(255,255,255,.65);font-size:11.5px;font-weight:600;margin-top:3px;}
+  .lightbox-actions{display:flex;gap:10px;margin-top:20px;}
+  .lightbox-btn{border:none;font-weight:800;font-size:12.5px;padding:10px 18px;border-radius:12px;cursor:pointer;}
+  .lightbox-close{background:rgba(255,255,255,.14);color:#fff;}
+  .lightbox-delete{background:#D64545;color:#fff;}
+
+  .body-weight-row{display:flex;align-items:center;gap:10px;margin:14px 0 4px;}
+  .body-weight-row input{
+    flex:1;font-size:15px;font-weight:700;border:2px solid var(--track);border-radius:12px;
+    padding:10px 12px;font-family:'Plus Jakarta Sans',sans-serif;color:var(--ink);
+  }
+  .body-weight-row input:focus{outline:none;border-color:var(--a2);}
+  .body-photo-skip{width:100%;background:none;border:none;color:var(--muted);font-weight:700;font-size:12.5px;text-decoration:underline;cursor:pointer;padding:8px 0;}
+
+  .body-feedback-title{font-size:15px;font-weight:800;margin-bottom:10px;}
+  .body-feedback-summary{
+    background:var(--fresh-soft);color:var(--fresh);font-size:13px;font-weight:600;line-height:1.5;
+    padding:12px 13px;border-radius:16px;
+  }
+  .body-feedback-summary.neutral{background:var(--track);color:var(--muted);}
+  .body-feedback-section{margin-top:14px;}
+  .body-feedback-heading{font-size:11.5px;font-weight:700;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.02em;}
+  .body-feedback-list{margin:0;padding-left:18px;font-size:13px;font-weight:500;line-height:1.6;}
+  .body-feedback-list li{margin-bottom:2px;}
+  .body-feedback-disclaimer{font-size:10.5px;color:var(--muted-soft);font-weight:500;line-height:1.5;margin-top:14px;}
+  .lightbox-feedback{
+    max-width:340px;background:rgba(255,255,255,.08);color:rgba(255,255,255,.85);
+    font-size:12px;font-weight:500;line-height:1.5;padding:12px 14px;border-radius:14px;margin-top:14px;text-align:left;
+  }
+
+  .nutri-card{background:var(--card);border-radius:22px;box-shadow:var(--shadow);padding:30px 22px;text-align:center;margin-bottom:18px;}
+  .nutri-empty-icon{font-size:38px;margin-bottom:8px;}
+  .nutri-empty-title{font-size:17.5px;font-weight:800;margin-bottom:6px;}
+  .nutri-empty-sub{font-size:12.5px;color:var(--muted);font-weight:500;line-height:1.55;margin-bottom:18px;}
+  .nutri-meta{font-size:11.5px;color:var(--muted);font-weight:600;margin-bottom:14px;}
+  .nutri-day-title{font-size:15px;font-weight:800;margin-bottom:2px;text-transform:capitalize;}
+  .nutri-meal-item{background:var(--card);border-radius:18px;box-shadow:var(--shadow-soft);padding:14px 15px;margin-bottom:10px;}
+  .nutri-meal-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
+  .nutri-meal-type{font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;}
+  .nutri-meal-name{font-size:14.5px;font-weight:800;margin-top:2px;}
+  .nutri-meal-desc{font-size:12px;color:var(--muted);font-weight:500;margin-top:3px;line-height:1.45;}
+  .nutri-meal-cal{font-size:13px;font-weight:800;color:var(--a2);white-space:nowrap;flex-shrink:0;}
+  .nutri-meal-add{
+    margin-top:10px;width:100%;background:var(--fresh-soft);color:var(--fresh);border:none;
+    font-weight:800;font-size:12.5px;padding:9px;border-radius:12px;cursor:pointer;
+  }
+  .nutri-meal-add.added{background:var(--track);color:var(--muted);cursor:default;}
+  .nutri-actions-row{display:flex;justify-content:space-between;gap:10px;margin-top:6px;}
+  .nutri-week-day{margin-bottom:20px;}
+  .nutri-notes{
+    background:var(--fresh-soft);color:var(--fresh);font-size:12.5px;font-weight:600;line-height:1.5;
+    padding:12px 13px;border-radius:16px;margin-bottom:18px;
+  }
+  .pref-chips-wrap{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 4px;}
+  .pref-chip{
+    background:var(--track);color:var(--ink);font-size:12.5px;font-weight:700;
+    padding:8px 14px;border-radius:20px;border:none;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;
+  }
+  .pref-chip.active{background:linear-gradient(135deg,var(--a1),var(--a2));color:#fff;}
 </style>
 </head>
 <body>
@@ -540,6 +640,34 @@
     <input type="number" id="onGoal" inputmode="numeric" placeholder="2000" value="2000">
   </div>
 
+  <div class="onboard-field">
+    <label>Peso objetivo (kg) — opcional</label>
+    <input type="number" id="onTargetWeight" inputmode="numeric" step="0.5" placeholder="ex: 68">
+  </div>
+
+  <div class="onboard-field">
+    <label>Queres manter um registo de progresso corporal (fotos)?</label>
+    <select id="onBodyCheckin">
+      <option value="no" selected>Não, obrigado</option>
+      <option value="weekly">Sim — semanalmente</option>
+      <option value="biweekly">Sim — quinzenalmente</option>
+    </select>
+  </div>
+
+  <div class="onboard-field" id="onBodyPhotoField" style="display:none;">
+    <label>Foto de corpo inteiro, de frente (opcional)</label>
+    <label for="onBodyPhotoInput" id="onBodyPhotoDropzone" class="dropzone" style="padding:22px 16px;display:block;">
+      <div class="camicon">🧍</div>
+      <p>Tirar ou carregar foto</p>
+      <small>Fica guardada só neste aparelho · podes saltar este passo</small>
+    </label>
+    <input type="file" id="onBodyPhotoInput" accept="image/*" capture="environment">
+    <div id="onBodyPhotoPreviewWrap" style="display:none;margin-top:10px;">
+      <img id="onBodyPhotoPreview" style="width:100%;max-height:240px;object-fit:cover;border-radius:18px;display:block;" alt="Pré-visualização">
+      <button type="button" class="body-photo-skip" id="onBodyPhotoRetakeBtn">Trocar foto</button>
+    </div>
+  </div>
+
   <button class="onboard-start" id="onboardStartBtn">Começar</button>
   <button class="onboard-skip" id="onboardSkipBtn">Saltar por agora</button>
 </div>
@@ -556,6 +684,11 @@
     <button class="gear" id="gearBtn" aria-label="Definir meta">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
     </button>
+  </div>
+
+  <div class="offline-banner" id="offlineBanner">
+    <span>📡</span>
+    <span>Estás offline — os teus dados continuam guardados no aparelho. A identificação de pratos por foto (IA) fica indisponível até teres ligação.</span>
   </div>
 
   <div class="day-strip" id="dayStrip"></div>
@@ -671,6 +804,33 @@
   <div id="mealList"></div>
   </div>
 
+  <div id="tabNutricao" style="display:none;">
+    <div class="nutri-card" id="nutriEmptyCard">
+      <div class="nutri-empty-icon">🥗</div>
+      <div class="nutri-empty-title">Plano de refeições</div>
+      <div class="nutri-empty-sub">Gera um plano semanal de refeições adaptado ao teu objetivo, meta calórica e preferências alimentares.</div>
+      <div class="scan-offline-notice" id="nutriOfflineNotice">📡 Estás offline — a geração do plano precisa de ligação à internet.</div>
+      <div id="nutriGenErrorBox" class="error" style="display:none;"></div>
+      <button class="add-btn" id="nutriGenerateBtn">Gerar plano semanal</button>
+      <button class="link-btn" id="nutriPrefsBtn" style="display:block;margin:10px auto 0;">Preferências e restrições alimentares</button>
+    </div>
+
+    <div id="nutriPlanView" style="display:none;">
+      <div class="nutri-meta" id="nutriMeta"></div>
+      <div class="nutri-notes" id="nutriNotes" style="display:none;"></div>
+      <div class="section-title" style="margin-top:0;">
+        <span>🥗 Plano de hoje</span>
+        <button class="clear-link" id="nutriWeekLink">ver semana</button>
+      </div>
+      <div id="nutriTodayMeals"></div>
+
+      <div class="nutri-actions-row">
+        <button class="link-btn" id="nutriPrefsBtn2">Preferências</button>
+        <button class="link-btn" id="nutriRegenBtn">Gerar novo plano</button>
+      </div>
+    </div>
+  </div>
+
   <div id="tabProgresso" style="display:none;">
     <div class="week-card">
       <div class="week-title">📊 Últimos 7 dias</div>
@@ -680,6 +840,18 @@
     <div class="week-card" id="weightCard" style="display:none;">
       <div class="week-title">⚖️ Peso (kg)</div>
       <div class="week-bars" id="weightBars"></div>
+    </div>
+
+    <div class="body-card" id="bodyCard" style="display:none;">
+      <div class="body-top">
+        <div>
+          <div class="body-title">📸 Progresso corporal</div>
+          <div class="body-status" id="bodyStatus">—</div>
+        </div>
+        <button class="body-checkin-btn" id="bodyCheckinBtn">Registar</button>
+      </div>
+      <div class="body-timeline" id="bodyTimeline"></div>
+      <div class="body-projection" id="bodyProjection" style="display:none;"></div>
     </div>
 
     <div class="section-title" style="margin-top:0;">
@@ -697,6 +869,10 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
       <span>Hoje</span>
     </button>
+    <button class="nav-btn" id="tabBtnNutricao">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 2a9 9 0 0 0-9 9c0 4.5 4 8.5 9 11 5-2.5 9-6.5 9-11a9 9 0 0 0-9-9z"/><path d="M11 6v6l4 2"/></svg>
+      <span>Nutrição</span>
+    </button>
     <button class="nav-cam" id="navCamBtn" aria-label="Adicionar refeição">
       <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8a2 2 0 0 1 2-2h1.5l1-1.5h7l1 1.5H18a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><circle cx="12" cy="13" r="3.5"/></svg>
     </button>
@@ -711,6 +887,8 @@
   <div class="sheet">
     <div class="sheet-handle"></div>
     <div class="sheet-title">Adicionar refeição</div>
+
+    <div class="scan-offline-notice" id="scanOfflineNotice">📡 Estás offline: a identificação de pratos por foto (IA) precisa de ligação à internet. Usa o registo manual abaixo.</div>
 
     <label for="fileInput" id="dropzone" class="dropzone">
       <div class="camicon">📷</div>
@@ -788,6 +966,14 @@
       <button class="onboard-skip" id="recalcGoalBtn" style="border:2px solid var(--track);border-radius:14px;color:var(--ink);margin-top:14px;width:100%;">Sugerir meta com base nestes dados</button>
       <label style="display:block;margin-top:16px;">Objetivo de calorias (kcal)</label>
       <input type="number" id="goalInput" inputmode="numeric" min="0" step="50">
+      <label style="display:block;margin-top:16px;">Peso objetivo (kg) — opcional</label>
+      <input type="number" id="targetWeightInput" inputmode="numeric" min="0" step="0.5">
+      <label style="display:block;margin-top:16px;">Registo de progresso corporal (fotos)</label>
+      <select id="bodyCheckinInput" style="width:100%;margin-top:8px;font-size:15px;font-weight:700;border:2px solid var(--track);border-radius:14px;padding:12px 14px;font-family:'Plus Jakarta Sans',sans-serif;color:var(--ink);">
+        <option value="no">Desativado</option>
+        <option value="weekly">Semanal</option>
+        <option value="biweekly">Quinzenal</option>
+      </select>
       <label style="display:block;margin-top:16px;">Aparência</label>
       <select id="themeInput" style="width:100%;margin-top:8px;font-size:15px;font-weight:700;border:2px solid var(--track);border-radius:14px;padding:12px 14px;font-family:'Plus Jakarta Sans',sans-serif;color:var(--ink);">
         <option value="auto">Automático (segue o telemóvel)</option>
@@ -838,6 +1024,94 @@
       <label>Calorias queimadas (kcal)</label>
       <input type="number" id="exCal" inputmode="numeric" placeholder="0">
       <button class="add-btn" id="exAddBtn" style="margin-top:16px;">Adicionar</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="bodyCheckinOverlay">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Registo de progresso corporal</div>
+
+    <div id="bodyCheckinForm">
+      <div class="scan-offline-notice" id="bodyOfflineNotice">📡 Estás offline: a foto fica guardada, mas sem verificação de enquadramento por IA.</div>
+
+      <label for="bodyFileInput" id="bodyDropzone" class="dropzone">
+        <div class="camicon">🧍</div>
+        <p>Tirar ou carregar foto de corpo inteiro</p>
+        <small>de frente, de pé, boa iluminação</small>
+      </label>
+      <input type="file" id="bodyFileInput" accept="image/*" capture="environment">
+
+      <div style="text-align:center;">
+        <button type="button" class="body-photo-skip" id="bodySkipPhotoBtn">registar só o peso, sem foto</button>
+      </div>
+
+      <div class="preview-wrap" id="bodyPreviewWrap" style="display:none;">
+        <img id="bodyPreviewImg" src="" alt="Pré-visualização">
+        <button class="retake" id="bodyRetakeBtn">Trocar foto</button>
+      </div>
+
+      <div id="bodyCheckErrorBox" class="error" style="display:none;"></div>
+
+      <div class="body-weight-row">
+        <input type="number" id="bodyWeightInput" inputmode="numeric" step="0.5" placeholder="Peso atual (kg) — opcional">
+      </div>
+
+      <button class="add-btn" id="bodyCheckinSaveBtn" style="margin-top:14px;">Guardar registo</button>
+      <button class="discard-btn" id="bodyCheckinCancelBtn">Cancelar</button>
+    </div>
+
+    <div id="bodyFeedbackPanel" style="display:none;">
+      <div class="body-feedback-title">🤖 Feedback de progresso</div>
+      <div class="body-feedback-summary" id="bodyFeedbackSummary"></div>
+      <div class="body-feedback-section" id="bodyFeedbackObsSection" style="display:none;">
+        <div class="body-feedback-heading">O que parece estar a mudar</div>
+        <ul class="body-feedback-list" id="bodyFeedbackObservations"></ul>
+      </div>
+      <div class="body-feedback-section" id="bodyFeedbackSugSection" style="display:none;">
+        <div class="body-feedback-heading">Sugestões para continuar</div>
+        <ul class="body-feedback-list" id="bodyFeedbackSuggestions"></ul>
+      </div>
+      <div class="body-feedback-disclaimer">Feedback gerado por IA a partir das fotos e do teu objetivo — não substitui aconselhamento profissional de nutrição, treino ou saúde.</div>
+      <button class="add-btn" id="bodyFeedbackDoneBtn" style="margin-top:16px;">Concluído</button>
+    </div>
+  </div>
+</div>
+
+<div class="lightbox-overlay" id="bodyLightbox">
+  <img id="bodyLightboxImg" src="" alt="Registo de progresso corporal">
+  <div class="lightbox-caption" id="bodyLightboxDate">—</div>
+  <div class="lightbox-sub" id="bodyLightboxWeight"></div>
+  <div class="lightbox-feedback" id="bodyLightboxFeedback" style="display:none;"></div>
+  <div class="lightbox-actions">
+    <button class="lightbox-btn lightbox-close" id="bodyLightboxCloseBtn">Fechar</button>
+    <button class="lightbox-btn lightbox-delete" id="bodyLightboxDeleteBtn">Eliminar</button>
+  </div>
+</div>
+
+<div class="overlay" id="nutriWeekOverlay">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Plano semanal</div>
+    <div id="nutriWeekList"></div>
+    <button class="discard-btn" id="nutriWeekCloseBtn">Fechar</button>
+  </div>
+</div>
+
+<div class="overlay" id="nutriPrefsOverlay">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Preferências alimentares</div>
+    <div class="manual-form">
+      <label>Restrições</label>
+      <div class="pref-chips-wrap" id="nutriRestrictionsGrid"></div>
+      <label>Alimentos que gostas particularmente (opcional)</label>
+      <input type="text" id="nutriPrefsText" placeholder="ex: frango, arroz, brócolos">
+      <label>Alimentos a evitar (opcional)</label>
+      <input type="text" id="nutriDislikesText" placeholder="ex: cogumelos, peixe">
+      <button class="add-btn" id="nutriPrefsSaveBtn" style="margin-top:16px;">Guardar preferências</button>
+      <button class="discard-btn" id="nutriPrefsCancelBtn">Cancelar</button>
     </div>
   </div>
 </div>
@@ -935,6 +1209,64 @@ const els = {
   weightBars: document.getElementById('weightBars'),
   editSaveBtn: document.getElementById('editSaveBtn'),
   editDeleteBtn: document.getElementById('editDeleteBtn'),
+  offlineBanner: document.getElementById('offlineBanner'),
+  scanOfflineNotice: document.getElementById('scanOfflineNotice'),
+  bodyCard: document.getElementById('bodyCard'),
+  bodyStatus: document.getElementById('bodyStatus'),
+  bodyCheckinBtn: document.getElementById('bodyCheckinBtn'),
+  bodyTimeline: document.getElementById('bodyTimeline'),
+  bodyProjection: document.getElementById('bodyProjection'),
+  bodyCheckinOverlay: document.getElementById('bodyCheckinOverlay'),
+  bodyOfflineNotice: document.getElementById('bodyOfflineNotice'),
+  bodyDropzone: document.getElementById('bodyDropzone'),
+  bodyFileInput: document.getElementById('bodyFileInput'),
+  bodySkipPhotoBtn: document.getElementById('bodySkipPhotoBtn'),
+  bodyPreviewWrap: document.getElementById('bodyPreviewWrap'),
+  bodyPreviewImg: document.getElementById('bodyPreviewImg'),
+  bodyRetakeBtn: document.getElementById('bodyRetakeBtn'),
+  bodyCheckErrorBox: document.getElementById('bodyCheckErrorBox'),
+  bodyWeightInput: document.getElementById('bodyWeightInput'),
+  bodyCheckinSaveBtn: document.getElementById('bodyCheckinSaveBtn'),
+  bodyCheckinCancelBtn: document.getElementById('bodyCheckinCancelBtn'),
+  bodyLightbox: document.getElementById('bodyLightbox'),
+  bodyLightboxImg: document.getElementById('bodyLightboxImg'),
+  bodyLightboxDate: document.getElementById('bodyLightboxDate'),
+  bodyLightboxWeight: document.getElementById('bodyLightboxWeight'),
+  bodyLightboxFeedback: document.getElementById('bodyLightboxFeedback'),
+  bodyLightboxCloseBtn: document.getElementById('bodyLightboxCloseBtn'),
+  bodyLightboxDeleteBtn: document.getElementById('bodyLightboxDeleteBtn'),
+  bodyCheckinForm: document.getElementById('bodyCheckinForm'),
+  bodyFeedbackPanel: document.getElementById('bodyFeedbackPanel'),
+  bodyFeedbackSummary: document.getElementById('bodyFeedbackSummary'),
+  bodyFeedbackObsSection: document.getElementById('bodyFeedbackObsSection'),
+  bodyFeedbackObservations: document.getElementById('bodyFeedbackObservations'),
+  bodyFeedbackSugSection: document.getElementById('bodyFeedbackSugSection'),
+  bodyFeedbackSuggestions: document.getElementById('bodyFeedbackSuggestions'),
+  bodyFeedbackDoneBtn: document.getElementById('bodyFeedbackDoneBtn'),
+  targetWeightInput: document.getElementById('targetWeightInput'),
+  bodyCheckinInput: document.getElementById('bodyCheckinInput'),
+  tabBtnNutricao: document.getElementById('tabBtnNutricao'),
+  nutriEmptyCard: document.getElementById('nutriEmptyCard'),
+  nutriOfflineNotice: document.getElementById('nutriOfflineNotice'),
+  nutriGenErrorBox: document.getElementById('nutriGenErrorBox'),
+  nutriGenerateBtn: document.getElementById('nutriGenerateBtn'),
+  nutriPrefsBtn: document.getElementById('nutriPrefsBtn'),
+  nutriPrefsBtn2: document.getElementById('nutriPrefsBtn2'),
+  nutriPlanView: document.getElementById('nutriPlanView'),
+  nutriMeta: document.getElementById('nutriMeta'),
+  nutriNotes: document.getElementById('nutriNotes'),
+  nutriTodayMeals: document.getElementById('nutriTodayMeals'),
+  nutriWeekLink: document.getElementById('nutriWeekLink'),
+  nutriRegenBtn: document.getElementById('nutriRegenBtn'),
+  nutriWeekOverlay: document.getElementById('nutriWeekOverlay'),
+  nutriWeekList: document.getElementById('nutriWeekList'),
+  nutriWeekCloseBtn: document.getElementById('nutriWeekCloseBtn'),
+  nutriPrefsOverlay: document.getElementById('nutriPrefsOverlay'),
+  nutriRestrictionsGrid: document.getElementById('nutriRestrictionsGrid'),
+  nutriPrefsText: document.getElementById('nutriPrefsText'),
+  nutriDislikesText: document.getElementById('nutriDislikesText'),
+  nutriPrefsSaveBtn: document.getElementById('nutriPrefsSaveBtn'),
+  nutriPrefsCancelBtn: document.getElementById('nutriPrefsCancelBtn'),
 };
 
 els.ringProgress.setAttribute('stroke-dasharray', CIRC.toFixed(2));
@@ -1004,26 +1336,32 @@ function renderHistory(){
 }
 
 function switchTab(tab){
-  const tabHoje = document.getElementById('tabHoje');
-  const tabProgresso = document.getElementById('tabProgresso');
-  const btnHoje = document.getElementById('tabBtnHoje');
-  const btnProgresso = document.getElementById('tabBtnProgresso');
+  const panels = {
+    hoje: document.getElementById('tabHoje'),
+    nutricao: document.getElementById('tabNutricao'),
+    progresso: document.getElementById('tabProgresso'),
+  };
+  const btns = {
+    hoje: document.getElementById('tabBtnHoje'),
+    nutricao: document.getElementById('tabBtnNutricao'),
+    progresso: document.getElementById('tabBtnProgresso'),
+  };
+  Object.keys(panels).forEach(key=>{
+    const active = key === tab;
+    panels[key].style.display = active ? 'block' : 'none';
+    btns[key].classList.toggle('active', active);
+  });
   if(tab === 'progresso'){
-    tabHoje.style.display = 'none';
-    tabProgresso.style.display = 'block';
-    btnHoje.classList.remove('active');
-    btnProgresso.classList.add('active');
     renderHistory();
     renderWeightChart();
-  } else {
-    tabHoje.style.display = 'block';
-    tabProgresso.style.display = 'none';
-    btnProgresso.classList.remove('active');
-    btnHoje.classList.add('active');
+    renderBodyCard();
+  } else if(tab === 'nutricao'){
+    renderNutriTab();
   }
 }
 
 document.getElementById('tabBtnHoje').addEventListener('click', ()=> switchTab('hoje'));
+document.getElementById('tabBtnNutricao').addEventListener('click', ()=> switchTab('nutricao'));
 document.getElementById('tabBtnProgresso').addEventListener('click', ()=> switchTab('progresso'));
 
 function applyTheme(){
@@ -1047,13 +1385,52 @@ if(window.matchMedia){
   });
 }
 
+function isOffline(){
+  return !navigator.onLine;
+}
+
+// Só a funcionalidade que depende de rede (identificação de pratos por foto
+// via IA) fica indisponível offline — o resto da app corre inteiramente a
+// partir dos dados guardados no aparelho (localStorage).
+let scanManualForcedByOffline = false;
+
+function updateOfflineUI(){
+  const offline = isOffline();
+  if(els.offlineBanner) els.offlineBanner.style.display = offline ? 'flex' : 'none';
+  if(els.scanOfflineNotice) els.scanOfflineNotice.style.display = offline ? 'block' : 'none';
+  if(els.dropzone) els.dropzone.classList.toggle('is-disabled', offline);
+  if(els.manualToggleBtn) els.manualToggleBtn.style.display = offline ? 'none' : 'inline';
+  // Se a folha "Adicionar refeição" ficou presa no formulário manual porque
+  // resetScan() a escondeu enquanto offline, repõe a dropzone assim que a
+  // ligação volta (sem isto, ficava escondida até fechar e reabrir a folha).
+  if(!offline && scanManualForcedByOffline && els.scanOverlay && els.scanOverlay.classList.contains('show')){
+    scanManualForcedByOffline = false;
+    els.dropzone.style.display = 'block';
+    els.manualForm.style.display = 'none';
+    els.manualToggleBtn.textContent = 'ou adicionar sem foto';
+  }
+  // O registo corporal continua a funcionar offline (a foto fica guardada de
+  // qualquer forma) — só o enquadramento/validação por IA fica indisponível,
+  // por isso a dropzone em si não é desativada, apenas mostramos um aviso.
+  if(els.bodyOfflineNotice) els.bodyOfflineNotice.style.display = offline ? 'block' : 'none';
+  if(els.nutriOfflineNotice) els.nutriOfflineNotice.style.display = offline ? 'block' : 'none';
+  if(els.nutriGenerateBtn) els.nutriGenerateBtn.disabled = offline;
+  if(els.nutriRegenBtn) els.nutriRegenBtn.disabled = offline;
+}
+
+window.addEventListener('online', updateOfflineUI);
+window.addEventListener('offline', updateOfflineUI);
+
 async function init(){
   els.dateBig.textContent = fmtDateBig(currentDate);
   await loadSettings();
   applyTheme();
   await loadDay();
+  loadBodyCheckins();
+  loadMealPlan();
   render();
   startFastingTicker();
+  updateOfflineUI();
   if(!settings.onboarded){
     document.getElementById('onboardOverlay').classList.remove('hide');
   }
@@ -1109,10 +1486,17 @@ document.getElementById('onboardStartBtn').addEventListener('click', async ()=>{
   settings.goal = (!isNaN(g) && g > 0) ? g : 2000;
   settings.objective = document.getElementById('onObjective').value;
   settings.fastingEnabled = document.getElementById('onFasting').value === 'yes';
+  const tw = parseFloat(document.getElementById('onTargetWeight').value);
+  settings.targetWeight = (!isNaN(tw) && tw > 0) ? tw : null;
+  settings.bodyCheckinFreq = document.getElementById('onBodyCheckin').value;
   settings.onboarded = true;
   logWeight(settings.weight);
   await saveSettings();
+  if(onboardBodyPhotoDataUrl){
+    await commitBodyCheckin({ photoDataUrl: onboardBodyPhotoDataUrl, mediaType: 'image/jpeg', weight: null });
+  }
   render();
+  renderBodyCard();
   finishOnboarding();
 });
 
@@ -1129,10 +1513,69 @@ async function loadSettings(){
   }catch(e){ /* ainda não definido, usa valor por omissão */ }
   if(!settings.fasting) settings.fasting = { plan: 16, active: false, startTime: null };
   if(typeof settings.fastingEnabled !== 'boolean') settings.fastingEnabled = false;
+  if(typeof settings.bodyCheckinFreq !== 'string') settings.bodyCheckinFreq = 'no';
+  if(!Array.isArray(settings.dietaryRestrictions)) settings.dietaryRestrictions = [];
+  if(typeof settings.dietaryPreferencesText !== 'string') settings.dietaryPreferencesText = '';
+  if(typeof settings.dietaryDislikesText !== 'string') settings.dietaryDislikesText = '';
 }
 async function saveSettings(){
   try{ localStorage.setItem('settings', JSON.stringify(settings)); }
   catch(e){ console.error('Erro ao guardar definições', e); }
+}
+
+let mealPlan = null;
+
+function loadMealPlan(){
+  try{
+    const raw = localStorage.getItem('mealPlan');
+    mealPlan = raw ? JSON.parse(raw) : null;
+  }catch(e){ mealPlan = null; }
+}
+function saveMealPlan(){
+  try{
+    if(mealPlan) localStorage.setItem('mealPlan', JSON.stringify(mealPlan));
+    else localStorage.removeItem('mealPlan');
+    return true;
+  }catch(e){ console.error('Erro ao guardar plano de refeições', e); return false; }
+}
+
+function bodyCheckinFreqDays(){
+  return settings.bodyCheckinFreq === 'weekly' ? 7 : 14;
+}
+
+let bodyCheckins = [];
+
+function loadBodyCheckins(){
+  try{
+    const raw = localStorage.getItem('bodyCheckins');
+    bodyCheckins = raw ? JSON.parse(raw) : [];
+  }catch(e){ bodyCheckins = []; }
+  if(!Array.isArray(bodyCheckins)) bodyCheckins = [];
+  bodyCheckins.sort((a,b)=> a.date.localeCompare(b.date));
+}
+
+function saveBodyCheckins(){
+  // Tenta gravar; se exceder a quota do localStorage, tenta outra vez sem a
+  // entrada mais antiga — mas só numa cópia. Só aplicamos esse corte ao array
+  // real (bodyCheckins) quando uma gravação efetivamente tiver sucesso, para
+  // nunca perder registos da memória se todas as tentativas falharem (nesse
+  // caso o localStorage em disco também nunca chegou a ser escrito, por isso
+  // nada se perde).
+  let attempt = bodyCheckins;
+  while(true){
+    try{
+      localStorage.setItem('bodyCheckins', JSON.stringify(attempt));
+      if(attempt !== bodyCheckins) bodyCheckins = attempt;
+      return true;
+    }catch(e){
+      if(attempt.length > 1){
+        attempt = attempt.slice(1);
+        continue;
+      }
+      console.error('Erro ao guardar registo corporal', e);
+      return false;
+    }
+  }
 }
 async function loadDay(){
   try{
@@ -1415,6 +1858,674 @@ els.exAddBtn.addEventListener('click', async ()=>{
   els.exerciseOverlay.classList.remove('show');
 });
 
+// ---- Registo de progresso corporal ----------------------------------------
+// Nota de conceção: a IA aqui é usada apenas para (a) confirmar que a foto é
+// tecnicamente adequada para comparação (corpo inteiro visível) e (b) sugerir
+// um enquadramento consistente entre registos. Não avalia nem comenta a
+// aparência física da pessoa. A "projeção" mostrada ao utilizador é sempre
+// calculada a partir dos números que a própria pessoa registou (peso ao
+// longo do tempo), nunca uma imagem gerada/alterada do corpo — ver api/body-checkin.js.
+
+function resizeImageFile(file, maxDim, quality){
+  return new Promise((resolve, reject)=>{
+    const reader = new FileReader();
+    reader.onload = ()=>{
+      const img = new Image();
+      img.onload = ()=>{
+        let w = img.width, h = img.height;
+        if(w > h && w > maxDim){ h = Math.round(h * maxDim / w); w = maxDim; }
+        else if(h > maxDim){ w = Math.round(w * maxDim / h); h = maxDim; }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', quality || 0.8));
+      };
+      img.onerror = reject;
+      img.src = reader.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function processBodyPhotoCapture(file){
+  const dataUrl = await resizeImageFile(file, 1024);
+  return { dataUrl, mediaType: 'image/jpeg' };
+}
+
+function cropBodyPhoto(dataUrl, cropBox){
+  return new Promise((resolve)=>{
+    if(!cropBox){ resolve(dataUrl); return; }
+    const img = new Image();
+    img.onload = ()=>{
+      try{
+        const iw = img.width, ih = img.height;
+        const bx = Math.max(0, Math.min(cropBox.x||0, 1));
+        const by = Math.max(0, Math.min(cropBox.y||0, 1));
+        const bw = Math.max(0.05, Math.min(cropBox.width||1, 1-bx));
+        const bh = Math.max(0.05, Math.min(cropBox.height||1, 1-by));
+        let sx = bx*iw, sy = by*ih, sw = bw*iw, sh = bh*ih;
+
+        const OUT_W = 360, OUT_H = 480; // proporção 3:4, retrato — consistente entre registos
+        const targetRatio = OUT_W / OUT_H;
+        const boxRatio = sw / sh;
+        if(boxRatio > targetRatio){
+          const newW = sh * targetRatio;
+          sx += (sw - newW) / 2;
+          sw = newW;
+        } else {
+          const newH = sw / targetRatio;
+          sy += (sh - newH) / 2;
+          sh = newH;
+        }
+        sx = Math.max(0, Math.min(sx, iw - sw));
+        sy = Math.max(0, Math.min(sy, ih - sh));
+
+        const canvas = document.createElement('canvas');
+        canvas.width = OUT_W; canvas.height = OUT_H;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, sx, sy, sw, sh, 0, 0, OUT_W, OUT_H);
+        resolve(canvas.toDataURL('image/jpeg', 0.7));
+      }catch(e){ resolve(dataUrl); }
+    };
+    img.onerror = ()=> resolve(dataUrl);
+    img.src = dataUrl;
+  });
+}
+
+async function analyzeBodyPhoto(base64, mediaType){
+  const response = await fetch('/api/body-checkin', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ image: base64, mediaType }),
+  });
+  if(!response.ok) throw new Error('Falha na chamada à API (' + response.status + ')');
+  return response.json();
+}
+
+// Guarda um registo (foto e/ou peso) para o dia de hoje, partilhado entre a
+// folha de registo e o onboarding. Tenta o enquadramento por IA quando há
+// ligação; offline (ou em caso de erro), guarda a foto tal como capturada.
+async function commitBodyCheckin({ photoDataUrl, mediaType, weight }){
+  let finalPhoto = photoDataUrl || null;
+  let validPhoto = null;
+  let note = '';
+
+  if(photoDataUrl && !isOffline()){
+    try{
+      const base64 = photoDataUrl.split(',')[1];
+      const result = await analyzeBodyPhoto(base64, mediaType || 'image/jpeg');
+      validPhoto = !!result.valid;
+      note = result.valid ? '' : (result.reason || '');
+      if(result.crop_box){
+        finalPhoto = await cropBodyPhoto(photoDataUrl, result.crop_box);
+      }
+    }catch(err){
+      console.error('Falha ao analisar foto de progresso', err);
+    }
+  }
+
+  const entry = {
+    id: Date.now(),
+    date: todayStr(),
+    photo: finalPhoto,
+    weight: (typeof weight === 'number' && weight > 0) ? weight : null,
+    validPhoto,
+    note,
+  };
+  // um registo por dia — um novo registo no mesmo dia substitui o anterior
+  bodyCheckins = bodyCheckins.filter(c => c.date !== entry.date);
+  bodyCheckins.push(entry);
+  bodyCheckins.sort((a,b)=> a.date.localeCompare(b.date));
+
+  let saved = saveBodyCheckins();
+  if(!saved && entry.photo){
+    // sem espaço no aparelho mesmo depois de descartar fotos antigas — guarda
+    // pelo menos a data/peso, sem a foto
+    entry.photo = null;
+    saved = saveBodyCheckins();
+  }
+  if(!saved){
+    bodyCheckins = bodyCheckins.filter(c => c.id !== entry.id);
+  }
+
+  if(entry.weight){
+    settings.weight = entry.weight;
+    logWeight(entry.weight);
+    await saveSettings();
+  }
+
+  return { entry, saved };
+}
+
+function renderBodyProjection(){
+  const history = settings.weightHistory || {};
+  const dates = Object.keys(history).sort();
+  els.bodyProjection.style.display = 'block';
+
+  if(dates.length < 2){
+    els.bodyProjection.className = 'body-projection neutral';
+    els.bodyProjection.textContent = 'Regista o teu peso ao longo do tempo (no registo corporal ou nas definições) para veres aqui uma projeção baseada no teu progresso real.';
+    return;
+  }
+
+  const first = dates[0], last = dates[dates.length-1];
+  const firstVal = Number(history[first]);
+  const lastVal = Number(history[last]);
+  const daysBetween = Math.max(1, (new Date(last) - new Date(first)) / 86400000);
+  const weeksBetween = daysBetween / 7;
+  const ratePerWeek = weeksBetween > 0 ? (lastVal - firstVal) / weeksBetween : 0;
+  const target = Number(settings.targetWeight) || null;
+
+  if(Math.abs(ratePerWeek) < 0.05 || weeksBetween < 1){
+    els.bodyProjection.className = 'body-projection neutral';
+    els.bodyProjection.textContent = 'O teu peso tem-se mantido estável até agora. Continua a registar para veres aqui uma tendência e projeção.';
+    return;
+  }
+
+  els.bodyProjection.className = 'body-projection';
+  const in4 = (lastVal + ratePerWeek * 4).toFixed(1);
+  const in8 = (lastVal + ratePerWeek * 8).toFixed(1);
+  let msg = `A um ritmo de ${ratePerWeek > 0 ? '+' : ''}${ratePerWeek.toFixed(2)} kg/semana, é expectável estares por volta de ${in4} kg daqui a 4 semanas e ${in8} kg daqui a 8 semanas, mantendo o plano atual.`;
+
+  if(target){
+    const diff = target - lastVal;
+    const weeksToTarget = ratePerWeek !== 0 ? diff / ratePerWeek : Infinity;
+    if(weeksToTarget > 0 && weeksToTarget < 104){
+      msg += ` A este ritmo, chegas ao peso objetivo (${target} kg) em cerca de ${Math.round(weeksToTarget)} semanas.`;
+    }
+  }
+  els.bodyProjection.textContent = msg;
+}
+
+function renderBodyCard(){
+  if(!els.bodyCard) return;
+  const enabled = settings.bodyCheckinFreq && settings.bodyCheckinFreq !== 'no';
+  const hasHistory = bodyCheckins.length > 0;
+  if(!enabled && !hasHistory){
+    els.bodyCard.style.display = 'none';
+    return;
+  }
+  els.bodyCard.style.display = 'block';
+
+  if(bodyCheckins.length === 0){
+    els.bodyStatus.textContent = 'Ainda sem registos — começa quando quiseres.';
+    els.bodyStatus.classList.remove('due');
+  } else {
+    const last = bodyCheckins[bodyCheckins.length - 1];
+    if(enabled){
+      const nextDue = addDays(last.date, bodyCheckinFreqDays());
+      const isDue = nextDue <= todayStr();
+      els.bodyStatus.textContent = isDue
+        ? 'Registo em atraso — regista o teu progresso.'
+        : ('Último registo: ' + fmtDateBig(last.date) + ' · próximo: ' + fmtDateBig(nextDue));
+      els.bodyStatus.classList.toggle('due', isDue);
+    } else {
+      els.bodyStatus.textContent = 'Último registo: ' + fmtDateBig(last.date);
+      els.bodyStatus.classList.remove('due');
+    }
+  }
+
+  els.bodyTimeline.innerHTML = '';
+  if(bodyCheckins.length === 0){
+    const empty = document.createElement('div');
+    empty.className = 'body-empty';
+    empty.textContent = 'Sem registos ainda.';
+    els.bodyTimeline.appendChild(empty);
+  } else {
+    bodyCheckins.slice(-12).forEach(entry=>{
+      const col = document.createElement('div');
+      col.className = 'body-thumb-col';
+      const d = new Date(entry.date+'T00:00:00');
+      const label = d.toLocaleDateString('pt-PT',{day:'2-digit', month:'2-digit'});
+      const thumb = entry.photo
+        ? `<img class="body-thumb" src="${escapeAttr(entry.photo)}" alt="Registo de ${label}">`
+        : `<div class="body-thumb" style="display:flex;align-items:center;justify-content:center;font-size:20px;">⚖️</div>`;
+      col.innerHTML = thumb + `<span class="body-thumb-date">${label}</span>`;
+      col.addEventListener('click', ()=> openBodyLightbox(entry));
+      els.bodyTimeline.appendChild(col);
+    });
+  }
+
+  renderBodyProjection();
+}
+
+let lightboxEntryId = null;
+function openBodyLightbox(entry){
+  lightboxEntryId = entry.id;
+  if(entry.photo){
+    els.bodyLightboxImg.src = entry.photo;
+    els.bodyLightboxImg.style.display = 'block';
+  } else {
+    els.bodyLightboxImg.removeAttribute('src');
+    els.bodyLightboxImg.style.display = 'none';
+  }
+  els.bodyLightboxDate.textContent = fmtDateBig(entry.date);
+  els.bodyLightboxWeight.textContent = entry.weight ? (entry.weight + ' kg') : (entry.note || '');
+  if(entry.feedback && entry.feedback.summary){
+    els.bodyLightboxFeedback.textContent = '🤖 ' + entry.feedback.summary;
+    els.bodyLightboxFeedback.style.display = 'block';
+  } else {
+    els.bodyLightboxFeedback.textContent = '';
+    els.bodyLightboxFeedback.style.display = 'none';
+  }
+  els.bodyLightbox.classList.add('show');
+}
+els.bodyLightboxCloseBtn.addEventListener('click', ()=> els.bodyLightbox.classList.remove('show'));
+els.bodyLightbox.addEventListener('click', (e)=>{ if(e.target === els.bodyLightbox) els.bodyLightbox.classList.remove('show'); });
+els.bodyLightboxDeleteBtn.addEventListener('click', ()=>{
+  if(lightboxEntryId == null) return;
+  if(!confirm('Eliminar este registo (foto e peso) permanentemente?')) return;
+  bodyCheckins = bodyCheckins.filter(c => c.id !== lightboxEntryId);
+  saveBodyCheckins();
+  els.bodyLightbox.classList.remove('show');
+  renderBodyCard();
+});
+
+let bodyPhotoDataUrl = null, bodyPhotoMediaType = null;
+
+function resetBodyCheckinSheet(){
+  els.bodyFileInput.value = '';
+  bodyPhotoDataUrl = null; bodyPhotoMediaType = null;
+  els.bodyDropzone.style.display = 'block';
+  els.bodyPreviewWrap.style.display = 'none';
+  els.bodyCheckErrorBox.style.display = 'none';
+  els.bodyWeightInput.value = settings.weight || '';
+  els.bodyCheckinForm.style.display = 'block';
+  els.bodyFeedbackPanel.style.display = 'none';
+  updateOfflineUI();
+}
+
+// Devolve o registo mais recente que tem foto (para comparação de progresso).
+// Devolve o registo com foto mais recente de um dia ANTERIOR a `beforeDate`
+// (por omissão, hoje) — nunca um registo do mesmo dia, para que a comparação
+// de progresso não acabe a comparar duas fotos tiradas minutos antes uma da
+// outra (ex: a pessoa repete o registo no mesmo dia).
+function latestPhotoEntry(beforeDate){
+  const cutoff = beforeDate || todayStr();
+  for(let i = bodyCheckins.length - 1; i >= 0; i--){
+    if(bodyCheckins[i].photo && bodyCheckins[i].date < cutoff) return bodyCheckins[i];
+  }
+  return null;
+}
+
+function splitDataUrl(dataUrl){
+  const match = /^data:([^;]+);base64,(.*)$/.exec(dataUrl || '');
+  return match ? { mediaType: match[1], base64: match[2] } : null;
+}
+
+async function fetchBodyProgressFeedback({ currentImage, currentMediaType, previousImage, previousMediaType, objective }){
+  const response = await fetch('/api/body-progress-feedback', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ currentImage, currentMediaType, previousImage, previousMediaType, objective }),
+  });
+  if(!response.ok) throw new Error('Falha na chamada à API (' + response.status + ')');
+  return response.json();
+}
+
+function showBodyFeedback(feedback){
+  els.bodyCheckinForm.style.display = 'none';
+  els.bodyFeedbackPanel.style.display = 'block';
+
+  const comparable = feedback && feedback.comparable !== false;
+  els.bodyFeedbackSummary.className = 'body-feedback-summary' + (comparable ? '' : ' neutral');
+  els.bodyFeedbackSummary.textContent = (feedback && feedback.summary) || 'Sem feedback disponível desta vez.';
+
+  const observations = (feedback && Array.isArray(feedback.observations)) ? feedback.observations : [];
+  if(observations.length){
+    els.bodyFeedbackObservations.innerHTML = observations.map(o => `<li>${escapeHtml(o)}</li>`).join('');
+    els.bodyFeedbackObsSection.style.display = 'block';
+  } else {
+    els.bodyFeedbackObsSection.style.display = 'none';
+  }
+
+  const suggestions = (feedback && Array.isArray(feedback.suggestions)) ? feedback.suggestions : [];
+  if(suggestions.length){
+    els.bodyFeedbackSuggestions.innerHTML = suggestions.map(s => `<li>${escapeHtml(s)}</li>`).join('');
+    els.bodyFeedbackSugSection.style.display = 'block';
+  } else {
+    els.bodyFeedbackSugSection.style.display = 'none';
+  }
+}
+
+els.bodyFeedbackDoneBtn.addEventListener('click', ()=>{
+  els.bodyCheckinOverlay.classList.remove('show');
+});
+
+els.bodyCheckinBtn.addEventListener('click', ()=>{
+  resetBodyCheckinSheet();
+  els.bodyCheckinOverlay.classList.add('show');
+});
+els.bodyCheckinCancelBtn.addEventListener('click', ()=> els.bodyCheckinOverlay.classList.remove('show'));
+els.bodyCheckinOverlay.addEventListener('click', (e)=>{ if(e.target === els.bodyCheckinOverlay) els.bodyCheckinOverlay.classList.remove('show'); });
+
+els.bodyFileInput.addEventListener('change', async (e)=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  const { dataUrl, mediaType } = await processBodyPhotoCapture(file);
+  bodyPhotoDataUrl = dataUrl; bodyPhotoMediaType = mediaType;
+  els.bodyPreviewImg.src = dataUrl;
+  els.bodyDropzone.style.display = 'none';
+  els.bodyPreviewWrap.style.display = 'block';
+  els.bodyCheckErrorBox.style.display = 'none';
+});
+els.bodyRetakeBtn.addEventListener('click', resetBodyCheckinSheet);
+els.bodySkipPhotoBtn.addEventListener('click', ()=> els.bodyWeightInput.focus());
+
+els.bodyCheckinSaveBtn.addEventListener('click', async ()=>{
+  const weightVal = parseFloat(els.bodyWeightInput.value);
+  const hasWeight = !isNaN(weightVal) && weightVal > 0;
+  if(!bodyPhotoDataUrl && !hasWeight){
+    els.bodyCheckErrorBox.textContent = 'Adiciona uma foto ou o peso atual para guardar o registo.';
+    els.bodyCheckErrorBox.style.display = 'block';
+    return;
+  }
+  els.bodyCheckErrorBox.style.display = 'none';
+  els.bodyCheckinSaveBtn.disabled = true;
+  const origLabel = els.bodyCheckinSaveBtn.textContent;
+  els.bodyCheckinSaveBtn.textContent = 'A guardar…';
+
+  // Captura o registo anterior com foto ANTES de guardar o novo, para poder
+  // comparar os dois (o novo registo pode substituir um registo do mesmo dia).
+  const previousPhotoEntry = bodyPhotoDataUrl ? latestPhotoEntry() : null;
+
+  const { entry, saved } = await commitBodyCheckin({
+    photoDataUrl: bodyPhotoDataUrl,
+    mediaType: bodyPhotoMediaType,
+    weight: hasWeight ? weightVal : null,
+  });
+
+  if(!saved){
+    els.bodyCheckinSaveBtn.disabled = false;
+    els.bodyCheckinSaveBtn.textContent = origLabel;
+    els.bodyCheckErrorBox.textContent = 'Não foi possível guardar o registo (sem espaço disponível no aparelho).';
+    els.bodyCheckErrorBox.style.display = 'block';
+    return;
+  }
+
+  render();
+  renderBodyCard();
+
+  // Feedback comparativo só é possível a partir do 2.º registo com foto, e só
+  // com ligação (usa o mesmo endpoint IA do enquadramento). Falha em silêncio
+  // e fecha normalmente se não houver comparação possível.
+  if(entry.photo && previousPhotoEntry && previousPhotoEntry.photo && !isOffline()){
+    els.bodyCheckinSaveBtn.textContent = 'A gerar feedback…';
+    try{
+      const cur = splitDataUrl(entry.photo);
+      const prev = splitDataUrl(previousPhotoEntry.photo);
+      const feedback = await fetchBodyProgressFeedback({
+        currentImage: cur.base64, currentMediaType: cur.mediaType,
+        previousImage: prev.base64, previousMediaType: prev.mediaType,
+        objective: settings.objective || 'manter',
+      });
+      entry.feedback = feedback;
+      saveBodyCheckins();
+      els.bodyCheckinSaveBtn.disabled = false;
+      els.bodyCheckinSaveBtn.textContent = origLabel;
+      showBodyFeedback(feedback);
+      return; // deixa o painel de feedback aberto — a pessoa fecha com "Concluído"
+    }catch(err){
+      console.error('Falha ao gerar feedback de progresso', err);
+      // sem feedback desta vez — segue o fluxo normal e fecha a folha
+    }
+  }
+
+  els.bodyCheckinSaveBtn.disabled = false;
+  els.bodyCheckinSaveBtn.textContent = origLabel;
+  els.bodyCheckinOverlay.classList.remove('show');
+});
+
+// ---- Onboarding: registo corporal ------------------------------------------
+let onboardBodyPhotoDataUrl = null;
+document.getElementById('onBodyCheckin').addEventListener('change', (e)=>{
+  document.getElementById('onBodyPhotoField').style.display = e.target.value === 'no' ? 'none' : 'block';
+});
+document.getElementById('onBodyPhotoInput').addEventListener('change', async (e)=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  const { dataUrl } = await processBodyPhotoCapture(file);
+  onboardBodyPhotoDataUrl = dataUrl;
+  document.getElementById('onBodyPhotoPreview').src = dataUrl;
+  document.getElementById('onBodyPhotoDropzone').style.display = 'none';
+  document.getElementById('onBodyPhotoPreviewWrap').style.display = 'block';
+});
+document.getElementById('onBodyPhotoRetakeBtn').addEventListener('click', ()=>{
+  onboardBodyPhotoDataUrl = null;
+  document.getElementById('onBodyPhotoInput').value = '';
+  document.getElementById('onBodyPhotoDropzone').style.display = 'block';
+  document.getElementById('onBodyPhotoPreviewWrap').style.display = 'none';
+});
+
+// ---- Nutrição: plano de refeições semanal ----------------------------------
+
+const NUTRI_RESTRICTIONS = [
+  { id: 'vegetariano', label: 'Vegetariano' },
+  { id: 'vegano', label: 'Vegano' },
+  { id: 'sem_gluten', label: 'Sem glúten' },
+  { id: 'sem_lactose', label: 'Sem lactose' },
+  { id: 'halal', label: 'Halal' },
+  { id: 'kosher', label: 'Kosher' },
+];
+
+function emojiForMealType(type){
+  const t = (type || '').toLowerCase();
+  if(t.includes('pequeno')) return '🍳';
+  if(t.includes('lanche')) return '🍎';
+  if(t.includes('jantar')) return '🌙';
+  return '🍽️';
+}
+
+// Refeições já registadas no dia real de hoje (independente do dia que
+// estiver a ser visto no separador "Hoje"), para saber que botões de
+// "adicionar" já foram usados.
+function todaysMealsForCheck(){
+  if(todayStr() === currentDate) return dayData.meals;
+  try{
+    const raw = localStorage.getItem(dayKey(todayStr()));
+    const data = raw ? JSON.parse(raw) : { meals: [] };
+    return Array.isArray(data.meals) ? data.meals : [];
+  }catch(e){ return []; }
+}
+
+async function addNutriMealToLog(meal, dayIdx, mealIdx){
+  const now = new Date();
+  const mealEntry = {
+    id: Date.now(),
+    name: meal.name || 'Refeição',
+    calories: Number(meal.calories) || 0,
+    protein_g: Number(meal.protein_g) || 0,
+    carbs_g: Number(meal.carbs_g) || 0,
+    fat_g: Number(meal.fat_g) || 0,
+    fiber_g: 0,
+    emoji: emojiForMealType(meal.type),
+    time: now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0'),
+    planKey: dayIdx + '-' + mealIdx,
+  };
+  const ds = todayStr();
+  if(ds === currentDate){
+    dayData.meals.push(mealEntry);
+    await saveDay();
+    render();
+  } else {
+    // A pessoa está a ver outro dia no separador "Hoje" — adiciona na mesma
+    // ao registo do dia real de hoje, sem mexer no dia atualmente carregado.
+    try{
+      const raw = localStorage.getItem(dayKey(ds));
+      const data = raw ? JSON.parse(raw) : { meals: [] };
+      if(!Array.isArray(data.meals)) data.meals = [];
+      data.meals.push(mealEntry);
+      localStorage.setItem(dayKey(ds), JSON.stringify(data));
+    }catch(e){ console.error('Erro ao adicionar refeição do plano', e); }
+  }
+}
+
+function buildNutriMealItem(meal, dayIdx, mealIdx){
+  const item = document.createElement('div');
+  item.className = 'nutri-meal-item';
+  const planKey = dayIdx + '-' + mealIdx;
+  const wasAdded = todaysMealsForCheck().some(m => m.planKey === planKey);
+  item.innerHTML = `
+    <div class="nutri-meal-top">
+      <div>
+        <div class="nutri-meal-type">${escapeHtml(meal.type || '')}</div>
+        <div class="nutri-meal-name">${emojiForMealType(meal.type)} ${escapeHtml(meal.name || '')}</div>
+        <div class="nutri-meal-desc">${escapeHtml(meal.description || '')}</div>
+      </div>
+      <div class="nutri-meal-cal">${Math.round(meal.calories) || 0} kcal</div>
+    </div>
+    <button class="nutri-meal-add ${wasAdded ? 'added' : ''}">${wasAdded ? '✓ Adicionado hoje' : '+ Adicionar ao registo de hoje'}</button>
+  `;
+  const btn = item.querySelector('.nutri-meal-add');
+  btn.addEventListener('click', async ()=>{
+    if(btn.classList.contains('added')) return;
+    btn.disabled = true;
+    await addNutriMealToLog(meal, dayIdx, mealIdx);
+    btn.disabled = false;
+    btn.classList.add('added');
+    btn.textContent = '✓ Adicionado hoje';
+  });
+  return item;
+}
+
+function renderNutriTab(){
+  if(!mealPlan || !Array.isArray(mealPlan.days) || mealPlan.days.length === 0){
+    els.nutriEmptyCard.style.display = 'block';
+    els.nutriPlanView.style.display = 'none';
+    return;
+  }
+  els.nutriEmptyCard.style.display = 'none';
+  els.nutriPlanView.style.display = 'block';
+
+  const macros = mealPlan.macro_targets || {};
+  const metaParts = [];
+  if(mealPlan.goalCalories) metaParts.push(Math.round(mealPlan.goalCalories) + ' kcal/dia');
+  if(macros.protein_g) metaParts.push('P ' + Math.round(macros.protein_g) + 'g');
+  if(macros.carbs_g) metaParts.push('H ' + Math.round(macros.carbs_g) + 'g');
+  if(macros.fat_g) metaParts.push('G ' + Math.round(macros.fat_g) + 'g');
+  els.nutriMeta.textContent = metaParts.join(' · ');
+
+  if(mealPlan.notes){
+    els.nutriNotes.textContent = mealPlan.notes;
+    els.nutriNotes.style.display = 'block';
+  } else {
+    els.nutriNotes.style.display = 'none';
+  }
+
+  const planIndex = (new Date().getDay() + 6) % 7; // getDay(): 0=domingo -> planIndex 0=segunda
+  const today = mealPlan.days[planIndex];
+
+  els.nutriTodayMeals.innerHTML = '';
+  if(!today || !Array.isArray(today.meals) || today.meals.length === 0){
+    const empty = document.createElement('div');
+    empty.className = 'empty-state';
+    empty.textContent = 'Sem refeições para hoje neste plano.';
+    els.nutriTodayMeals.appendChild(empty);
+    return;
+  }
+  today.meals.forEach((meal, idx)=> els.nutriTodayMeals.appendChild(buildNutriMealItem(meal, planIndex, idx)));
+}
+
+function openNutriWeek(){
+  els.nutriWeekList.innerHTML = '';
+  if(mealPlan && Array.isArray(mealPlan.days)){
+    mealPlan.days.forEach((day, dayIdx)=>{
+      const section = document.createElement('div');
+      section.className = 'nutri-week-day';
+      const title = document.createElement('div');
+      title.className = 'nutri-day-title';
+      title.textContent = day.day || ('Dia ' + (dayIdx + 1));
+      section.appendChild(title);
+      (day.meals || []).forEach((meal, mealIdx)=> section.appendChild(buildNutriMealItem(meal, dayIdx, mealIdx)));
+      els.nutriWeekList.appendChild(section);
+    });
+  }
+  els.nutriWeekOverlay.classList.add('show');
+}
+els.nutriWeekLink.addEventListener('click', openNutriWeek);
+els.nutriWeekCloseBtn.addEventListener('click', ()=> els.nutriWeekOverlay.classList.remove('show'));
+els.nutriWeekOverlay.addEventListener('click', (e)=>{ if(e.target === els.nutriWeekOverlay) els.nutriWeekOverlay.classList.remove('show'); });
+
+function openNutriPrefs(){
+  els.nutriRestrictionsGrid.innerHTML = '';
+  NUTRI_RESTRICTIONS.forEach(r=>{
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'pref-chip' + (settings.dietaryRestrictions.includes(r.id) ? ' active' : '');
+    btn.textContent = r.label;
+    btn.dataset.id = r.id;
+    btn.addEventListener('click', ()=> btn.classList.toggle('active'));
+    els.nutriRestrictionsGrid.appendChild(btn);
+  });
+  els.nutriPrefsText.value = settings.dietaryPreferencesText || '';
+  els.nutriDislikesText.value = settings.dietaryDislikesText || '';
+  els.nutriPrefsOverlay.classList.add('show');
+}
+els.nutriPrefsBtn.addEventListener('click', openNutriPrefs);
+els.nutriPrefsBtn2.addEventListener('click', openNutriPrefs);
+els.nutriPrefsCancelBtn.addEventListener('click', ()=> els.nutriPrefsOverlay.classList.remove('show'));
+els.nutriPrefsOverlay.addEventListener('click', (e)=>{ if(e.target === els.nutriPrefsOverlay) els.nutriPrefsOverlay.classList.remove('show'); });
+els.nutriPrefsSaveBtn.addEventListener('click', async ()=>{
+  const active = Array.from(els.nutriRestrictionsGrid.querySelectorAll('.pref-chip.active')).map(b => b.dataset.id);
+  settings.dietaryRestrictions = active;
+  settings.dietaryPreferencesText = els.nutriPrefsText.value.trim();
+  settings.dietaryDislikesText = els.nutriDislikesText.value.trim();
+  await saveSettings();
+  els.nutriPrefsOverlay.classList.remove('show');
+});
+
+async function generateMealPlan(){
+  if(isOffline()){
+    els.nutriGenErrorBox.textContent = 'Estás offline — a geração do plano precisa de ligação à internet.';
+    els.nutriGenErrorBox.style.display = 'block';
+    return;
+  }
+  els.nutriGenErrorBox.style.display = 'none';
+  const btn = els.nutriEmptyCard.style.display !== 'none' ? els.nutriGenerateBtn : els.nutriRegenBtn;
+  const origLabel = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'A gerar plano…';
+  try{
+    const response = await fetch('/api/meal-plan', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        objective: settings.objective || 'manter',
+        goalCalories: settings.goal || 2000,
+        restrictions: settings.dietaryRestrictions || [],
+        preferences: settings.dietaryPreferencesText || '',
+        dislikes: settings.dietaryDislikesText || '',
+      }),
+    });
+    if(!response.ok){
+      const errData = await response.json().catch(()=>({}));
+      throw new Error((errData.error || ('Falha na chamada à API (' + response.status + ')')) + (errData.details ? ' — ' + errData.details : ''));
+    }
+    const parsed = await response.json();
+    mealPlan = {
+      generatedAt: new Date().toISOString(),
+      objective: settings.objective || 'manter',
+      goalCalories: settings.goal || 2000,
+      macro_targets: parsed.macro_targets || {},
+      days: Array.isArray(parsed.days) ? parsed.days : [],
+      notes: parsed.notes || '',
+    };
+    saveMealPlan();
+    renderNutriTab();
+  }catch(err){
+    console.error(err);
+    els.nutriGenErrorBox.textContent = 'Erro: ' + (err.message || 'não foi possível gerar o plano') + '. Tenta novamente.';
+    els.nutriGenErrorBox.style.display = 'block';
+  }finally{
+    btn.disabled = false;
+    btn.textContent = origLabel;
+  }
+}
+els.nutriGenerateBtn.addEventListener('click', generateMealPlan);
+els.nutriRegenBtn.addEventListener('click', generateMealPlan);
+
 function escapeHtml(s){
   const d = document.createElement('div');
   d.textContent = s || '';
@@ -1530,50 +2641,42 @@ function closeScan(){ els.scanOverlay.classList.remove('show'); }
 function resetScan(){
   els.fileInput.value = '';
   base64Data = null; pendingResult = null;
-  els.dropzone.style.display = 'block';
+  updateOfflineUI();
+  const offline = isOffline();
+  scanManualForcedByOffline = offline;
+  els.dropzone.style.display = offline ? 'none' : 'block';
   els.previewWrap.style.display = 'none';
   els.analyzeBtn.style.display = 'none';
   els.resultCard.classList.remove('show');
   els.errorBox.style.display = 'none';
-  els.manualForm.style.display = 'none';
+  els.manualForm.style.display = offline ? 'block' : 'none';
   els.manualToggleBtn.textContent = 'ou adicionar sem foto';
   document.getElementById('resultPhotoWrap').style.display = 'none';
 }
 
-els.fileInput.addEventListener('change', (e)=>{
+els.fileInput.addEventListener('change', async (e)=>{
   const file = e.target.files[0];
   if(!file) return;
-  const reader = new FileReader();
-  reader.onload = ()=>{
-    const img = new Image();
-    img.onload = ()=>{
-      const MAX_DIM = 1024;
-      let w = img.width, h = img.height;
-      if(w > h && w > MAX_DIM){ h = Math.round(h * MAX_DIM / w); w = MAX_DIM; }
-      else if(h > MAX_DIM){ w = Math.round(w * MAX_DIM / h); h = MAX_DIM; }
-      const canvas = document.createElement('canvas');
-      canvas.width = w; canvas.height = h;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0, w, h);
-      const dataUrl = canvas.toDataURL('image/jpeg', 0.75);
-      mediaType = 'image/jpeg';
-      base64Data = dataUrl.split(',')[1];
-      els.previewImg.src = dataUrl;
-      els.dropzone.style.display = 'none';
-      els.previewWrap.style.display = 'block';
-      els.analyzeBtn.style.display = 'flex';
-      els.resultCard.classList.remove('show');
-      els.errorBox.style.display = 'none';
-    };
-    img.src = reader.result;
-  };
-  reader.readAsDataURL(file);
+  const dataUrl = await resizeImageFile(file, 1024, 0.75);
+  mediaType = 'image/jpeg';
+  base64Data = dataUrl.split(',')[1];
+  els.previewImg.src = dataUrl;
+  els.dropzone.style.display = 'none';
+  els.previewWrap.style.display = 'block';
+  els.analyzeBtn.style.display = 'flex';
+  els.resultCard.classList.remove('show');
+  els.errorBox.style.display = 'none';
 });
 els.retakeBtn.addEventListener('click', resetScan);
 els.discardBtn.addEventListener('click', closeScan);
 
 els.analyzeBtn.addEventListener('click', async ()=>{
   if(!base64Data) return;
+  if(isOffline()){
+    els.errorBox.textContent = 'Estás offline — a identificação por foto (IA) precisa de ligação à internet. Usa "adicionar sem foto".';
+    els.errorBox.style.display = 'block';
+    return;
+  }
   els.analyzeBtn.disabled = true;
   els.errorBox.style.display = 'none';
   els.btnLabel.textContent = '';
@@ -1829,6 +2932,7 @@ els.addBtn.addEventListener('click', async ()=>{
 });
 
 els.manualToggleBtn.addEventListener('click', ()=>{
+  scanManualForcedByOffline = false; // a partir daqui é uma escolha deliberada da pessoa, não o offline
   const opening = els.manualForm.style.display === 'none';
   els.manualForm.style.display = opening ? 'block' : 'none';
   els.dropzone.style.display = opening ? 'none' : 'block';
@@ -1924,6 +3028,8 @@ els.gearBtn.addEventListener('click', ()=>{
   els.goalInput.value = settings.goal || 2000;
   els.weightInput.value = settings.weight || '';
   document.getElementById('objectiveInput').value = settings.objective || 'manter';
+  els.targetWeightInput.value = settings.targetWeight || '';
+  els.bodyCheckinInput.value = settings.bodyCheckinFreq || 'no';
   document.getElementById('themeInput').value = settings.theme || 'auto';
   document.getElementById('fastingEnabledInput').value = settings.fastingEnabled ? 'yes' : 'no';
   els.goalOverlay.classList.add('show');
@@ -1935,10 +3041,14 @@ els.goalSaveBtn.addEventListener('click', async ()=>{
   const w = parseFloat(els.weightInput.value);
   settings.weight = (!isNaN(w) && w > 0) ? w : settings.weight;
   settings.objective = document.getElementById('objectiveInput').value;
+  const tw = parseFloat(els.targetWeightInput.value);
+  settings.targetWeight = (!isNaN(tw) && tw > 0) ? tw : null;
+  settings.bodyCheckinFreq = els.bodyCheckinInput.value;
   settings.theme = document.getElementById('themeInput').value;
   settings.fastingEnabled = document.getElementById('fastingEnabledInput').value === 'yes';
   logWeight(settings.weight);
   await saveSettings();
+  renderBodyCard();
   applyTheme();
   render();
   els.goalOverlay.classList.remove('show');
