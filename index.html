@@ -41,6 +41,7 @@
   .ring-track{stroke:var(--track);transition:stroke .2s ease;}
   [data-theme="dark"] .dropzone{background:var(--card);}
   [data-theme="dark"] .goal-edit input,[data-theme="dark"] .manual-form input,
+  [data-theme="dark"] .manual-form textarea,
   [data-theme="dark"] .onboard-field input,[data-theme="dark"] .onboard-field select,
   [data-theme="dark"] .goal-edit select{
     background:var(--card);color:var(--ink);
@@ -450,6 +451,28 @@
     padding:11px;border-radius:12px;cursor:pointer;
   }
 
+  .quickask-card{background:var(--card);border-radius:22px;box-shadow:var(--shadow-soft);padding:16px 18px;margin-bottom:16px;}
+  .quickask-top{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+  .quickask-emoji{font-size:24px;}
+  .quickask-info{flex:1;}
+  .quickask-title{font-size:14px;font-weight:800;}
+  .quickask-sub{font-size:12px;color:var(--muted);font-weight:500;margin-top:2px;line-height:1.4;}
+  .quickask-open-btn{
+    width:100%;background:var(--fresh-soft);color:var(--fresh);border:none;font-weight:800;font-size:13px;
+    padding:11px;border-radius:12px;cursor:pointer;
+  }
+  .manual-form textarea{
+    width:100%;font-size:15px;font-weight:600;border:2px solid var(--track);border-radius:12px;
+    padding:11px 12px;font-family:'Plus Jakarta Sans',sans-serif;color:var(--ink);resize:vertical;
+  }
+  .manual-form textarea:focus{outline:none;border-color:var(--a2);}
+  .quickask-context{font-size:12.5px;color:var(--muted);font-weight:600;margin-bottom:4px;}
+  .quickask-answer{font-size:14px;font-weight:600;line-height:1.55;margin:14px 0 10px;}
+  .quickask-suggestion{background:var(--fresh-soft);border-radius:14px;padding:12px 14px;margin-bottom:8px;}
+  .quickask-suggestion-name{font-size:13.5px;font-weight:800;color:var(--ink);}
+  .quickask-suggestion-meta{font-size:11.5px;color:var(--fresh);font-weight:700;margin-top:1px;}
+  .quickask-suggestion-note{font-size:12px;color:var(--muted);font-weight:500;margin-top:3px;line-height:1.4;}
+
   .exercise-item{
     background:var(--card);border-radius:16px;box-shadow:var(--shadow-soft);
     padding:12px 14px;display:flex;align-items:center;gap:10px;margin-bottom:9px;
@@ -747,6 +770,17 @@
         <span class="chip" id="totSodiumChip">Sódio <span id="totSodium">0mg</span></span>
       </div>
     </div>
+
+  <div class="quickask-card">
+    <div class="quickask-top">
+      <div class="quickask-emoji">💬</div>
+      <div class="quickask-info">
+        <div class="quickask-title">Tenho fome, o que posso comer?</div>
+        <div class="quickask-sub">Pergunta à IA e recebe uma ideia que cabe no que ainda tens disponível hoje.</div>
+      </div>
+    </div>
+    <button class="quickask-open-btn" id="quickAskOpenBtn">Perguntar</button>
+  </div>
 
   <div class="fast-card" style="display:none;">
     <div class="fast-top">
@@ -1155,6 +1189,25 @@
   </div>
 </div>
 
+<div class="overlay" id="quickAskOverlay">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">O que posso comer agora?</div>
+    <div class="quickask-context" id="quickAskContext"></div>
+    <div class="manual-form">
+      <textarea id="quickAskInput" rows="2" placeholder="ex: Tenho fome, o que posso comer sem estragar o plano?"></textarea>
+      <button class="add-btn" id="quickAskSubmitBtn" style="margin-top:12px;">Perguntar</button>
+    </div>
+    <div id="quickAskErrorBox" class="error" style="display:none;"></div>
+    <div id="quickAskResult" style="display:none;">
+      <div class="quickask-answer" id="quickAskAnswer"></div>
+      <div id="quickAskSuggestions"></div>
+      <div class="ai-disclaimer">Sugestões geradas por IA — apenas uma ideia prática, não substitui aconselhamento nutricional profissional.</div>
+    </div>
+    <button class="discard-btn" id="quickAskCloseBtn">Fechar</button>
+  </div>
+</div>
+
 <div class="overlay" id="nutriPrefsOverlay">
   <div class="sheet">
     <div class="sheet-handle"></div>
@@ -1354,6 +1407,16 @@ const els = {
   nutriWeekOverlay: document.getElementById('nutriWeekOverlay'),
   nutriWeekList: document.getElementById('nutriWeekList'),
   nutriWeekCloseBtn: document.getElementById('nutriWeekCloseBtn'),
+  quickAskOpenBtn: document.getElementById('quickAskOpenBtn'),
+  quickAskOverlay: document.getElementById('quickAskOverlay'),
+  quickAskContext: document.getElementById('quickAskContext'),
+  quickAskInput: document.getElementById('quickAskInput'),
+  quickAskSubmitBtn: document.getElementById('quickAskSubmitBtn'),
+  quickAskErrorBox: document.getElementById('quickAskErrorBox'),
+  quickAskResult: document.getElementById('quickAskResult'),
+  quickAskAnswer: document.getElementById('quickAskAnswer'),
+  quickAskSuggestions: document.getElementById('quickAskSuggestions'),
+  quickAskCloseBtn: document.getElementById('quickAskCloseBtn'),
   nutriPrefsOverlay: document.getElementById('nutriPrefsOverlay'),
   nutriRestrictionsGrid: document.getElementById('nutriRestrictionsGrid'),
   nutriPrefsText: document.getElementById('nutriPrefsText'),
@@ -1752,6 +1815,8 @@ function updateOfflineUI(){
   if(els.gymOfflineNotice) els.gymOfflineNotice.style.display = offline ? 'block' : 'none';
   if(els.gymGenerateBtn) els.gymGenerateBtn.disabled = offline;
   if(els.gymRegenBtn) els.gymRegenBtn.disabled = offline;
+  if(els.quickAskOpenBtn) els.quickAskOpenBtn.disabled = offline;
+  if(els.quickAskSubmitBtn) els.quickAskSubmitBtn.disabled = offline;
 }
 
 window.addEventListener('online', updateOfflineUI);
@@ -2994,6 +3059,88 @@ els.bodyCheckinSaveBtn.addEventListener('click', async ()=>{
   els.bodyCheckinSaveBtn.textContent = origLabel;
   els.bodyCheckinOverlay.classList.remove('show');
 });
+
+// ---- Pergunta rápida: "o que posso comer agora?" --------------------------
+
+function quickAskContextSummary(){
+  const t = totals();
+  const exerciseBurned = (dayData.exercise||[]).reduce((s,ex)=> s + (Number(ex.calories)||0), 0);
+  const goal = (Number(settings.goal)||2000) + exerciseBurned;
+  const remaining = Math.round(goal - t.cal);
+  return {
+    consumed: Math.round(t.cal), goal: Math.round(goal), remaining,
+    protein: Math.round(t.protein), carbs: Math.round(t.carbs), fat: Math.round(t.fat),
+  };
+}
+
+function openQuickAsk(){
+  if(isOffline()){
+    els.quickAskContext.textContent = 'Estás offline — esta funcionalidade precisa de ligação à internet.';
+  } else {
+    const ctx = quickAskContextSummary();
+    els.quickAskContext.textContent = ctx.remaining >= 0
+      ? `Tens ${ctx.remaining} kcal disponíveis hoje (de ${ctx.goal} kcal).`
+      : `Já ultrapassaste a meta de hoje em ${Math.abs(ctx.remaining)} kcal.`;
+  }
+  els.quickAskErrorBox.style.display = 'none';
+  els.quickAskResult.style.display = 'none';
+  els.quickAskOverlay.classList.add('show');
+}
+els.quickAskOpenBtn.addEventListener('click', openQuickAsk);
+els.quickAskCloseBtn.addEventListener('click', ()=> els.quickAskOverlay.classList.remove('show'));
+els.quickAskOverlay.addEventListener('click', (e)=>{ if(e.target === els.quickAskOverlay) els.quickAskOverlay.classList.remove('show'); });
+
+async function submitQuickAsk(){
+  const question = els.quickAskInput.value.trim();
+  if(!question){ els.quickAskInput.focus(); return; }
+  if(isOffline()){
+    els.quickAskErrorBox.textContent = 'Estás offline — esta funcionalidade precisa de ligação à internet.';
+    els.quickAskErrorBox.style.display = 'block';
+    return;
+  }
+  els.quickAskErrorBox.style.display = 'none';
+  els.quickAskResult.style.display = 'none';
+  const origLabel = els.quickAskSubmitBtn.textContent;
+  els.quickAskSubmitBtn.disabled = true;
+  els.quickAskSubmitBtn.textContent = 'A pensar…';
+  try{
+    const ctx = quickAskContextSummary();
+    const parsed = await callAiEndpoint('/api/quick-ask', {
+      question,
+      remainingCalories: ctx.remaining,
+      consumedCalories: ctx.consumed,
+      goalCalories: ctx.goal,
+      consumedProtein: ctx.protein,
+      consumedCarbs: ctx.carbs,
+      consumedFat: ctx.fat,
+      objective: settings.objective || 'manter',
+      restrictions: settings.dietaryRestrictions || [],
+      preferences: settings.dietaryPreferencesText || '',
+      dislikes: settings.dietaryDislikesText || '',
+    });
+    els.quickAskAnswer.textContent = parsed.answer || '';
+    const suggestions = Array.isArray(parsed.suggestions) ? parsed.suggestions : [];
+    els.quickAskSuggestions.innerHTML = suggestions.map(s => `
+      <div class="quickask-suggestion">
+        <div class="quickask-suggestion-name">${escapeHtml(s.name || '')}</div>
+        ${s.calories ? `<div class="quickask-suggestion-meta">${escapeHtml(String(Math.round(s.calories)))} kcal</div>` : ''}
+        ${s.note ? `<div class="quickask-suggestion-note">${escapeHtml(s.note)}</div>` : ''}
+      </div>
+    `).join('');
+    els.quickAskResult.style.display = 'block';
+  }catch(err){
+    if(err.requiresLogin){
+      showLoginRequiredIn(els.quickAskErrorBox, err.message);
+    } else {
+      els.quickAskErrorBox.textContent = err.message || 'Não foi possível obter uma resposta. Tenta novamente.';
+      els.quickAskErrorBox.style.display = 'block';
+    }
+  } finally {
+    els.quickAskSubmitBtn.disabled = false;
+    els.quickAskSubmitBtn.textContent = origLabel;
+  }
+}
+els.quickAskSubmitBtn.addEventListener('click', submitQuickAsk);
 
 // ---- Nutrição: plano de refeições semanal ----------------------------------
 
