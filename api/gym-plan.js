@@ -18,7 +18,7 @@ export default async function handler(req, res) {
     return;
   }
 
-  const { objective, activity, equipment, daysPerWeek, sessionMinutes } = req.body || {};
+  const { objective, activity, equipment, daysPerWeek, sessionMinutes, detailLevel, flexibility } = req.body || {};
   const days = Number(daysPerWeek);
   if (!days || days < 1 || days > 7) {
     res.status(400).json({ error: 'Número de dias de treino em falta ou inválido' });
@@ -49,12 +49,21 @@ export default async function handler(req, res) {
   const equipmentText = equipmentList.length ? equipmentList.join(', ') : 'sem equipamento (apenas peso do corpo)';
   const minutes = Number(sessionMinutes) || 45;
 
+  const detailLevelText = detailLevel === 'elaborado'
+    ? 'Pode incluir treinos mais completos e variados, com mais exercícios por sessão — a pessoa não se importa com isso.'
+    : 'Prefere treinos diretos e eficientes, com poucos exercícios por sessão.';
+  const flexibilityText = flexibility === 'flexivel'
+    ? 'A pessoa prefere ter liberdade para escolher — para cada exercício principal, sugere também 1 alternativa equivalente (mesmo grupo muscular, material compatível) que possa fazer em vez dele, e refere isso nas notas.'
+    : 'A pessoa prefere um plano definido ao pormenor, sessão a sessão, sem alternativas.';
+
   const prompt = `Cria um plano de treino semanal (7 dias, de segunda a domingo) em português de Portugal, adaptado a estes dados da pessoa:
 - Objetivo: ${objectiveLabel}
 - Nível de atividade atual: ${activityLabel}
 - Material disponível: ${equipmentText}
 - Dias de treino por semana: exatamente ${days}
 - Duração aproximada de cada sessão: ${minutes} minutos
+- Nível de detalhe dos treinos: ${detailLevelText}
+- Estilo do plano: ${flexibilityText}
 
 Regras obrigatórias:
 - O array "days" deve ter exatamente 7 entradas (Segunda-feira a Domingo). Exatamente ${days} dessas entradas devem ser dias de treino ("rest": false), distribuídos de forma sensata ao longo da semana (não todos consecutivos, com pelo menos 1 dia de descanso entre grupos musculares grandes quando possível). As restantes são dias de descanso ("rest": true).
