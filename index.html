@@ -296,7 +296,7 @@
   .macro-edit label{font-size:10.5px;font-weight:700;color:var(--muted);display:block;margin-bottom:4px;}
   .macro-edit input{
     width:100%;font-size:15px;font-weight:700;border:2px solid var(--track);border-radius:10px;
-    padding:8px 9px;font-family:'Plus Jakarta Sans',sans-serif;color:var(--ink);
+    padding:8px 9px;font-family:'Plus Jakarta Sans',sans-serif;color:var(--ink);background:var(--card);
   }
   .macro-edit input:focus{outline:none;border-color:var(--fresh);}
   .link-btn{background:none;border:none;color:var(--muted);font-weight:700;font-size:12.5px;text-decoration:underline;cursor:pointer;padding:8px;}
@@ -377,17 +377,17 @@
   .manual-item-row{align-items:flex-start;}
   .manual-item-name{
     width:100%;font-size:13.5px;font-weight:700;border:2px solid var(--track);border-radius:10px;
-    padding:8px 10px;font-family:'Plus Jakarta Sans',sans-serif;color:var(--ink);margin-bottom:8px;
+    padding:8px 10px;font-family:'Plus Jakarta Sans',sans-serif;color:var(--ink);margin-bottom:8px;background:var(--card);
   }
   .manual-item-name:focus{outline:none;border-color:var(--a2);}
   .manual-item-grid{display:flex;gap:6px;}
   .manual-item-field{
     width:100%;min-width:0;font-size:12.5px;font-weight:700;border:2px solid var(--track);border-radius:10px;
-    padding:7px 6px;text-align:center;font-family:'Plus Jakarta Sans',sans-serif;color:var(--ink);
+    padding:7px 6px;text-align:center;font-family:'Plus Jakarta Sans',sans-serif;color:var(--ink);background:var(--card);
   }
   .manual-item-field:focus{outline:none;border-color:var(--fresh);}
   .item-cal{font-size:11px;color:var(--muted);font-weight:600;margin-top:1px;}
-  .item-qty{width:64px;font-size:13.5px;font-weight:700;border:2px solid var(--track);border-radius:10px;padding:7px 8px;text-align:center;font-family:'Plus Jakarta Sans',sans-serif;color:var(--ink);}
+  .item-qty{width:64px;font-size:13.5px;font-weight:700;border:2px solid var(--track);border-radius:10px;padding:7px 8px;text-align:center;font-family:'Plus Jakarta Sans',sans-serif;color:var(--ink);background:var(--card);}
   .item-qty:focus{outline:none;border-color:var(--a2);}
   .item-unit{font-size:12px;font-weight:600;border:2px solid var(--track);border-radius:10px;padding:7px 6px;font-family:'Plus Jakarta Sans',sans-serif;color:var(--ink);background:var(--card);}
   .item-unit:focus{outline:none;border-color:var(--a2);}
@@ -564,7 +564,7 @@
   .body-weight-row{display:flex;align-items:center;gap:10px;margin:14px 0 4px;}
   .body-weight-row input{
     flex:1;font-size:15px;font-weight:700;border:2px solid var(--track);border-radius:12px;
-    padding:10px 12px;font-family:'Plus Jakarta Sans',sans-serif;color:var(--ink);
+    padding:10px 12px;font-family:'Plus Jakarta Sans',sans-serif;color:var(--ink);background:var(--card);
   }
   .body-weight-row input:focus{outline:none;border-color:var(--a2);}
   .body-photo-skip{width:100%;background:none;border:none;color:var(--muted);font-weight:700;font-size:12.5px;text-decoration:underline;cursor:pointer;padding:8px 0;}
@@ -727,7 +727,7 @@
           <div class="ring-unit" id="goalRemainLabel">kcal restantes</div>
         </div>
       </div>
-      <div class="ring-caption"><span id="ringNum">0</span> kcal consumidas &middot; meta <span id="ringGoalTxt">2000</span> kcal</div>
+      <div class="ring-caption"><span id="ringNum">0</span> kcal consumidas &middot; meta <span id="ringGoalTxt">2000</span> kcal<span id="ringExerciseNote"></span></div>
 
       <div class="macro-rings">
         <div class="macro-ring-col">
@@ -1307,6 +1307,7 @@ const els = {
   ringNum: document.getElementById('ringNum'),
   goalRemainNum: document.getElementById('goalRemainNum'),
   goalRemainLabel: document.getElementById('goalRemainLabel'),
+  ringExerciseNote: document.getElementById('ringExerciseNote'),
   totProtein: document.getElementById('totProtein'),
   totCarbs: document.getElementById('totCarbs'),
   totFat: document.getElementById('totFat'),
@@ -2505,8 +2506,12 @@ function render(){
   } else {
     els.goalRemainNum.textContent = Math.round(remain);
     els.goalRemainNum.style.color = '';
-    els.goalRemainLabel.textContent = exerciseBurned > 0 ? ('kcal restantes (+' + exerciseBurned + ' do exercício)') : 'kcal restantes';
+    els.goalRemainLabel.textContent = 'kcal restantes';
   }
+  // O bónus do exercício vai na legenda por baixo do anel, não dentro dele —
+  // "(+80 do exercício)" a seguir a "kcal restantes" não cabia numa boa
+  // largura dentro do círculo e quebrava em três linhas.
+  els.ringExerciseNote.textContent = exerciseBurned > 0 ? (' · +' + exerciseBurned + ' do exercício') : '';
   els.totProtein.textContent = Math.round(t.protein)+'g';
   els.totCarbs.textContent = Math.round(t.carbs)+'g';
   els.totFat.textContent = Math.round(t.fat)+'g';
