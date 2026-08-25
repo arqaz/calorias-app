@@ -168,6 +168,7 @@
     display:flex;align-items:center;justify-content:center;
     font-size:21px;flex-shrink:0;
   }
+  .meal-thumb{width:44px;height:44px;border-radius:14px;object-fit:cover;flex-shrink:0;}
   .meal-mid{flex:1;min-width:0;}
   .meal-name{font-size:14.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .meal-time{font-size:11px;color:var(--muted-soft);font-weight:600;margin-top:1px;}
@@ -2547,7 +2548,7 @@ function render(){
     const hs = m.health_score;
     const hsColor = hs == null ? null : (hs >= 7 ? '#2FA66B' : hs >= 4 ? '#DDA015' : '#D64545');
     item.innerHTML = `
-      <div class="meal-emoji">${m.emoji || '🍽️'}</div>
+      ${m.photo ? `<img class="meal-thumb" src="${m.photo}" alt="">` : `<div class="meal-emoji">${m.emoji || '🍽️'}</div>`}
       <div class="meal-mid">
         <div class="meal-name">${escapeHtml(m.name)}</div>
         <div class="meal-time">${m.time || ''}</div>
@@ -3772,6 +3773,28 @@ function cropToPlate(cropBox){
   });
 }
 
+// Miniatura pequena e leve (guardada com cada refeição, para aparecer na
+// lista de "Refeições de hoje") — reencolhe a foto já recortada ao prato
+// (resultPhoto, 260×260) para um tamanho e qualidade bem menores, já que
+// isto fica guardado indefinidamente no aparelho para todas as refeições.
+function downscaleDataUrl(dataUrl, size, quality){
+  return new Promise((resolve)=>{
+    if(!dataUrl){ resolve(null); return; }
+    const img = new Image();
+    img.onload = ()=>{
+      try{
+        const canvas = document.createElement('canvas');
+        canvas.width = size; canvas.height = size;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, size, size);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      }catch(e){ resolve(null); }
+    };
+    img.onerror = ()=> resolve(null);
+    img.src = dataUrl;
+  });
+}
+
 els.clearLink.addEventListener('click', async ()=>{
   dayData.meals = [];
   await saveDay();
@@ -4098,6 +4121,11 @@ els.addBtn.addEventListener('click', async ()=>{
   if(!pendingResult) return;
   const t = computeTotals();
   const now = new Date();
+  const resultPhotoWrap = document.getElementById('resultPhotoWrap');
+  const resultPhoto = document.getElementById('resultPhoto');
+  const photoThumb = (resultPhotoWrap.style.display !== 'none' && resultPhoto.src)
+    ? await downscaleDataUrl(resultPhoto.src, 96, 0.6)
+    : null;
   const meal = {
     id: Date.now(),
     name: els.foodName.value.trim() || 'Refeição',
@@ -4108,6 +4136,7 @@ els.addBtn.addEventListener('click', async ()=>{
     fiber_g: Math.round(t.fiber),
     sugar_g: Math.round(t.sugar),
     sodium_mg: Math.round(t.sodium),
+    photo: photoThumb,
     emoji: pendingResult.emoji || '🍽️',
     health_score: (Number(pendingResult.health_score) >= 1 && Number(pendingResult.health_score) <= 10) ? Number(pendingResult.health_score) : null,
     time: now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0'),
