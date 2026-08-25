@@ -1278,12 +1278,23 @@ function isOffline(){
 // Só a funcionalidade que depende de rede (identificação de pratos por foto
 // via IA) fica indisponível offline — o resto da app corre inteiramente a
 // partir dos dados guardados no aparelho (localStorage).
+let scanManualForcedByOffline = false;
+
 function updateOfflineUI(){
   const offline = isOffline();
   if(els.offlineBanner) els.offlineBanner.style.display = offline ? 'flex' : 'none';
   if(els.scanOfflineNotice) els.scanOfflineNotice.style.display = offline ? 'block' : 'none';
   if(els.dropzone) els.dropzone.classList.toggle('is-disabled', offline);
   if(els.manualToggleBtn) els.manualToggleBtn.style.display = offline ? 'none' : 'inline';
+  // Se a folha "Adicionar refeição" ficou presa no formulário manual porque
+  // resetScan() a escondeu enquanto offline, repõe a dropzone assim que a
+  // ligação volta (sem isto, ficava escondida até fechar e reabrir a folha).
+  if(!offline && scanManualForcedByOffline && els.scanOverlay && els.scanOverlay.classList.contains('show')){
+    scanManualForcedByOffline = false;
+    els.dropzone.style.display = 'block';
+    els.manualForm.style.display = 'none';
+    els.manualToggleBtn.textContent = 'ou adicionar sem foto';
+  }
   // O registo corporal continua a funcionar offline (a foto fica guardada de
   // qualquer forma) — só o enquadramento/validação por IA fica indisponível,
   // por isso a dropzone em si não é desativada, apenas mostramos um aviso.
@@ -1407,18 +1418,26 @@ function loadBodyCheckins(){
 }
 
 function saveBodyCheckins(){
-  try{
-    localStorage.setItem('bodyCheckins', JSON.stringify(bodyCheckins));
-    return true;
-  }catch(e){
-    // Provavelmente excedeu a quota do localStorage (fotos ocupam espaço).
-    // Descarta a foto mais antiga e tenta novamente, para não perder o registo novo.
-    if(bodyCheckins.length > 1){
-      bodyCheckins.shift();
-      return saveBodyCheckins();
+  // Tenta gravar; se exceder a quota do localStorage, tenta outra vez sem a
+  // entrada mais antiga — mas só numa cópia. Só aplicamos esse corte ao array
+  // real (bodyCheckins) quando uma gravação efetivamente tiver sucesso, para
+  // nunca perder registos da memória se todas as tentativas falharem (nesse
+  // caso o localStorage em disco também nunca chegou a ser escrito, por isso
+  // nada se perde).
+  let attempt = bodyCheckins;
+  while(true){
+    try{
+      localStorage.setItem('bodyCheckins', JSON.stringify(attempt));
+      if(attempt !== bodyCheckins) bodyCheckins = attempt;
+      return true;
+    }catch(e){
+      if(attempt.length > 1){
+        attempt = attempt.slice(1);
+        continue;
+      }
+      console.error('Erro ao guardar registo corporal', e);
+      return false;
     }
-    console.error('Erro ao guardar registo corporal', e);
-    return false;
   }
 }
 async function loadDay(){
@@ -1710,7 +1729,7 @@ els.exAddBtn.addEventListener('click', async ()=>{
 // calculada a partir dos números que a própria pessoa registou (peso ao
 // longo do tempo), nunca uma imagem gerada/alterada do corpo — ver api/body-checkin.js.
 
-function resizeImageFile(file, maxDim){
+function resizeImageFile(file, maxDim, quality){
   return new Promise((resolve, reject)=>{
     const reader = new FileReader();
     reader.onload = ()=>{
@@ -1723,7 +1742,7 @@ function resizeImageFile(file, maxDim){
         canvas.width = w; canvas.height = h;
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, w, h);
-        resolve(canvas.toDataURL('image/jpeg', 0.8));
+        resolve(canvas.toDataURL('image/jpeg', quality || 0.8));
       };
       img.onerror = reject;
       img.src = reader.result;
@@ -1982,9 +2001,14 @@ function resetBodyCheckinSheet(){
 }
 
 // Devolve o registo mais recente que tem foto (para comparação de progresso).
-function latestPhotoEntry(){
+// Devolve o registo com foto mais recente de um dia ANTERIOR a `beforeDate`
+// (por omissão, hoje) — nunca um registo do mesmo dia, para que a comparação
+// de progresso não acabe a comparar duas fotos tiradas minutos antes uma da
+// outra (ex: a pessoa repete o registo no mesmo dia).
+function latestPhotoEntry(beforeDate){
+  const cutoff = beforeDate || todayStr();
   for(let i = bodyCheckins.length - 1; i >= 0; i--){
-    if(bodyCheckins[i].photo) return bodyCheckins[i];
+    if(bodyCheckins[i].photo && bodyCheckins[i].date < cutoff) return bodyCheckins[i];
   }
   return null;
 }
@@ -2255,6 +2279,7 @@ function resetScan(){
   base64Data = null; pendingResult = null;
   updateOfflineUI();
   const offline = isOffline();
+  scanManualForcedByOffline = offline;
   els.dropzone.style.display = offline ? 'none' : 'block';
   els.previewWrap.style.display = 'none';
   els.analyzeBtn.style.display = 'none';
@@ -2265,34 +2290,18 @@ function resetScan(){
   document.getElementById('resultPhotoWrap').style.display = 'none';
 }
 
-els.fileInput.addEventListener('change', (e)=>{
+els.fileInput.addEventListener('change', async (e)=>{
   const file = e.target.files[0];
   if(!file) return;
-  const reader = new FileReader();
-  reader.onload = ()=>{
-    const img = new Image();
-    img.onload = ()=>{
-      const MAX_DIM = 1024;
-      let w = img.width, h = img.height;
-      if(w > h && w > MAX_DIM){ h = Math.round(h * MAX_DIM / w); w = MAX_DIM; }
-      else if(h > MAX_DIM){ w = Math.round(w * MAX_DIM / h); h = MAX_DIM; }
-      const canvas = document.createElement('canvas');
-      canvas.width = w; canvas.height = h;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0, w, h);
-      const dataUrl = canvas.toDataURL('image/jpeg', 0.75);
-      mediaType = 'image/jpeg';
-      base64Data = dataUrl.split(',')[1];
-      els.previewImg.src = dataUrl;
-      els.dropzone.style.display = 'none';
-      els.previewWrap.style.display = 'block';
-      els.analyzeBtn.style.display = 'flex';
-      els.resultCard.classList.remove('show');
-      els.errorBox.style.display = 'none';
-    };
-    img.src = reader.result;
-  };
-  reader.readAsDataURL(file);
+  const dataUrl = await resizeImageFile(file, 1024, 0.75);
+  mediaType = 'image/jpeg';
+  base64Data = dataUrl.split(',')[1];
+  els.previewImg.src = dataUrl;
+  els.dropzone.style.display = 'none';
+  els.previewWrap.style.display = 'block';
+  els.analyzeBtn.style.display = 'flex';
+  els.resultCard.classList.remove('show');
+  els.errorBox.style.display = 'none';
 });
 els.retakeBtn.addEventListener('click', resetScan);
 els.discardBtn.addEventListener('click', closeScan);
@@ -2559,6 +2568,7 @@ els.addBtn.addEventListener('click', async ()=>{
 });
 
 els.manualToggleBtn.addEventListener('click', ()=>{
+  scanManualForcedByOffline = false; // a partir daqui é uma escolha deliberada da pessoa, não o offline
   const opening = els.manualForm.style.display === 'none';
   els.manualForm.style.display = opening ? 'block' : 'none';
   els.dropzone.style.display = opening ? 'none' : 'block';
