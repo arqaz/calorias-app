@@ -585,18 +585,16 @@
   .gym-week-day{margin-bottom:20px;}
   .ai-disclaimer{font-size:10.5px;color:var(--muted-soft);font-weight:500;line-height:1.5;margin:8px 2px 4px;}
 
-  .tutorial-slide{display:flex;flex-direction:column;align-items:center;text-align:center;padding-top:12vh;min-height:52vh;justify-content:center;}
+  .tutorial-viewport{overflow:hidden;touch-action:pan-y;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;}
+  .tutorial-track{display:flex;}
+  .tutorial-slide{flex:0 0 100%;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;text-align:center;padding-top:12vh;min-height:52vh;justify-content:center;}
   .tutorial-emoji{font-size:56px;margin-bottom:20px;}
   .tutorial-title{font-size:24px;font-weight:800;margin-bottom:12px;letter-spacing:-.01em;}
   .tutorial-desc{font-size:14.5px;color:var(--muted);font-weight:500;line-height:1.6;max-width:340px;}
   .tutorial-dots{display:flex;justify-content:center;gap:7px;margin:0 0 24px;}
   .tutorial-dot{width:7px;height:7px;border-radius:50%;background:var(--track);transition:background .2s ease,width .2s ease;}
   .tutorial-dot.active{background:var(--a2);width:20px;border-radius:4px;}
-  .tutorial-actions{display:flex;gap:10px;align-items:center;}
-  .tutorial-back-btn{
-    background:none;border:none;color:var(--muted);font-weight:700;font-size:13px;cursor:pointer;
-    padding:0 6px;flex-shrink:0;width:56px;font-family:'Plus Jakarta Sans',sans-serif;
-  }
+  .tutorial-swipe-hint{font-size:12px;color:var(--muted-soft);font-weight:600;text-align:center;margin:0 0 16px;}
 
   .account-row{display:flex;align-items:center;gap:10px;margin-top:8px;}
   .account-avatar{width:38px;height:38px;border-radius:50%;flex-shrink:0;background:var(--track);object-fit:cover;}
@@ -707,16 +705,12 @@
 </div>
 
 <div class="onboard-overlay hide" id="tutorialOverlay">
-  <div class="tutorial-slide">
-    <div class="tutorial-emoji" id="tutorialEmoji">👋</div>
-    <div class="tutorial-title" id="tutorialTitle">—</div>
-    <div class="tutorial-desc" id="tutorialDesc">—</div>
+  <div class="tutorial-viewport" id="tutorialViewport">
+    <div class="tutorial-track" id="tutorialTrack"></div>
   </div>
   <div class="tutorial-dots" id="tutorialDots"></div>
-  <div class="tutorial-actions">
-    <button class="tutorial-back-btn" id="tutorialBackBtn">Voltar</button>
-    <button class="onboard-start" id="tutorialNextBtn" style="flex:1;">Seguinte</button>
-  </div>
+  <div class="tutorial-swipe-hint" id="tutorialSwipeHint">Desliza para continuar →</div>
+  <button class="onboard-start" id="tutorialNextBtn" style="display:none;">Vamos a isso!</button>
   <button class="onboard-skip" id="tutorialSkipBtn">Saltar tutorial</button>
 </div>
 
@@ -1428,12 +1422,11 @@ const els = {
   gymPrefsSaveBtn: document.getElementById('gymPrefsSaveBtn'),
   gymPrefsCancelBtn: document.getElementById('gymPrefsCancelBtn'),
   tutorialOverlay: document.getElementById('tutorialOverlay'),
-  tutorialEmoji: document.getElementById('tutorialEmoji'),
-  tutorialTitle: document.getElementById('tutorialTitle'),
-  tutorialDesc: document.getElementById('tutorialDesc'),
+  tutorialViewport: document.getElementById('tutorialViewport'),
+  tutorialTrack: document.getElementById('tutorialTrack'),
   tutorialDots: document.getElementById('tutorialDots'),
+  tutorialSwipeHint: document.getElementById('tutorialSwipeHint'),
   tutorialNextBtn: document.getElementById('tutorialNextBtn'),
-  tutorialBackBtn: document.getElementById('tutorialBackBtn'),
   tutorialSkipBtn: document.getElementById('tutorialSkipBtn'),
   replayTutorialBtn: document.getElementById('replayTutorialBtn'),
   accountSection: document.getElementById('accountSection'),
@@ -1772,21 +1765,43 @@ const TUTORIAL_SLIDES = [
 ];
 
 let tutorialIndex = 0;
+let tutorialDragging = false;
+let tutorialDragStartX = 0;
+let tutorialDragDeltaX = 0;
+let tutorialPointerId = null;
+
+function tutorialViewportWidth(){
+  return els.tutorialViewport.getBoundingClientRect().width || 1;
+}
+
+function tutorialSetTransform(px, animate){
+  els.tutorialTrack.style.transition = animate ? 'transform .32s cubic-bezier(.22,.61,.36,1)' : 'none';
+  els.tutorialTrack.style.transform = `translateX(${px}px)`;
+}
+
+function buildTutorialSlides(){
+  els.tutorialTrack.innerHTML = TUTORIAL_SLIDES.map(slide => `
+    <div class="tutorial-slide">
+      <div class="tutorial-emoji">${escapeHtml(slide.emoji)}</div>
+      <div class="tutorial-title">${escapeHtml(slide.title)}</div>
+      <div class="tutorial-desc">${escapeHtml(slide.desc)}</div>
+    </div>
+  `).join('');
+}
 
 function renderTutorialSlide(){
-  const slide = TUTORIAL_SLIDES[tutorialIndex];
-  els.tutorialEmoji.textContent = slide.emoji;
-  els.tutorialTitle.textContent = slide.title;
-  els.tutorialDesc.textContent = slide.desc;
+  const isLast = tutorialIndex === TUTORIAL_SLIDES.length - 1;
   els.tutorialDots.innerHTML = TUTORIAL_SLIDES.map((_, i)=> `<span class="tutorial-dot${i === tutorialIndex ? ' active' : ''}"></span>`).join('');
-  els.tutorialNextBtn.textContent = tutorialIndex === TUTORIAL_SLIDES.length - 1 ? 'Vamos a isso!' : 'Seguinte';
-  els.tutorialBackBtn.style.display = tutorialIndex === 0 ? 'none' : 'block';
+  els.tutorialSwipeHint.style.display = isLast ? 'none' : 'block';
+  els.tutorialNextBtn.style.display = isLast ? 'block' : 'none';
+  tutorialSetTransform(-tutorialIndex * tutorialViewportWidth(), true);
 }
 
 function openTutorial(){
   tutorialIndex = 0;
-  renderTutorialSlide();
+  buildTutorialSlides();
   els.tutorialOverlay.classList.remove('hide');
+  renderTutorialSlide();
 }
 
 async function closeTutorial(){
@@ -1802,20 +1817,44 @@ function maybeShowTutorial(){
   if(!settings.tutorialSeen) openTutorial();
 }
 
-els.tutorialNextBtn.addEventListener('click', async ()=>{
-  if(tutorialIndex < TUTORIAL_SLIDES.length - 1){
+// Navegação por swipe (arrastar horizontalmente) em vez de um botão
+// "seguinte" em cada slide — só há um botão de confirmação no último slide.
+els.tutorialViewport.addEventListener('pointerdown', (e)=>{
+  tutorialDragging = true;
+  tutorialPointerId = e.pointerId;
+  tutorialDragStartX = e.clientX;
+  tutorialDragDeltaX = 0;
+  els.tutorialViewport.setPointerCapture(e.pointerId);
+});
+els.tutorialViewport.addEventListener('pointermove', (e)=>{
+  if(!tutorialDragging || e.pointerId !== tutorialPointerId) return;
+  tutorialDragDeltaX = e.clientX - tutorialDragStartX;
+  let delta = tutorialDragDeltaX;
+  // Resistência ("rubber-band") ao arrastar para lá do primeiro/último slide.
+  if((tutorialIndex === 0 && delta > 0) || (tutorialIndex === TUTORIAL_SLIDES.length - 1 && delta < 0)){
+    delta = delta / 3;
+  }
+  tutorialSetTransform(-tutorialIndex * tutorialViewportWidth() + delta, false);
+});
+function tutorialEndDrag(e){
+  if(!tutorialDragging || (e && e.pointerId !== tutorialPointerId)) return;
+  tutorialDragging = false;
+  const threshold = Math.min(80, tutorialViewportWidth() * 0.18);
+  if(tutorialDragDeltaX < -threshold && tutorialIndex < TUTORIAL_SLIDES.length - 1){
     tutorialIndex++;
-    renderTutorialSlide();
-  } else {
-    await closeTutorial();
-  }
-});
-els.tutorialBackBtn.addEventListener('click', ()=>{
-  if(tutorialIndex > 0){
+  } else if(tutorialDragDeltaX > threshold && tutorialIndex > 0){
     tutorialIndex--;
-    renderTutorialSlide();
   }
+  tutorialDragDeltaX = 0;
+  renderTutorialSlide();
+}
+els.tutorialViewport.addEventListener('pointerup', tutorialEndDrag);
+els.tutorialViewport.addEventListener('pointercancel', tutorialEndDrag);
+window.addEventListener('resize', ()=>{
+  if(!els.tutorialOverlay.classList.contains('hide')) tutorialSetTransform(-tutorialIndex * tutorialViewportWidth(), false);
 });
+
+els.tutorialNextBtn.addEventListener('click', closeTutorial);
 els.tutorialSkipBtn.addEventListener('click', closeTutorial);
 els.replayTutorialBtn.addEventListener('click', ()=>{
   els.goalOverlay.classList.remove('show');
