@@ -1693,6 +1693,15 @@ async function callAiEndpoint(url, body){
     const err = new Error((errData.error || ('Falha na chamada à API (' + response.status + ')')) + (errData.details ? ' — ' + errData.details : ''));
     err.requiresLogin = !!errData.requiresLogin;
     err.status = response.status;
+    // O servidor recusou o token guardado (ex: expirou, o que os tokens de
+    // sessão da Google fazem ao fim de cerca de uma hora) — sem isto, a app
+    // continuava a mostrar-se "com sessão iniciada" (o ecrã de login não
+    // reaparece, e as Definições mostram a conta como ligada), levando a
+    // pessoa a um beco sem saída: o link "Iniciar sessão" do erro abria
+    // Definições, que mostravam sempre a vista de sessão iniciada. Limpar a
+    // sessão aqui faz o ecrã de login reaparecer, com um caminho real para
+    // voltar a entrar.
+    if(err.requiresLogin && googleIdToken) signOutGoogle();
     throw err;
   }
   return response.json();
