@@ -1,6 +1,20 @@
+import { requireEntitledUser, getClientIp } from '../lib/auth.js';
+import { checkRateLimit } from '../lib/kv.js';
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'Método não permitido' });
+    return;
+  }
+
+  const { user, error: authError } = await requireEntitledUser(req);
+  if (authError) {
+    res.status(authError.status).json(authError.body);
+    return;
+  }
+  const rl = await checkRateLimit('rl:body-feedback:' + (user ? user.sub : getClientIp(req)), 10, 3600);
+  if (!rl.allowed) {
+    res.status(429).json({ error: 'Demasiados pedidos. Tenta novamente daqui a pouco.' });
     return;
   }
 
