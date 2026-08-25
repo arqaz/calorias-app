@@ -1669,6 +1669,17 @@ function fmtDateBig(ds){
   return d.toLocaleDateString('pt-PT',{weekday:'long', day:'numeric', month:'long'});
 }
 
+// Versão curta, só para o cabeçalho ("Terça, 25 Ago") — a versão completa
+// (fmtDateBig) ocupava duas linhas no topo do ecrã. O mês é escrito à mão
+// (em vez de month:'short') porque o Intl em pt-PT devolve "25/08" nesse
+// caso, em vez de "25 ago".
+const PT_MONTHS_SHORT = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+function fmtDateHeader(ds){
+  const d = new Date(ds+'T00:00:00');
+  const weekday = d.toLocaleDateString('pt-PT',{weekday:'short'});
+  return `${weekday}, ${d.getDate()} ${PT_MONTHS_SHORT[d.getMonth()]}`;
+}
+
 function addDays(ds, delta){
   const d = new Date(ds+'T00:00:00');
   d.setDate(d.getDate() + delta);
@@ -1677,7 +1688,7 @@ function addDays(ds, delta){
 
 async function goToDate(ds){
   currentDate = ds;
-  els.dateBig.textContent = fmtDateBig(currentDate);
+  els.dateBig.textContent = fmtDateHeader(currentDate);
   await loadDay();
   render();
 }
@@ -1823,7 +1834,7 @@ window.addEventListener('online', updateOfflineUI);
 window.addEventListener('offline', updateOfflineUI);
 
 async function init(){
-  els.dateBig.textContent = fmtDateBig(currentDate);
+  els.dateBig.textContent = fmtDateHeader(currentDate);
   await loadSettings();
   applyTheme();
   await loadDay();
