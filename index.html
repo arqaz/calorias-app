@@ -1040,6 +1040,7 @@
         <option value="flexivel">Só as metas, com alternativas à escolha</option>
       </select>
       <button class="goal-save" id="goalSaveBtn">Guardar</button>
+      <button class="onboard-skip" id="replayOnboardingBtn" style="border:2px solid var(--track);border-radius:14px;color:var(--ink);margin-top:10px;width:100%;">Repetir configuração inicial</button>
       <button class="onboard-skip" id="replayTutorialBtn" style="border:2px solid var(--track);border-radius:14px;color:var(--ink);margin-top:10px;width:100%;">Ver tutorial da app novamente</button>
     </div>
   </div>
@@ -1399,6 +1400,7 @@ const els = {
   tutorialNextBtn: document.getElementById('tutorialNextBtn'),
   tutorialSkipBtn: document.getElementById('tutorialSkipBtn'),
   replayTutorialBtn: document.getElementById('replayTutorialBtn'),
+  replayOnboardingBtn: document.getElementById('replayOnboardingBtn'),
   accountSection: document.getElementById('accountSection'),
   accountSignedOut: document.getElementById('accountSignedOut'),
   accountSignedIn: document.getElementById('accountSignedIn'),
@@ -1891,6 +1893,16 @@ els.tutorialSkipBtn.addEventListener('click', closeTutorial);
 els.replayTutorialBtn.addEventListener('click', ()=>{
   els.goalOverlay.classList.remove('show');
   openTutorial();
+});
+
+// Repete o assistente de configuração inicial — útil para rever/ajustar as
+// respostas sem ter de apagar os dados da app. As respostas já dadas
+// aparecem pré-preenchidas/pré-selecionadas (o assistente lê sempre de
+// `settings`); nada é gravado até se chegar ao fim ("Começar").
+els.replayOnboardingBtn.addEventListener('click', ()=>{
+  els.goalOverlay.classList.remove('show');
+  settings.onboarded = false;
+  openOnboardingWizard();
 });
 
 function calcSuggestedGoal({ sex, weight, height, age, activity, objective }){
