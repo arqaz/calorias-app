@@ -525,6 +525,22 @@
   }
   .body-weight-row input:focus{outline:none;border-color:var(--a2);}
   .body-photo-skip{width:100%;background:none;border:none;color:var(--muted);font-weight:700;font-size:12.5px;text-decoration:underline;cursor:pointer;padding:8px 0;}
+
+  .body-feedback-title{font-size:15px;font-weight:800;margin-bottom:10px;}
+  .body-feedback-summary{
+    background:var(--fresh-soft);color:var(--fresh);font-size:13px;font-weight:600;line-height:1.5;
+    padding:12px 13px;border-radius:16px;
+  }
+  .body-feedback-summary.neutral{background:var(--track);color:var(--muted);}
+  .body-feedback-section{margin-top:14px;}
+  .body-feedback-heading{font-size:11.5px;font-weight:700;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.02em;}
+  .body-feedback-list{margin:0;padding-left:18px;font-size:13px;font-weight:500;line-height:1.6;}
+  .body-feedback-list li{margin-bottom:2px;}
+  .body-feedback-disclaimer{font-size:10.5px;color:var(--muted-soft);font-weight:500;line-height:1.5;margin-top:14px;}
+  .lightbox-feedback{
+    max-width:340px;background:rgba(255,255,255,.08);color:rgba(255,255,255,.85);
+    font-size:12px;font-weight:500;line-height:1.5;padding:12px 14px;border-radius:14px;margin-top:14px;text-align:left;
+  }
 </style>
 </head>
 <body>
@@ -956,32 +972,49 @@
     <div class="sheet-handle"></div>
     <div class="sheet-title">Registo de progresso corporal</div>
 
-    <div class="scan-offline-notice" id="bodyOfflineNotice">📡 Estás offline: a foto fica guardada, mas sem verificação de enquadramento por IA.</div>
+    <div id="bodyCheckinForm">
+      <div class="scan-offline-notice" id="bodyOfflineNotice">📡 Estás offline: a foto fica guardada, mas sem verificação de enquadramento por IA.</div>
 
-    <label for="bodyFileInput" id="bodyDropzone" class="dropzone">
-      <div class="camicon">🧍</div>
-      <p>Tirar ou carregar foto de corpo inteiro</p>
-      <small>de frente, de pé, boa iluminação</small>
-    </label>
-    <input type="file" id="bodyFileInput" accept="image/*" capture="environment">
+      <label for="bodyFileInput" id="bodyDropzone" class="dropzone">
+        <div class="camicon">🧍</div>
+        <p>Tirar ou carregar foto de corpo inteiro</p>
+        <small>de frente, de pé, boa iluminação</small>
+      </label>
+      <input type="file" id="bodyFileInput" accept="image/*" capture="environment">
 
-    <div style="text-align:center;">
-      <button type="button" class="body-photo-skip" id="bodySkipPhotoBtn">registar só o peso, sem foto</button>
+      <div style="text-align:center;">
+        <button type="button" class="body-photo-skip" id="bodySkipPhotoBtn">registar só o peso, sem foto</button>
+      </div>
+
+      <div class="preview-wrap" id="bodyPreviewWrap" style="display:none;">
+        <img id="bodyPreviewImg" src="" alt="Pré-visualização">
+        <button class="retake" id="bodyRetakeBtn">Trocar foto</button>
+      </div>
+
+      <div id="bodyCheckErrorBox" class="error" style="display:none;"></div>
+
+      <div class="body-weight-row">
+        <input type="number" id="bodyWeightInput" inputmode="numeric" step="0.5" placeholder="Peso atual (kg) — opcional">
+      </div>
+
+      <button class="add-btn" id="bodyCheckinSaveBtn" style="margin-top:14px;">Guardar registo</button>
+      <button class="discard-btn" id="bodyCheckinCancelBtn">Cancelar</button>
     </div>
 
-    <div class="preview-wrap" id="bodyPreviewWrap" style="display:none;">
-      <img id="bodyPreviewImg" src="" alt="Pré-visualização">
-      <button class="retake" id="bodyRetakeBtn">Trocar foto</button>
+    <div id="bodyFeedbackPanel" style="display:none;">
+      <div class="body-feedback-title">🤖 Feedback de progresso</div>
+      <div class="body-feedback-summary" id="bodyFeedbackSummary"></div>
+      <div class="body-feedback-section" id="bodyFeedbackObsSection" style="display:none;">
+        <div class="body-feedback-heading">O que parece estar a mudar</div>
+        <ul class="body-feedback-list" id="bodyFeedbackObservations"></ul>
+      </div>
+      <div class="body-feedback-section" id="bodyFeedbackSugSection" style="display:none;">
+        <div class="body-feedback-heading">Sugestões para continuar</div>
+        <ul class="body-feedback-list" id="bodyFeedbackSuggestions"></ul>
+      </div>
+      <div class="body-feedback-disclaimer">Feedback gerado por IA a partir das fotos e do teu objetivo — não substitui aconselhamento profissional de nutrição, treino ou saúde.</div>
+      <button class="add-btn" id="bodyFeedbackDoneBtn" style="margin-top:16px;">Concluído</button>
     </div>
-
-    <div id="bodyCheckErrorBox" class="error" style="display:none;"></div>
-
-    <div class="body-weight-row">
-      <input type="number" id="bodyWeightInput" inputmode="numeric" step="0.5" placeholder="Peso atual (kg) — opcional">
-    </div>
-
-    <button class="add-btn" id="bodyCheckinSaveBtn" style="margin-top:14px;">Guardar registo</button>
-    <button class="discard-btn" id="bodyCheckinCancelBtn">Cancelar</button>
   </div>
 </div>
 
@@ -989,6 +1022,7 @@
   <img id="bodyLightboxImg" src="" alt="Registo de progresso corporal">
   <div class="lightbox-caption" id="bodyLightboxDate">—</div>
   <div class="lightbox-sub" id="bodyLightboxWeight"></div>
+  <div class="lightbox-feedback" id="bodyLightboxFeedback" style="display:none;"></div>
   <div class="lightbox-actions">
     <button class="lightbox-btn lightbox-close" id="bodyLightboxCloseBtn">Fechar</button>
     <button class="lightbox-btn lightbox-delete" id="bodyLightboxDeleteBtn">Eliminar</button>
@@ -1111,8 +1145,17 @@ const els = {
   bodyLightboxImg: document.getElementById('bodyLightboxImg'),
   bodyLightboxDate: document.getElementById('bodyLightboxDate'),
   bodyLightboxWeight: document.getElementById('bodyLightboxWeight'),
+  bodyLightboxFeedback: document.getElementById('bodyLightboxFeedback'),
   bodyLightboxCloseBtn: document.getElementById('bodyLightboxCloseBtn'),
   bodyLightboxDeleteBtn: document.getElementById('bodyLightboxDeleteBtn'),
+  bodyCheckinForm: document.getElementById('bodyCheckinForm'),
+  bodyFeedbackPanel: document.getElementById('bodyFeedbackPanel'),
+  bodyFeedbackSummary: document.getElementById('bodyFeedbackSummary'),
+  bodyFeedbackObsSection: document.getElementById('bodyFeedbackObsSection'),
+  bodyFeedbackObservations: document.getElementById('bodyFeedbackObservations'),
+  bodyFeedbackSugSection: document.getElementById('bodyFeedbackSugSection'),
+  bodyFeedbackSuggestions: document.getElementById('bodyFeedbackSuggestions'),
+  bodyFeedbackDoneBtn: document.getElementById('bodyFeedbackDoneBtn'),
   targetWeightInput: document.getElementById('targetWeightInput'),
   bodyCheckinInput: document.getElementById('bodyCheckinInput'),
 };
@@ -1904,6 +1947,13 @@ function openBodyLightbox(entry){
   }
   els.bodyLightboxDate.textContent = fmtDateBig(entry.date);
   els.bodyLightboxWeight.textContent = entry.weight ? (entry.weight + ' kg') : (entry.note || '');
+  if(entry.feedback && entry.feedback.summary){
+    els.bodyLightboxFeedback.textContent = '🤖 ' + entry.feedback.summary;
+    els.bodyLightboxFeedback.style.display = 'block';
+  } else {
+    els.bodyLightboxFeedback.textContent = '';
+    els.bodyLightboxFeedback.style.display = 'none';
+  }
   els.bodyLightbox.classList.add('show');
 }
 els.bodyLightboxCloseBtn.addEventListener('click', ()=> els.bodyLightbox.classList.remove('show'));
@@ -1926,8 +1976,62 @@ function resetBodyCheckinSheet(){
   els.bodyPreviewWrap.style.display = 'none';
   els.bodyCheckErrorBox.style.display = 'none';
   els.bodyWeightInput.value = settings.weight || '';
+  els.bodyCheckinForm.style.display = 'block';
+  els.bodyFeedbackPanel.style.display = 'none';
   updateOfflineUI();
 }
+
+// Devolve o registo mais recente que tem foto (para comparação de progresso).
+function latestPhotoEntry(){
+  for(let i = bodyCheckins.length - 1; i >= 0; i--){
+    if(bodyCheckins[i].photo) return bodyCheckins[i];
+  }
+  return null;
+}
+
+function splitDataUrl(dataUrl){
+  const match = /^data:([^;]+);base64,(.*)$/.exec(dataUrl || '');
+  return match ? { mediaType: match[1], base64: match[2] } : null;
+}
+
+async function fetchBodyProgressFeedback({ currentImage, currentMediaType, previousImage, previousMediaType, objective }){
+  const response = await fetch('/api/body-progress-feedback', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ currentImage, currentMediaType, previousImage, previousMediaType, objective }),
+  });
+  if(!response.ok) throw new Error('Falha na chamada à API (' + response.status + ')');
+  return response.json();
+}
+
+function showBodyFeedback(feedback){
+  els.bodyCheckinForm.style.display = 'none';
+  els.bodyFeedbackPanel.style.display = 'block';
+
+  const comparable = feedback && feedback.comparable !== false;
+  els.bodyFeedbackSummary.className = 'body-feedback-summary' + (comparable ? '' : ' neutral');
+  els.bodyFeedbackSummary.textContent = (feedback && feedback.summary) || 'Sem feedback disponível desta vez.';
+
+  const observations = (feedback && Array.isArray(feedback.observations)) ? feedback.observations : [];
+  if(observations.length){
+    els.bodyFeedbackObservations.innerHTML = observations.map(o => `<li>${escapeHtml(o)}</li>`).join('');
+    els.bodyFeedbackObsSection.style.display = 'block';
+  } else {
+    els.bodyFeedbackObsSection.style.display = 'none';
+  }
+
+  const suggestions = (feedback && Array.isArray(feedback.suggestions)) ? feedback.suggestions : [];
+  if(suggestions.length){
+    els.bodyFeedbackSuggestions.innerHTML = suggestions.map(s => `<li>${escapeHtml(s)}</li>`).join('');
+    els.bodyFeedbackSugSection.style.display = 'block';
+  } else {
+    els.bodyFeedbackSugSection.style.display = 'none';
+  }
+}
+
+els.bodyFeedbackDoneBtn.addEventListener('click', ()=>{
+  els.bodyCheckinOverlay.classList.remove('show');
+});
 
 els.bodyCheckinBtn.addEventListener('click', ()=>{
   resetBodyCheckinSheet();
@@ -1962,24 +2066,55 @@ els.bodyCheckinSaveBtn.addEventListener('click', async ()=>{
   const origLabel = els.bodyCheckinSaveBtn.textContent;
   els.bodyCheckinSaveBtn.textContent = 'A guardar…';
 
-  const { saved } = await commitBodyCheckin({
+  // Captura o registo anterior com foto ANTES de guardar o novo, para poder
+  // comparar os dois (o novo registo pode substituir um registo do mesmo dia).
+  const previousPhotoEntry = bodyPhotoDataUrl ? latestPhotoEntry() : null;
+
+  const { entry, saved } = await commitBodyCheckin({
     photoDataUrl: bodyPhotoDataUrl,
     mediaType: bodyPhotoMediaType,
     weight: hasWeight ? weightVal : null,
   });
 
-  els.bodyCheckinSaveBtn.disabled = false;
-  els.bodyCheckinSaveBtn.textContent = origLabel;
-
   if(!saved){
+    els.bodyCheckinSaveBtn.disabled = false;
+    els.bodyCheckinSaveBtn.textContent = origLabel;
     els.bodyCheckErrorBox.textContent = 'Não foi possível guardar o registo (sem espaço disponível no aparelho).';
     els.bodyCheckErrorBox.style.display = 'block';
     return;
   }
 
-  els.bodyCheckinOverlay.classList.remove('show');
   render();
   renderBodyCard();
+
+  // Feedback comparativo só é possível a partir do 2.º registo com foto, e só
+  // com ligação (usa o mesmo endpoint IA do enquadramento). Falha em silêncio
+  // e fecha normalmente se não houver comparação possível.
+  if(entry.photo && previousPhotoEntry && previousPhotoEntry.photo && !isOffline()){
+    els.bodyCheckinSaveBtn.textContent = 'A gerar feedback…';
+    try{
+      const cur = splitDataUrl(entry.photo);
+      const prev = splitDataUrl(previousPhotoEntry.photo);
+      const feedback = await fetchBodyProgressFeedback({
+        currentImage: cur.base64, currentMediaType: cur.mediaType,
+        previousImage: prev.base64, previousMediaType: prev.mediaType,
+        objective: settings.objective || 'manter',
+      });
+      entry.feedback = feedback;
+      saveBodyCheckins();
+      els.bodyCheckinSaveBtn.disabled = false;
+      els.bodyCheckinSaveBtn.textContent = origLabel;
+      showBodyFeedback(feedback);
+      return; // deixa o painel de feedback aberto — a pessoa fecha com "Concluído"
+    }catch(err){
+      console.error('Falha ao gerar feedback de progresso', err);
+      // sem feedback desta vez — segue o fluxo normal e fecha a folha
+    }
+  }
+
+  els.bodyCheckinSaveBtn.disabled = false;
+  els.bodyCheckinSaveBtn.textContent = origLabel;
+  els.bodyCheckinOverlay.classList.remove('show');
 });
 
 // ---- Onboarding: registo corporal ------------------------------------------
