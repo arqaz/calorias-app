@@ -954,7 +954,7 @@
       <p>Tirar ou carregar foto do prato</p>
       <small>uma refeição por foto</small>
     </label>
-    <input type="file" id="fileInput" accept="image/*" capture="environment">
+    <input type="file" id="fileInput" accept="image/*">
 
     <div style="text-align:center;">
       <button class="link-btn" id="manualToggleBtn">ou adicionar sem foto</button>
@@ -1152,7 +1152,7 @@
         <p>Tirar ou carregar foto de corpo inteiro</p>
         <small>de frente, de pé, boa iluminação</small>
       </label>
-      <input type="file" id="bodyFileInput" accept="image/*" capture="environment">
+      <input type="file" id="bodyFileInput" accept="image/*">
 
       <div style="text-align:center;">
         <button type="button" class="body-photo-skip" id="bodySkipPhotoBtn">registar só o peso, sem foto</button>
@@ -2279,7 +2279,7 @@ function renderWizardPhoto(){
       <p>Tirar ou carregar foto</p>
       <small>de corpo inteiro, de frente · fica só neste aparelho</small>
     </label>
-    <input type="file" id="wizardPhotoInput" accept="image/*" capture="environment" style="display:none;">
+    <input type="file" id="wizardPhotoInput" accept="image/*" style="display:none;">
     <div id="wizardPhotoPreviewWrap" style="display:${onboardBodyPhotoDataUrl ? 'block' : 'none'};margin-top:10px;">
       <img id="wizardPhotoPreview" src="${onboardBodyPhotoDataUrl || ''}" style="width:100%;max-height:240px;object-fit:cover;border-radius:18px;display:block;" alt="Pré-visualização">
       <button type="button" class="body-photo-skip" id="wizardPhotoRetakeBtn">Trocar foto</button>
