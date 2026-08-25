@@ -18,7 +18,7 @@ export default async function handler(req, res) {
     return;
   }
 
-  const { objective, goalCalories, restrictions, preferences, dislikes } = req.body || {};
+  const { objective, goalCalories, restrictions, preferences, dislikes, detailLevel, flexibility } = req.body || {};
   const calories = Number(goalCalories);
   if (!calories || calories <= 0) {
     res.status(400).json({ error: 'Meta calórica em falta ou inválida' });
@@ -42,12 +42,21 @@ export default async function handler(req, res) {
   const preferencesText = (preferences || '').trim() || 'nenhuma em particular';
   const dislikesText = (dislikes || '').trim() || 'nenhum';
 
+  const detailLevelText = detailLevel === 'elaborado'
+    ? 'Pode incluir receitas mais elaboradas e variadas, com mais ingredientes e algum tempo de preparação — a pessoa não se importa com isso.'
+    : 'Prefere receitas simples e rápidas de preparar, com poucos ingredientes.';
+  const flexibilityText = flexibility === 'flexivel'
+    ? 'A pessoa prefere ter liberdade para escolher — em cada refeição, sugere a par da refeição principal 1 a 2 alternativas equivalentes em calorias que possa escolher em vez dela, e refere isso nas notas.'
+    : 'A pessoa prefere um plano definido ao pormenor, dia a dia, sem alternativas — cada refeição deve ser uma sugestão única e concreta.';
+
   const prompt = `Cria um plano de refeições semanal (7 dias, de segunda a domingo) em português de Portugal, adaptado a estes dados da pessoa:
 - Objetivo: ${objectiveLabel}
 - Meta calórica diária: ${calories} kcal
 - Restrições alimentares: ${restrictionsText}
 - Alimentos preferidos: ${preferencesText}
 - Alimentos a evitar: ${dislikesText}
+- Nível de detalhe das receitas: ${detailLevelText}
+- Estilo do plano: ${flexibilityText}
 
 Regras:
 - Para cada dia, sugere exatamente 4 refeições, nesta ordem: "Pequeno-almoço", "Almoço", "Lanche", "Jantar".

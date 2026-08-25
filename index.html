@@ -336,6 +336,26 @@
     color:#fff;border:none;font-weight:800;font-size:15.5px;padding:16px;border-radius:16px;cursor:pointer;
   }
   .onboard-skip{width:100%;background:none;border:none;color:var(--muted);font-weight:600;font-size:12.5px;padding:12px;cursor:pointer;}
+
+  .wizard-progress-track{width:100%;height:5px;border-radius:3px;background:var(--track);margin-bottom:22px;overflow:hidden;}
+  .wizard-progress-fill{height:100%;border-radius:3px;background:linear-gradient(135deg,var(--a1),var(--a2));transition:width .25s ease;}
+  .wizard-back-link{background:none;border:none;color:var(--muted);font-weight:700;font-size:13px;cursor:pointer;padding:0 0 14px;font-family:'Plus Jakarta Sans',sans-serif;}
+  .wizard-header{text-align:center;padding:4px 0 20px;}
+  .wizard-emoji{font-size:48px;margin-bottom:14px;}
+  .wizard-title{font-size:21px;font-weight:800;letter-spacing:-.01em;line-height:1.3;}
+  .wizard-desc{font-size:13px;color:var(--muted);font-weight:500;margin-top:8px;line-height:1.5;}
+  .wizard-option-btn{
+    display:block;width:100%;text-align:left;background:var(--card);border:2px solid var(--track);
+    border-radius:16px;padding:14px 16px;margin-bottom:10px;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;
+    transition:border-color .15s ease,background .15s ease;
+  }
+  .wizard-option-btn.selected{background:linear-gradient(135deg,var(--a1),var(--a2));border-color:transparent;}
+  .wizard-option-label{font-size:14.5px;font-weight:800;color:var(--ink);}
+  .wizard-option-sub{font-size:12px;color:var(--muted);font-weight:500;margin-top:2px;}
+  .wizard-option-btn.selected .wizard-option-label,.wizard-option-btn.selected .wizard-option-sub{color:#fff;}
+  .wizard-goal-card{background:var(--card);border-radius:22px;box-shadow:var(--shadow);padding:28px 20px;text-align:center;margin-bottom:8px;}
+  .wizard-goal-number{font-size:38px;font-weight:800;letter-spacing:-.02em;background:linear-gradient(135deg,var(--a1),var(--a2));-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .wizard-goal-sub{font-size:12.5px;color:var(--muted);font-weight:600;margin-top:6px;}
   .item-row{
     display:flex;align-items:center;gap:10px;
     padding:10px 0;border-bottom:1px solid var(--track);
@@ -614,98 +634,17 @@
   <img src="/icons/logo-full.png" alt="Trinca" id="splashLogoImg">
 </div>
 <div class="onboard-overlay hide" id="onboardOverlay">
-  <img src="/icons/icon-192.png" alt="Trinca" class="onboard-logo" id="onboardLogoImg">
-  <div class="onboard-title">Bem-vindo ao Trinca</div>
-  <div class="onboard-sub">Antes de começares, define alguns dados básicos. Podes alterá-los sempre que quiseres nas definições (ícone da engrenagem).</div>
-
-  <div class="onboard-field">
-    <label>Sexo</label>
-    <select id="onSex">
-      <option value="f">Feminino</option>
-      <option value="m">Masculino</option>
-    </select>
+  <div class="wizard-progress-track"><div class="wizard-progress-fill" id="wizardProgressFill" style="width:0%;"></div></div>
+  <button type="button" class="wizard-back-link" id="wizardBackBtn" style="display:none;">← Voltar</button>
+  <div class="wizard-header">
+    <div class="wizard-emoji" id="wizardEmoji">👋</div>
+    <div class="wizard-title" id="wizardTitle">—</div>
+    <div class="wizard-desc" id="wizardDesc" style="display:none;"></div>
   </div>
-
-  <div class="onboard-field">
-    <label>Idade</label>
-    <input type="number" id="onAge" inputmode="numeric" placeholder="ex: 34">
-  </div>
-
-  <div class="onboard-field">
-    <label>Altura (cm)</label>
-    <input type="number" id="onHeight" inputmode="numeric" placeholder="ex: 170">
-  </div>
-
-  <div class="onboard-field">
-    <label>Peso atual (kg)</label>
-    <input type="number" id="onWeight" inputmode="numeric" placeholder="ex: 75">
-  </div>
-
-  <div class="onboard-field">
-    <label>Nível de atividade</label>
-    <select id="onActivity">
-      <option value="sedentario">Sedentário (pouco ou nenhum exercício)</option>
-      <option value="leve">Leve (exercício 1-3x/semana)</option>
-      <option value="moderado" selected>Moderado (exercício 3-5x/semana)</option>
-      <option value="ativo">Ativo (exercício 6-7x/semana)</option>
-      <option value="muito_ativo">Muito ativo (exercício intenso diário)</option>
-    </select>
-  </div>
-
-  <div class="onboard-field">
-    <label>Objetivo</label>
-    <select id="onObjective">
-      <option value="perder">Perder peso</option>
-      <option value="manter" selected>Manter peso</option>
-      <option value="ganhar">Ganhar massa muscular</option>
-    </select>
-  </div>
-
-  <div class="onboard-field">
-    <label>Praticas ou queres praticar jejum intermitente?</label>
-    <select id="onFasting">
-      <option value="no" selected>Não</option>
-      <option value="yes">Sim</option>
-    </select>
-  </div>
-
-  <button class="onboard-skip" id="onboardSuggestBtn" style="border:2px solid var(--track);border-radius:14px;color:var(--ink);margin-bottom:10px;">Sugerir meta de calorias</button>
-
-  <div class="onboard-field">
-    <label>Meta diária de calorias (kcal)</label>
-    <input type="number" id="onGoal" inputmode="numeric" placeholder="2000" value="2000">
-  </div>
-
-  <div class="onboard-field">
-    <label>Peso objetivo (kg) — opcional</label>
-    <input type="number" id="onTargetWeight" inputmode="numeric" step="0.5" placeholder="ex: 68">
-  </div>
-
-  <div class="onboard-field">
-    <label>Queres manter um registo de progresso corporal (fotos)?</label>
-    <select id="onBodyCheckin">
-      <option value="no" selected>Não, obrigado</option>
-      <option value="weekly">Sim — semanalmente</option>
-      <option value="biweekly">Sim — quinzenalmente</option>
-    </select>
-  </div>
-
-  <div class="onboard-field" id="onBodyPhotoField" style="display:none;">
-    <label>Foto de corpo inteiro, de frente (opcional)</label>
-    <label for="onBodyPhotoInput" id="onBodyPhotoDropzone" class="dropzone" style="padding:22px 16px;display:block;">
-      <div class="camicon">🧍</div>
-      <p>Tirar ou carregar foto</p>
-      <small>Fica guardada só neste aparelho · podes saltar este passo</small>
-    </label>
-    <input type="file" id="onBodyPhotoInput" accept="image/*" capture="environment">
-    <div id="onBodyPhotoPreviewWrap" style="display:none;margin-top:10px;">
-      <img id="onBodyPhotoPreview" style="width:100%;max-height:240px;object-fit:cover;border-radius:18px;display:block;" alt="Pré-visualização">
-      <button type="button" class="body-photo-skip" id="onBodyPhotoRetakeBtn">Trocar foto</button>
-    </div>
-  </div>
-
-  <button class="onboard-start" id="onboardStartBtn">Começar</button>
-  <button class="onboard-skip" id="onboardSkipBtn">Saltar por agora</button>
+  <div id="wizardBody"></div>
+  <button class="onboard-start" id="wizardContinueBtn" style="display:none;">Continuar</button>
+  <button class="onboard-skip" id="wizardSkipBtn" style="display:none;">Saltar este passo</button>
+  <button class="onboard-skip" id="onboardSkipAllBtn">Saltar tudo por agora</button>
 </div>
 
 <div class="onboard-overlay hide" id="tutorialOverlay">
@@ -1090,6 +1029,16 @@
         <option value="no">Não mostrar</option>
         <option value="yes">Mostrar</option>
       </select>
+      <label style="display:block;margin-top:16px;">Nível de detalhe dos planos (nutrição e ginásio)</label>
+      <select id="planDetailLevelInput" style="width:100%;margin-top:8px;font-size:15px;font-weight:700;border:2px solid var(--track);border-radius:14px;padding:12px 14px;font-family:'Plus Jakarta Sans',sans-serif;color:var(--ink);">
+        <option value="simples">Simples e rápidos</option>
+        <option value="elaborado">Mais elaborados</option>
+      </select>
+      <label style="display:block;margin-top:16px;">Estilo dos planos</label>
+      <select id="planFlexibilityInput" style="width:100%;margin-top:8px;font-size:15px;font-weight:700;border:2px solid var(--track);border-radius:14px;padding:12px 14px;font-family:'Plus Jakarta Sans',sans-serif;color:var(--ink);">
+        <option value="guiado">Dia a dia, tudo definido</option>
+        <option value="flexivel">Só as metas, com alternativas à escolha</option>
+      </select>
       <button class="goal-save" id="goalSaveBtn">Guardar</button>
       <button class="onboard-skip" id="replayTutorialBtn" style="border:2px solid var(--track);border-radius:14px;color:var(--ink);margin-top:10px;width:100%;">Ver tutorial da app novamente</button>
     </div>
@@ -1433,6 +1382,15 @@ const els = {
   gymDurationInput: document.getElementById('gymDurationInput'),
   gymPrefsSaveBtn: document.getElementById('gymPrefsSaveBtn'),
   gymPrefsCancelBtn: document.getElementById('gymPrefsCancelBtn'),
+  wizardProgressFill: document.getElementById('wizardProgressFill'),
+  wizardBackBtn: document.getElementById('wizardBackBtn'),
+  wizardEmoji: document.getElementById('wizardEmoji'),
+  wizardTitle: document.getElementById('wizardTitle'),
+  wizardDesc: document.getElementById('wizardDesc'),
+  wizardBody: document.getElementById('wizardBody'),
+  wizardContinueBtn: document.getElementById('wizardContinueBtn'),
+  wizardSkipBtn: document.getElementById('wizardSkipBtn'),
+  onboardSkipAllBtn: document.getElementById('onboardSkipAllBtn'),
   tutorialOverlay: document.getElementById('tutorialOverlay'),
   tutorialViewport: document.getElementById('tutorialViewport'),
   tutorialTrack: document.getElementById('tutorialTrack'),
@@ -1748,10 +1706,8 @@ function applyTheme(){
 
   const isDark = resolved === 'dark';
   const splashImg = document.getElementById('splashLogoImg');
-  const onboardImg = document.getElementById('onboardLogoImg');
   const brandImg = document.getElementById('brandMarkImg');
   if(splashImg) splashImg.src = isDark ? '/icons/logo-full-dark.png' : '/icons/logo-full.png';
-  if(onboardImg) onboardImg.src = isDark ? '/icons/icon-192-dark.png' : '/icons/icon-192.png';
   if(brandImg) brandImg.src = isDark ? '/icons/icon-192-dark.png' : '/icons/icon-192.png';
 }
 if(window.matchMedia){
@@ -1825,7 +1781,7 @@ function finishOnboarding(){
 // estiverem todos concluídos, para confirmar que a app fica acessível).
 function advanceOnboardingFlow(){
   if(!settings.onboarded){
-    document.getElementById('onboardOverlay').classList.remove('hide');
+    openOnboardingWizard();
     return;
   }
   if(!settings.tutorialSeen){
@@ -1948,44 +1904,291 @@ function calcSuggestedGoal({ sex, weight, height, age, activity, objective }){
   return Math.max(1200, Math.round((tdee + adjust) / 10) * 10);
 }
 
-document.getElementById('onboardSuggestBtn').addEventListener('click', ()=>{
-  const suggestion = calcSuggestedGoal({
-    sex: document.getElementById('onSex').value,
-    weight: parseFloat(document.getElementById('onWeight').value),
-    height: parseFloat(document.getElementById('onHeight').value),
-    age: parseInt(document.getElementById('onAge').value, 10),
-    activity: document.getElementById('onActivity').value,
-    objective: document.getElementById('onObjective').value,
-  });
-  if(suggestion){
-    document.getElementById('onGoal').value = suggestion;
-  } else {
-    document.getElementById('onWeight').focus();
-  }
-});
-
 function logWeight(weight){
   if(!weight) return;
   if(!settings.weightHistory) settings.weightHistory = {};
   settings.weightHistory[todayStr()] = weight;
 }
 
-document.getElementById('onboardStartBtn').addEventListener('click', async ()=>{
-  const w = parseFloat(document.getElementById('onWeight').value);
-  const h = parseFloat(document.getElementById('onHeight').value);
-  const a = parseInt(document.getElementById('onAge').value, 10);
-  const g = parseInt(document.getElementById('onGoal').value, 10);
-  settings.weight = (!isNaN(w) && w > 0) ? w : settings.weight;
-  settings.height = (!isNaN(h) && h > 0) ? h : settings.height;
-  settings.age = (!isNaN(a) && a > 0) ? a : settings.age;
-  settings.sex = document.getElementById('onSex').value;
-  settings.activity = document.getElementById('onActivity').value;
-  settings.goal = (!isNaN(g) && g > 0) ? g : 2000;
-  settings.objective = document.getElementById('onObjective').value;
-  settings.fastingEnabled = document.getElementById('onFasting').value === 'yes';
-  const tw = parseFloat(document.getElementById('onTargetWeight').value);
-  settings.targetWeight = (!isNaN(tw) && tw > 0) ? tw : null;
-  settings.bodyCheckinFreq = document.getElementById('onBodyCheckin').value;
+// ---- Assistente de primeira utilização (perguntas passo-a-passo) ----------
+//
+// Em vez de um único formulário longo, a primeira utilização é uma série de
+// perguntas curtas, uma de cada vez — as de escolha única avançam sozinhas
+// ao tocar numa opção (sem precisar de um botão "seguinte" à parte), para
+// não se tornar uma tarefa maçadora antes de sequer começar a usar a app.
+// Cada passo lê/escreve diretamente em `settings`, tal como o formulário
+// antigo fazia de uma vez só — só é gravado (saveSettings) no fim.
+
+const ONBOARD_STEPS = [
+  { id:'sex', kind:'choice', emoji:'👋', title:'Para começarmos, como te identificas?',
+    key:'sex', options:[ {value:'f',label:'Feminino'}, {value:'m',label:'Masculino'} ] },
+  { id:'basics', kind:'fields', emoji:'📏', title:'Uns números básicos',
+    desc:'Usamos isto para calcular as tuas necessidades calóricas com mais precisão.',
+    fields:[
+      { key:'age', label:'Idade', type:'number', placeholder:'ex: 34' },
+      { key:'height', label:'Altura (cm)', type:'number', placeholder:'ex: 170' },
+      { key:'weight', label:'Peso atual (kg)', type:'number', placeholder:'ex: 75' },
+    ] },
+  { id:'activity', kind:'choice', emoji:'🏃', title:'Como descreves o teu dia a dia?',
+    key:'activity', options:[
+      {value:'sedentario',label:'Sedentário',sub:'Pouco ou nenhum exercício'},
+      {value:'leve',label:'Leve',sub:'Exercício 1 a 3x por semana'},
+      {value:'moderado',label:'Moderado',sub:'Exercício 3 a 5x por semana'},
+      {value:'ativo',label:'Ativo',sub:'Exercício 6 a 7x por semana'},
+      {value:'muito_ativo',label:'Muito ativo',sub:'Exercício intenso, todos os dias'},
+    ] },
+  { id:'objective', kind:'choice', emoji:'🎯', title:'Qual é o teu objetivo principal?',
+    key:'objective', options:[
+      {value:'perder',label:'Perder peso'},
+      {value:'manter',label:'Manter peso e forma física'},
+      {value:'ganhar',label:'Ganhar massa muscular'},
+    ] },
+  { id:'goalPreview', kind:'goalPreview', emoji:'🔥', title:'A tua meta calórica sugerida' },
+  { id:'targetWeight', kind:'fields', emoji:'🏁', title:'Tens um peso-alvo em mente?', optional:true,
+    fields:[ { key:'targetWeight', label:'Peso-alvo (kg)', type:'number', step:'0.5', placeholder:'ex: 68', fallbackNull:true } ] },
+  { id:'restrictions', kind:'multichoice', emoji:'🥗', title:'Alguma restrição alimentar?',
+    key:'dietaryRestrictions', optionsFrom:'NUTRI_RESTRICTIONS' },
+  { id:'foodTastes', kind:'fields', emoji:'😋', title:'Gostos à mesa', optional:true,
+    fields:[
+      { key:'dietaryPreferencesText', label:'Alimentos que adoras', type:'text', placeholder:'ex: frango, arroz, brócolos' },
+      { key:'dietaryDislikesText', label:'Alimentos a evitar', type:'text', placeholder:'ex: cogumelos, peixe' },
+    ] },
+  { id:'equipment', kind:'multichoice', emoji:'🏋️', title:'Que material tens disponível para treinar?',
+    key:'gymEquipment', optionsFrom:'GYM_EQUIPMENT' },
+  { id:'gymDays', kind:'choice', emoji:'📅', title:'Quantos dias por semana queres treinar?',
+    key:'gymDaysPerWeek', options:[2,3,4,5,6].map(n=>({value:n,label:n+' dias'})) },
+  { id:'gymDuration', kind:'choice', emoji:'⏱️', title:'Quanto tempo tens, normalmente, por treino?',
+    key:'gymSessionMinutes', options:[
+      {value:20,label:'Até 20 min'}, {value:30,label:'30 min'}, {value:45,label:'45 min'}, {value:60,label:'60 min ou mais'},
+    ] },
+  { id:'planDetailLevel', kind:'choice', emoji:'📋', title:'Como preferes os teus planos?',
+    key:'planDetailLevel', options:[
+      {value:'simples',label:'Simples e rápidos',sub:'Receitas e treinos diretos, poucos ingredientes/exercícios'},
+      {value:'elaborado',label:'Mais elaborados',sub:'Não me importo de mais variedade e detalhe'},
+    ] },
+  { id:'planFlexibility', kind:'choice', emoji:'🔀', title:'Como preferes seguir o plano?',
+    key:'planFlexibility', options:[
+      {value:'guiado',label:'Dia a dia, tudo definido',sub:'Sabes exatamente o que comer e treinar em cada dia'},
+      {value:'flexivel',label:'Só as metas',sub:'Defino objetivos e alternativas, tu escolhes livremente'},
+    ] },
+  { id:'fasting', kind:'choice', emoji:'⏳', title:'Fazes ou queres experimentar jejum intermitente?',
+    key:'fastingEnabled', options:[ {value:'yes',label:'Sim'}, {value:'no',label:'Não'} ],
+    transform:(v)=> v === 'yes', serialize:()=> settings.fastingEnabled ? 'yes' : 'no' },
+  { id:'bodyCheckin', kind:'choice', emoji:'📸', title:'Queres acompanhar o teu progresso com fotos?',
+    key:'bodyCheckinFreq', options:[
+      {value:'no',label:'Não, obrigado'},
+      {value:'weekly',label:'Sim — semanalmente'},
+      {value:'biweekly',label:'Sim — quinzenalmente'},
+    ] },
+  { id:'bodyPhoto', kind:'photo', emoji:'🧍', title:'Foto de referência (opcional)', optional:true },
+  { id:'done', kind:'done', emoji:'🎉', title:'Tudo pronto!' },
+];
+
+let wizardIndex = 0;
+let onboardBodyPhotoDataUrl = null;
+
+// O passo da foto só faz sentido para quem pediu registo de progresso.
+function wizardVisibleSteps(){
+  return ONBOARD_STEPS.filter(s => s.id !== 'bodyPhoto' || settings.bodyCheckinFreq !== 'no');
+}
+
+function resolveWizardOptions(step){
+  if(step.optionsFrom === 'NUTRI_RESTRICTIONS') return NUTRI_RESTRICTIONS;
+  if(step.optionsFrom === 'GYM_EQUIPMENT') return GYM_EQUIPMENT;
+  return step.options || [];
+}
+
+function openOnboardingWizard(){
+  wizardIndex = 0;
+  onboardBodyPhotoDataUrl = null;
+  renderWizardStep();
+  document.getElementById('onboardOverlay').classList.remove('hide');
+}
+
+function wizardGoNext(){
+  const steps = wizardVisibleSteps();
+  if(wizardIndex < steps.length - 1){
+    wizardIndex++;
+    renderWizardStep();
+  }
+}
+function wizardGoBack(){
+  if(wizardIndex > 0){
+    wizardIndex--;
+    renderWizardStep();
+  }
+}
+els.wizardBackBtn.addEventListener('click', wizardGoBack);
+els.wizardSkipBtn.addEventListener('click', wizardGoNext);
+els.onboardSkipAllBtn.addEventListener('click', async ()=>{
+  settings.onboarded = true;
+  await saveSettings();
+  finishOnboarding();
+  advanceOnboardingFlow();
+});
+
+function renderWizardStep(){
+  const steps = wizardVisibleSteps();
+  const step = steps[wizardIndex];
+  const pct = steps.length > 1 ? Math.round((wizardIndex / (steps.length - 1)) * 100) : 100;
+  els.wizardProgressFill.style.width = pct + '%';
+  els.wizardBackBtn.style.display = wizardIndex === 0 ? 'none' : 'block';
+  els.wizardEmoji.textContent = step.emoji;
+  els.wizardTitle.textContent = step.title;
+  els.wizardDesc.textContent = step.desc || '';
+  els.wizardDesc.style.display = step.desc ? 'block' : 'none';
+  els.wizardSkipBtn.style.display = step.optional ? 'block' : 'none';
+  els.wizardContinueBtn.style.display = 'none';
+  els.wizardContinueBtn.textContent = 'Continuar';
+  els.wizardBody.innerHTML = '';
+
+  if(step.kind === 'choice') renderWizardChoice(step);
+  else if(step.kind === 'multichoice') renderWizardMultichoice(step);
+  else if(step.kind === 'fields') renderWizardFields(step);
+  else if(step.kind === 'goalPreview') renderWizardGoalPreview(step);
+  else if(step.kind === 'photo') renderWizardPhoto(step);
+  else if(step.kind === 'done') renderWizardDone(step);
+}
+
+function renderWizardChoice(step){
+  const currentRaw = step.serialize ? step.serialize() : settings[step.key];
+  step.options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'wizard-option-btn' + (currentRaw === opt.value ? ' selected' : '');
+    btn.innerHTML = `<div class="wizard-option-label">${escapeHtml(opt.label)}</div>` +
+      (opt.sub ? `<div class="wizard-option-sub">${escapeHtml(opt.sub)}</div>` : '');
+    btn.addEventListener('click', ()=>{
+      Array.from(els.wizardBody.children).forEach(c => c.classList.remove('selected'));
+      btn.classList.add('selected');
+      settings[step.key] = step.transform ? step.transform(opt.value) : opt.value;
+      setTimeout(wizardGoNext, 220);
+    });
+    els.wizardBody.appendChild(btn);
+  });
+}
+
+function renderWizardMultichoice(step){
+  const options = resolveWizardOptions(step);
+  const current = Array.isArray(settings[step.key]) ? settings[step.key] : [];
+  const wrap = document.createElement('div');
+  wrap.className = 'pref-chips-wrap';
+  options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'pref-chip' + (current.includes(opt.id) ? ' active' : '');
+    btn.textContent = opt.label;
+    btn.dataset.id = opt.id;
+    btn.addEventListener('click', ()=> btn.classList.toggle('active'));
+    wrap.appendChild(btn);
+  });
+  els.wizardBody.appendChild(wrap);
+  els.wizardContinueBtn.style.display = 'block';
+  els.wizardContinueBtn.onclick = ()=>{
+    settings[step.key] = Array.from(wrap.querySelectorAll('.pref-chip.active')).map(b => b.dataset.id);
+    wizardGoNext();
+  };
+}
+
+function renderWizardFields(step){
+  const inputs = [];
+  step.fields.forEach(f => {
+    const wrap = document.createElement('div');
+    wrap.className = 'onboard-field';
+    const label = document.createElement('label');
+    label.textContent = f.label;
+    const input = document.createElement('input');
+    input.type = f.type;
+    if(f.placeholder) input.placeholder = f.placeholder;
+    if(f.step) input.step = f.step;
+    if(f.type === 'number') input.inputMode = 'numeric';
+    const existing = settings[f.key];
+    input.value = (existing != null && existing !== '') ? existing : '';
+    wrap.appendChild(label);
+    wrap.appendChild(input);
+    els.wizardBody.appendChild(wrap);
+    inputs.push({ field: f, input });
+  });
+  els.wizardContinueBtn.style.display = 'block';
+  els.wizardContinueBtn.onclick = ()=>{
+    inputs.forEach(({ field, input })=>{
+      if(field.type === 'number'){
+        const v = parseFloat(input.value);
+        if(!isNaN(v) && v > 0) settings[field.key] = v;
+        else if(field.fallbackNull) settings[field.key] = null;
+      } else {
+        settings[field.key] = input.value.trim();
+      }
+    });
+    wizardGoNext();
+  };
+}
+
+function renderWizardGoalPreview(){
+  const suggestion = calcSuggestedGoal({
+    sex: settings.sex, weight: settings.weight, height: settings.height,
+    age: settings.age, activity: settings.activity, objective: settings.objective,
+  }) || 2000;
+  settings.goal = suggestion;
+  const card = document.createElement('div');
+  card.className = 'wizard-goal-card';
+  card.innerHTML = `<div class="wizard-goal-number">${suggestion} kcal</div>` +
+    `<div class="wizard-goal-sub">por dia, calculado com base nos teus dados. Podes ajustar isto a qualquer momento nas Definições.</div>`;
+  els.wizardBody.appendChild(card);
+  els.wizardContinueBtn.style.display = 'block';
+  els.wizardContinueBtn.onclick = wizardGoNext;
+}
+
+function renderWizardPhoto(){
+  const wrap = document.createElement('div');
+  wrap.innerHTML = `
+    <label class="dropzone" id="wizardPhotoDropzone" for="wizardPhotoInput" style="padding:22px 16px;display:${onboardBodyPhotoDataUrl ? 'none' : 'block'};">
+      <div class="camicon">🧍</div>
+      <p>Tirar ou carregar foto</p>
+      <small>de corpo inteiro, de frente · fica só neste aparelho</small>
+    </label>
+    <input type="file" id="wizardPhotoInput" accept="image/*" capture="environment" style="display:none;">
+    <div id="wizardPhotoPreviewWrap" style="display:${onboardBodyPhotoDataUrl ? 'block' : 'none'};margin-top:10px;">
+      <img id="wizardPhotoPreview" src="${onboardBodyPhotoDataUrl || ''}" style="width:100%;max-height:240px;object-fit:cover;border-radius:18px;display:block;" alt="Pré-visualização">
+      <button type="button" class="body-photo-skip" id="wizardPhotoRetakeBtn">Trocar foto</button>
+    </div>
+  `;
+  els.wizardBody.appendChild(wrap);
+  const dropzone = wrap.querySelector('#wizardPhotoDropzone');
+  const input = wrap.querySelector('#wizardPhotoInput');
+  const previewWrap = wrap.querySelector('#wizardPhotoPreviewWrap');
+  const preview = wrap.querySelector('#wizardPhotoPreview');
+  const retakeBtn = wrap.querySelector('#wizardPhotoRetakeBtn');
+  input.addEventListener('change', async (e)=>{
+    const file = e.target.files && e.target.files[0];
+    if(!file) return;
+    const { dataUrl } = await processBodyPhotoCapture(file);
+    onboardBodyPhotoDataUrl = dataUrl;
+    preview.src = dataUrl;
+    dropzone.style.display = 'none';
+    previewWrap.style.display = 'block';
+  });
+  retakeBtn.addEventListener('click', ()=>{
+    onboardBodyPhotoDataUrl = null;
+    input.value = '';
+    dropzone.style.display = 'block';
+    previewWrap.style.display = 'none';
+  });
+  els.wizardContinueBtn.style.display = 'block';
+  els.wizardContinueBtn.onclick = wizardGoNext;
+}
+
+function renderWizardDone(){
+  const card = document.createElement('div');
+  card.className = 'wizard-goal-card';
+  card.innerHTML = `<div style="font-size:13.5px;font-weight:600;color:var(--muted);line-height:1.6;">Já sabemos o essencial sobre ti. Podes mudar qualquer resposta mais tarde nas Definições (ícone da engrenagem).</div>`;
+  els.wizardBody.appendChild(card);
+  els.wizardContinueBtn.style.display = 'block';
+  els.wizardContinueBtn.textContent = 'Começar';
+  els.wizardContinueBtn.onclick = finishOnboardingWizard;
+}
+
+async function finishOnboardingWizard(){
   settings.onboarded = true;
   logWeight(settings.weight);
   await saveSettings();
@@ -1996,14 +2199,7 @@ document.getElementById('onboardStartBtn').addEventListener('click', async ()=>{
   renderBodyCard();
   finishOnboarding();
   advanceOnboardingFlow();
-});
-
-document.getElementById('onboardSkipBtn').addEventListener('click', async ()=>{
-  settings.onboarded = true;
-  await saveSettings();
-  finishOnboarding();
-  advanceOnboardingFlow();
-});
+}
 
 async function loadSettings(){
   try{
@@ -2019,6 +2215,8 @@ async function loadSettings(){
   if(!Array.isArray(settings.gymEquipment)) settings.gymEquipment = [];
   if(typeof settings.gymDaysPerWeek !== 'number') settings.gymDaysPerWeek = 3;
   if(typeof settings.gymSessionMinutes !== 'number') settings.gymSessionMinutes = 45;
+  if(settings.planDetailLevel !== 'simples' && settings.planDetailLevel !== 'elaborado') settings.planDetailLevel = 'simples';
+  if(settings.planFlexibility !== 'guiado' && settings.planFlexibility !== 'flexivel') settings.planFlexibility = 'guiado';
   if(typeof settings.tutorialSeen !== 'boolean') settings.tutorialSeen = false;
 }
 async function saveSettings(){
@@ -2785,27 +2983,6 @@ els.bodyCheckinSaveBtn.addEventListener('click', async ()=>{
   els.bodyCheckinOverlay.classList.remove('show');
 });
 
-// ---- Onboarding: registo corporal ------------------------------------------
-let onboardBodyPhotoDataUrl = null;
-document.getElementById('onBodyCheckin').addEventListener('change', (e)=>{
-  document.getElementById('onBodyPhotoField').style.display = e.target.value === 'no' ? 'none' : 'block';
-});
-document.getElementById('onBodyPhotoInput').addEventListener('change', async (e)=>{
-  const file = e.target.files[0];
-  if(!file) return;
-  const { dataUrl } = await processBodyPhotoCapture(file);
-  onboardBodyPhotoDataUrl = dataUrl;
-  document.getElementById('onBodyPhotoPreview').src = dataUrl;
-  document.getElementById('onBodyPhotoDropzone').style.display = 'none';
-  document.getElementById('onBodyPhotoPreviewWrap').style.display = 'block';
-});
-document.getElementById('onBodyPhotoRetakeBtn').addEventListener('click', ()=>{
-  onboardBodyPhotoDataUrl = null;
-  document.getElementById('onBodyPhotoInput').value = '';
-  document.getElementById('onBodyPhotoDropzone').style.display = 'block';
-  document.getElementById('onBodyPhotoPreviewWrap').style.display = 'none';
-});
-
 // ---- Nutrição: plano de refeições semanal ----------------------------------
 
 const NUTRI_RESTRICTIONS = [
@@ -3001,6 +3178,8 @@ async function generateMealPlan(){
       restrictions: settings.dietaryRestrictions || [],
       preferences: settings.dietaryPreferencesText || '',
       dislikes: settings.dietaryDislikesText || '',
+      detailLevel: settings.planDetailLevel || 'simples',
+      flexibility: settings.planFlexibility || 'guiado',
     });
     mealPlan = {
       generatedAt: new Date().toISOString(),
@@ -3212,6 +3391,8 @@ async function generateGymPlan(){
       equipment: settings.gymEquipment || [],
       daysPerWeek: settings.gymDaysPerWeek || 3,
       sessionMinutes: settings.gymSessionMinutes || 45,
+      detailLevel: settings.planDetailLevel || 'simples',
+      flexibility: settings.planFlexibility || 'guiado',
     });
     gymPlan = {
       generatedAt: new Date().toISOString(),
@@ -3739,6 +3920,8 @@ els.gearBtn.addEventListener('click', ()=>{
   els.bodyCheckinInput.value = settings.bodyCheckinFreq || 'no';
   document.getElementById('themeInput').value = settings.theme || 'auto';
   document.getElementById('fastingEnabledInput').value = settings.fastingEnabled ? 'yes' : 'no';
+  document.getElementById('planDetailLevelInput').value = settings.planDetailLevel || 'simples';
+  document.getElementById('planFlexibilityInput').value = settings.planFlexibility || 'guiado';
   els.goalOverlay.classList.add('show');
 });
 els.goalOverlay.addEventListener('click', (e)=>{ if(e.target === els.goalOverlay) els.goalOverlay.classList.remove('show'); });
@@ -3753,6 +3936,8 @@ els.goalSaveBtn.addEventListener('click', async ()=>{
   settings.bodyCheckinFreq = els.bodyCheckinInput.value;
   settings.theme = document.getElementById('themeInput').value;
   settings.fastingEnabled = document.getElementById('fastingEnabledInput').value === 'yes';
+  settings.planDetailLevel = document.getElementById('planDetailLevelInput').value;
+  settings.planFlexibility = document.getElementById('planFlexibilityInput').value;
   logWeight(settings.weight);
   await saveSettings();
   renderBodyCard();
