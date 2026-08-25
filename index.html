@@ -42,7 +42,7 @@
   [data-theme="dark"] .dropzone{background:var(--card);}
   [data-theme="dark"] .goal-edit input,[data-theme="dark"] .manual-form input,
   [data-theme="dark"] .onboard-field input,[data-theme="dark"] .onboard-field select,
-  [data-theme="dark"] #objectiveInput,[data-theme="dark"] #themeInput{
+  [data-theme="dark"] .goal-edit select{
     background:var(--card);color:var(--ink);
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
@@ -1780,7 +1780,7 @@ function renderTutorialSlide(){
   els.tutorialDesc.textContent = slide.desc;
   els.tutorialDots.innerHTML = TUTORIAL_SLIDES.map((_, i)=> `<span class="tutorial-dot${i === tutorialIndex ? ' active' : ''}"></span>`).join('');
   els.tutorialNextBtn.textContent = tutorialIndex === TUTORIAL_SLIDES.length - 1 ? 'Vamos a isso!' : 'Seguinte';
-  els.tutorialBackBtn.style.visibility = tutorialIndex === 0 ? 'hidden' : 'visible';
+  els.tutorialBackBtn.style.display = tutorialIndex === 0 ? 'none' : 'block';
 }
 
 function openTutorial(){
