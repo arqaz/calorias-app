@@ -596,6 +596,10 @@
   .tutorial-dot.active{background:var(--a2);width:20px;border-radius:4px;}
   .tutorial-swipe-hint{font-size:12px;color:var(--muted-soft);font-weight:600;text-align:center;margin:0 0 16px;}
 
+  .login-gate-overlay{display:flex;flex-direction:column;align-items:center;text-align:center;padding-top:22vh;}
+  .login-gate-overlay .onboard-logo{margin-left:auto;margin-right:auto;}
+  .login-gate-btn-container{display:flex;justify-content:center;margin-top:22px;min-height:44px;}
+
   .account-row{display:flex;align-items:center;gap:10px;margin-top:8px;}
   .account-avatar{width:38px;height:38px;border-radius:50%;flex-shrink:0;background:var(--track);object-fit:cover;}
   .account-info{flex:1;min-width:0;}
@@ -712,6 +716,13 @@
   <div class="tutorial-swipe-hint" id="tutorialSwipeHint">Desliza para continuar →</div>
   <button class="onboard-start" id="tutorialNextBtn" style="display:none;">Vamos a isso!</button>
   <button class="onboard-skip" id="tutorialSkipBtn">Saltar tutorial</button>
+</div>
+
+<div class="onboard-overlay login-gate-overlay hide" id="loginGateOverlay">
+  <img src="/icons/icon-192.png" alt="Trinca" class="onboard-logo">
+  <div class="onboard-title">Entra na tua conta</div>
+  <div class="onboard-sub">Inicia sessão com a Google para guardares o teu progresso e usares a app — gratuito enquanto estamos em fase de testes.</div>
+  <div id="loginGateButtonContainer" class="login-gate-btn-container"></div>
 </div>
 
 <div class="app">
@@ -1437,6 +1448,8 @@ const els = {
   accountName: document.getElementById('accountName'),
   accountEmail: document.getElementById('accountEmail'),
   accountSignOutBtn: document.getElementById('accountSignOutBtn'),
+  loginGateOverlay: document.getElementById('loginGateOverlay'),
+  loginGateButtonContainer: document.getElementById('loginGateButtonContainer'),
 };
 
 els.ringProgress.setAttribute('stroke-dasharray', CIRC.toFixed(2));
@@ -1485,6 +1498,7 @@ function handleGoogleCredential(response){
   authProfile = payload ? { email: payload.email, name: payload.name || payload.email, picture: payload.picture || '' } : null;
   saveAuthToStorage();
   renderAuthUI();
+  maybeShowLoginGate();
 }
 
 function initGoogleSignIn(){
@@ -1492,14 +1506,22 @@ function initGoogleSignIn(){
   google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: handleGoogleCredential });
 }
 
-function renderGoogleButton(){
-  if(!els.googleButtonContainer) return;
-  els.googleButtonContainer.innerHTML = '';
+// Desenha o botão de início de sessão da Google dentro de um contentor à
+// escolha — usado tanto na secção "Conta" das Definições como no ecrã de
+// login obrigatório, que têm cada um o seu próprio contentor (a Google só
+// permite desenhar um botão por contentor).
+function renderGoogleButtonInto(container){
+  if(!container) return;
+  container.innerHTML = '';
   if(!GOOGLE_CLIENT_ID || !window.google || !window.google.accounts || !window.google.accounts.id){
-    els.googleButtonContainer.innerHTML = '<div class="empty-state">Início de sessão indisponível de momento.</div>';
+    container.innerHTML = '<div class="empty-state">Início de sessão indisponível de momento.</div>';
     return;
   }
-  google.accounts.id.renderButton(els.googleButtonContainer, { theme: 'outline', size: 'large', width: 260, locale: 'pt-PT' });
+  google.accounts.id.renderButton(container, { theme: 'outline', size: 'large', width: 260, locale: 'pt-PT' });
+}
+
+function renderGoogleButton(){
+  renderGoogleButtonInto(els.googleButtonContainer);
 }
 
 function signOutGoogle(){
@@ -1508,6 +1530,7 @@ function signOutGoogle(){
   saveAuthToStorage();
   if(window.google && window.google.accounts && window.google.accounts.id) google.accounts.id.disableAutoSelect();
   renderAuthUI();
+  maybeShowLoginGate();
 }
 
 function renderAuthUI(){
@@ -1533,6 +1556,21 @@ function renderAuthUI(){
 }
 
 if(els.accountSignOutBtn) els.accountSignOutBtn.addEventListener('click', signOutGoogle);
+
+// Ecrã de login obrigatório: mostrado sempre que há um Client ID da Google
+// configurado mas ainda não há sessão guardada (nem localmente, de uma
+// utilização anterior). Enquanto o Client ID não estiver definido, ninguém
+// fica bloqueado — a app funciona como antes desta funcionalidade existir.
+function maybeShowLoginGate(){
+  if(!els.loginGateOverlay) return;
+  if(!GOOGLE_CLIENT_ID || authProfile){
+    els.loginGateOverlay.classList.add('hide');
+    return;
+  }
+  els.loginGateOverlay.classList.remove('hide');
+  initGoogleSignIn();
+  renderGoogleButtonInto(els.loginGateButtonContainer);
+}
 
 function openAccountSheet(){
   els.goalOverlay.classList.add('show');
@@ -1742,15 +1780,27 @@ async function init(){
   render();
   startFastingTicker();
   updateOfflineUI();
-  if(!settings.onboarded){
-    document.getElementById('onboardOverlay').classList.remove('hide');
-  } else {
-    maybeShowTutorial();
-  }
+  advanceOnboardingFlow();
 }
 
 function finishOnboarding(){
   document.getElementById('onboardOverlay').classList.add('hide');
+}
+
+// Encadeia os três passos de primeira utilização — dados iniciais, tutorial
+// e, por fim, sessão da Google — chamado sempre que um destes passos
+// termina, para avançar automaticamente para o seguinte (ou, se já
+// estiverem todos concluídos, para confirmar que a app fica acessível).
+function advanceOnboardingFlow(){
+  if(!settings.onboarded){
+    document.getElementById('onboardOverlay').classList.remove('hide');
+    return;
+  }
+  if(!settings.tutorialSeen){
+    openTutorial();
+    return;
+  }
+  maybeShowLoginGate();
 }
 
 // ---- Tutorial de primeira utilização ---------------------------------------
@@ -1808,13 +1858,7 @@ async function closeTutorial(){
   settings.tutorialSeen = true;
   await saveSettings();
   els.tutorialOverlay.classList.add('hide');
-}
-
-// Mostra o tutorial uma única vez (controlado por settings.tutorialSeen) —
-// tanto a quem acaba de se registar como a quem já usava a app antes desta
-// funcionalidade existir, para conhecer as zonas mais recentes.
-function maybeShowTutorial(){
-  if(!settings.tutorialSeen) openTutorial();
+  advanceOnboardingFlow();
 }
 
 // Navegação por swipe (arrastar horizontalmente) em vez de um botão
@@ -1919,14 +1963,14 @@ document.getElementById('onboardStartBtn').addEventListener('click', async ()=>{
   render();
   renderBodyCard();
   finishOnboarding();
-  maybeShowTutorial();
+  advanceOnboardingFlow();
 });
 
 document.getElementById('onboardSkipBtn').addEventListener('click', async ()=>{
   settings.onboarded = true;
   await saveSettings();
   finishOnboarding();
-  maybeShowTutorial();
+  advanceOnboardingFlow();
 });
 
 async function loadSettings(){
