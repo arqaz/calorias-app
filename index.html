@@ -597,7 +597,15 @@
     background:none;border:none;color:var(--muted);font-weight:700;font-size:13px;cursor:pointer;
     padding:0 6px;flex-shrink:0;width:56px;font-family:'Plus Jakarta Sans',sans-serif;
   }
+
+  .account-row{display:flex;align-items:center;gap:10px;margin-top:8px;}
+  .account-avatar{width:38px;height:38px;border-radius:50%;flex-shrink:0;background:var(--track);object-fit:cover;}
+  .account-info{flex:1;min-width:0;}
+  .account-name{font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .account-email{font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .login-prompt-btn{background:none;border:none;color:var(--a2);font-weight:800;font-size:12.5px;text-decoration:underline;cursor:pointer;padding:6px 0 0;font-family:'Plus Jakarta Sans',sans-serif;}
 </style>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
 <div class="splash" id="splashScreen">
@@ -1027,6 +1035,25 @@
     <div class="sheet-handle"></div>
     <div class="sheet-title">Definições</div>
     <div class="goal-edit">
+      <div class="account-section" id="accountSection" style="display:none;margin-bottom:20px;padding-bottom:18px;border-bottom:1px solid var(--track);">
+        <label>Conta</label>
+        <div id="accountSignedOut">
+          <div id="googleButtonContainer" style="margin-top:10px;"></div>
+          <div class="ai-disclaimer" id="accountHint">Inicia sessão para usar as funcionalidades de IA (gratuito enquanto estamos em fase de testes).</div>
+        </div>
+        <div id="accountSignedIn" style="display:none;">
+          <div class="account-row">
+            <img id="accountPicture" src="" alt="" class="account-avatar">
+            <div class="account-info">
+              <div class="account-name" id="accountName">—</div>
+              <div class="account-email" id="accountEmail">—</div>
+            </div>
+            <button class="item-remove" id="accountSignOutBtn" aria-label="Sair" title="Sair">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
       <label>Peso atual (kg)</label>
       <input type="number" id="weightInput" inputmode="numeric" min="0" step="0.5">
       <label style="display:block;margin-top:16px;">Objetivo</label>
@@ -1409,9 +1436,148 @@ const els = {
   tutorialBackBtn: document.getElementById('tutorialBackBtn'),
   tutorialSkipBtn: document.getElementById('tutorialSkipBtn'),
   replayTutorialBtn: document.getElementById('replayTutorialBtn'),
+  accountSection: document.getElementById('accountSection'),
+  accountSignedOut: document.getElementById('accountSignedOut'),
+  accountSignedIn: document.getElementById('accountSignedIn'),
+  googleButtonContainer: document.getElementById('googleButtonContainer'),
+  accountPicture: document.getElementById('accountPicture'),
+  accountName: document.getElementById('accountName'),
+  accountEmail: document.getElementById('accountEmail'),
+  accountSignOutBtn: document.getElementById('accountSignOutBtn'),
 };
 
 els.ringProgress.setAttribute('stroke-dasharray', CIRC.toFixed(2));
+
+// ---- Conta (login Google) ---------------------------------------------
+// Só serve para autenticar pedidos às funcionalidades de IA (análise de
+// fotos, planos de nutrição/ginásio) — o resto da app continua a funcionar
+// sem sessão iniciada. Preparado para, mais tarde, o acesso passar a
+// depender de uma subscrição Stripe em vez de "qualquer conta Google" —
+// só a validação do lado do servidor muda nessa altura.
+//
+// Define aqui o Client ID criado na Google Cloud Console (Credentials →
+// OAuth 2.0 Client IDs → Web application). Enquanto ficar vazio, a secção
+// de conta fica escondida e a app funciona exatamente como antes.
+const GOOGLE_CLIENT_ID = '369624027582-h4pmes51qvoa4jmu6gsbl6s5m1k7742o.apps.googleusercontent.com';
+
+let googleIdToken = null;
+let authProfile = null;
+
+function loadAuthFromStorage(){
+  try{
+    const raw = localStorage.getItem('authProfile');
+    authProfile = raw ? JSON.parse(raw) : null;
+  }catch(e){ authProfile = null; }
+  googleIdToken = localStorage.getItem('googleIdToken') || null;
+}
+
+function saveAuthToStorage(){
+  if(authProfile) localStorage.setItem('authProfile', JSON.stringify(authProfile));
+  else localStorage.removeItem('authProfile');
+  if(googleIdToken) localStorage.setItem('googleIdToken', googleIdToken);
+  else localStorage.removeItem('googleIdToken');
+}
+
+function decodeJwtPayload(token){
+  try{
+    const base64 = token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');
+    const json = decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+    return JSON.parse(json);
+  }catch(e){ return null; }
+}
+
+function handleGoogleCredential(response){
+  googleIdToken = response.credential;
+  const payload = decodeJwtPayload(googleIdToken);
+  authProfile = payload ? { email: payload.email, name: payload.name || payload.email, picture: payload.picture || '' } : null;
+  saveAuthToStorage();
+  renderAuthUI();
+}
+
+function initGoogleSignIn(){
+  if(!GOOGLE_CLIENT_ID || !window.google || !window.google.accounts || !window.google.accounts.id) return;
+  google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: handleGoogleCredential });
+}
+
+function renderGoogleButton(){
+  if(!els.googleButtonContainer) return;
+  els.googleButtonContainer.innerHTML = '';
+  if(!GOOGLE_CLIENT_ID || !window.google || !window.google.accounts || !window.google.accounts.id){
+    els.googleButtonContainer.innerHTML = '<div class="empty-state">Início de sessão indisponível de momento.</div>';
+    return;
+  }
+  google.accounts.id.renderButton(els.googleButtonContainer, { theme: 'outline', size: 'large', width: 260, locale: 'pt-PT' });
+}
+
+function signOutGoogle(){
+  googleIdToken = null;
+  authProfile = null;
+  saveAuthToStorage();
+  if(window.google && window.google.accounts && window.google.accounts.id) google.accounts.id.disableAutoSelect();
+  renderAuthUI();
+}
+
+function renderAuthUI(){
+  if(!els.accountSection) return;
+  if(!GOOGLE_CLIENT_ID){
+    els.accountSection.style.display = 'none';
+    return;
+  }
+  els.accountSection.style.display = 'block';
+  if(authProfile){
+    els.accountSignedOut.style.display = 'none';
+    els.accountSignedIn.style.display = 'block';
+    els.accountName.textContent = authProfile.name || authProfile.email;
+    els.accountEmail.textContent = authProfile.email || '';
+    if(authProfile.picture){ els.accountPicture.src = authProfile.picture; els.accountPicture.style.display = 'block'; }
+    else { els.accountPicture.style.display = 'none'; }
+  } else {
+    els.accountSignedIn.style.display = 'none';
+    els.accountSignedOut.style.display = 'block';
+    initGoogleSignIn();
+    renderGoogleButton();
+  }
+}
+
+if(els.accountSignOutBtn) els.accountSignOutBtn.addEventListener('click', signOutGoogle);
+
+function openAccountSheet(){
+  els.goalOverlay.classList.add('show');
+  els.goalOverlay.scrollTop = 0;
+}
+
+// Mostra, dentro de uma caixa de erro já existente, um pedido de início de
+// sessão em vez do texto de erro genérico — reutiliza as caixas que a app
+// já tem (análise de refeição, geração de planos), em vez de criar UI nova.
+function showLoginRequiredIn(box, message){
+  box.innerHTML = '';
+  box.appendChild(document.createTextNode(message || 'É preciso iniciar sessão para usar esta funcionalidade (gratuito enquanto estamos em fase de testes).'));
+  box.appendChild(document.createElement('br'));
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'login-prompt-btn';
+  btn.textContent = 'Iniciar sessão';
+  btn.addEventListener('click', openAccountSheet);
+  box.appendChild(btn);
+  box.style.display = 'block';
+}
+
+// Wrapper único para chamar os endpoints de IA: junta o token de sessão (se
+// existir) e normaliza os erros, incluindo um sinalizador requiresLogin
+// para a UI poder mostrar o pedido de login em vez de um erro genérico.
+async function callAiEndpoint(url, body){
+  const headers = { 'Content-Type': 'application/json' };
+  if(googleIdToken) headers['Authorization'] = 'Bearer ' + googleIdToken;
+  const response = await fetch(url, { method: 'POST', headers, body: JSON.stringify(body) });
+  if(!response.ok){
+    const errData = await response.json().catch(()=>({}));
+    const err = new Error((errData.error || ('Falha na chamada à API (' + response.status + ')')) + (errData.details ? ' — ' + errData.details : ''));
+    err.requiresLogin = !!errData.requiresLogin;
+    err.status = response.status;
+    throw err;
+  }
+  return response.json();
+}
 
 function fmtDateBig(ds){
   const d = new Date(ds+'T00:00:00');
@@ -1579,6 +1745,7 @@ async function init(){
   loadBodyCheckins();
   loadMealPlan();
   loadGymPlan();
+  loadAuthFromStorage();
   render();
   startFastingTicker();
   updateOfflineUI();
@@ -2172,13 +2339,7 @@ function cropBodyPhoto(dataUrl, cropBox){
 }
 
 async function analyzeBodyPhoto(base64, mediaType){
-  const response = await fetch('/api/body-checkin', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ image: base64, mediaType }),
-  });
-  if(!response.ok) throw new Error('Falha na chamada à API (' + response.status + ')');
-  return response.json();
+  return callAiEndpoint('/api/body-checkin', { image: base64, mediaType });
 }
 
 // Guarda um registo (foto e/ou peso) para o dia de hoje, partilhado entre a
@@ -2393,13 +2554,7 @@ function splitDataUrl(dataUrl){
 }
 
 async function fetchBodyProgressFeedback({ currentImage, currentMediaType, previousImage, previousMediaType, objective }){
-  const response = await fetch('/api/body-progress-feedback', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ currentImage, currentMediaType, previousImage, previousMediaType, objective }),
-  });
-  if(!response.ok) throw new Error('Falha na chamada à API (' + response.status + ')');
-  return response.json();
+  return callAiEndpoint('/api/body-progress-feedback', { currentImage, currentMediaType, previousImage, previousMediaType, objective });
 }
 
 function showBodyFeedback(feedback){
@@ -2725,22 +2880,13 @@ async function generateMealPlan(){
   btn.disabled = true;
   btn.textContent = 'A gerar plano…';
   try{
-    const response = await fetch('/api/meal-plan', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        objective: settings.objective || 'manter',
-        goalCalories: settings.goal || 2000,
-        restrictions: settings.dietaryRestrictions || [],
-        preferences: settings.dietaryPreferencesText || '',
-        dislikes: settings.dietaryDislikesText || '',
-      }),
+    const parsed = await callAiEndpoint('/api/meal-plan', {
+      objective: settings.objective || 'manter',
+      goalCalories: settings.goal || 2000,
+      restrictions: settings.dietaryRestrictions || [],
+      preferences: settings.dietaryPreferencesText || '',
+      dislikes: settings.dietaryDislikesText || '',
     });
-    if(!response.ok){
-      const errData = await response.json().catch(()=>({}));
-      throw new Error((errData.error || ('Falha na chamada à API (' + response.status + ')')) + (errData.details ? ' — ' + errData.details : ''));
-    }
-    const parsed = await response.json();
     mealPlan = {
       generatedAt: new Date().toISOString(),
       objective: settings.objective || 'manter',
@@ -2753,8 +2899,12 @@ async function generateMealPlan(){
     renderNutriTab();
   }catch(err){
     console.error(err);
-    els.nutriGenErrorBox.textContent = 'Erro: ' + (err.message || 'não foi possível gerar o plano') + '. Tenta novamente.';
-    els.nutriGenErrorBox.style.display = 'block';
+    if(err.requiresLogin){
+      showLoginRequiredIn(els.nutriGenErrorBox, err.message);
+    } else {
+      els.nutriGenErrorBox.textContent = 'Erro: ' + (err.message || 'não foi possível gerar o plano') + '. Tenta novamente.';
+      els.nutriGenErrorBox.style.display = 'block';
+    }
   }finally{
     btn.disabled = false;
     btn.textContent = origLabel;
@@ -2941,22 +3091,13 @@ async function generateGymPlan(){
   btn.disabled = true;
   btn.textContent = 'A gerar plano…';
   try{
-    const response = await fetch('/api/gym-plan', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        objective: settings.objective || 'manter',
-        activity: settings.activity || 'moderado',
-        equipment: settings.gymEquipment || [],
-        daysPerWeek: settings.gymDaysPerWeek || 3,
-        sessionMinutes: settings.gymSessionMinutes || 45,
-      }),
+    const parsed = await callAiEndpoint('/api/gym-plan', {
+      objective: settings.objective || 'manter',
+      activity: settings.activity || 'moderado',
+      equipment: settings.gymEquipment || [],
+      daysPerWeek: settings.gymDaysPerWeek || 3,
+      sessionMinutes: settings.gymSessionMinutes || 45,
     });
-    if(!response.ok){
-      const errData = await response.json().catch(()=>({}));
-      throw new Error((errData.error || ('Falha na chamada à API (' + response.status + ')')) + (errData.details ? ' — ' + errData.details : ''));
-    }
-    const parsed = await response.json();
     gymPlan = {
       generatedAt: new Date().toISOString(),
       objective: settings.objective || 'manter',
@@ -2969,8 +3110,12 @@ async function generateGymPlan(){
     renderGymTab();
   }catch(err){
     console.error(err);
-    els.gymGenErrorBox.textContent = 'Erro: ' + (err.message || 'não foi possível gerar o plano') + '. Tenta novamente.';
-    els.gymGenErrorBox.style.display = 'block';
+    if(err.requiresLogin){
+      showLoginRequiredIn(els.gymGenErrorBox, err.message);
+    } else {
+      els.gymGenErrorBox.textContent = 'Erro: ' + (err.message || 'não foi possível gerar o plano') + '. Tenta novamente.';
+      els.gymGenErrorBox.style.display = 'block';
+    }
   }finally{
     btn.disabled = false;
     btn.textContent = origLabel;
@@ -3139,25 +3284,18 @@ els.analyzeBtn.addEventListener('click', async ()=>{
   els.btnLabel.textContent = 'A analisar…';
 
   try{
-    const response = await fetch("/api/analyze", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ image: base64Data, mediaType: mediaType })
-    });
-
-    if(!response.ok){
-      const errData = await response.json().catch(()=>({}));
-      const msg = (errData.error || ("Falha na chamada à API (" + response.status + ")")) + (errData.details ? " — " + errData.details : "");
-      throw new Error(msg);
-    }
-    const parsed = await response.json();
+    const parsed = await callAiEndpoint('/api/analyze', { image: base64Data, mediaType: mediaType });
     pendingResult = parsed;
     await cropToPlate(parsed.crop_box);
     showResult(parsed);
   }catch(err){
     console.error(err);
-    els.errorBox.textContent = "Erro: " + (err.message || "não foi possível analisar a foto") + ". Tenta novamente.";
-    els.errorBox.style.display = 'block';
+    if(err.requiresLogin){
+      showLoginRequiredIn(els.errorBox, err.message);
+    } else {
+      els.errorBox.textContent = "Erro: " + (err.message || "não foi possível analisar a foto") + ". Tenta novamente.";
+      els.errorBox.style.display = 'block';
+    }
   }finally{
     els.analyzeBtn.disabled = false;
     els.btnLabel.textContent = 'Estimar calorias';
@@ -3478,6 +3616,7 @@ function renderWeekChart(){
 }
 
 els.gearBtn.addEventListener('click', ()=>{
+  renderAuthUI();
   els.goalInput.value = settings.goal || 2000;
   els.weightInput.value = settings.weight || '';
   document.getElementById('objectiveInput').value = settings.objective || 'manter';
