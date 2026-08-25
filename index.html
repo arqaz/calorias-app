@@ -584,6 +584,19 @@
   .gym-rest-card{background:var(--fresh-soft);color:var(--fresh);border-radius:20px;padding:26px 20px;text-align:center;font-size:13.5px;font-weight:700;margin-bottom:14px;}
   .gym-week-day{margin-bottom:20px;}
   .ai-disclaimer{font-size:10.5px;color:var(--muted-soft);font-weight:500;line-height:1.5;margin:8px 2px 4px;}
+
+  .tutorial-slide{display:flex;flex-direction:column;align-items:center;text-align:center;padding-top:12vh;min-height:52vh;justify-content:center;}
+  .tutorial-emoji{font-size:56px;margin-bottom:20px;}
+  .tutorial-title{font-size:24px;font-weight:800;margin-bottom:12px;letter-spacing:-.01em;}
+  .tutorial-desc{font-size:14.5px;color:var(--muted);font-weight:500;line-height:1.6;max-width:340px;}
+  .tutorial-dots{display:flex;justify-content:center;gap:7px;margin:0 0 24px;}
+  .tutorial-dot{width:7px;height:7px;border-radius:50%;background:var(--track);transition:background .2s ease,width .2s ease;}
+  .tutorial-dot.active{background:var(--a2);width:20px;border-radius:4px;}
+  .tutorial-actions{display:flex;gap:10px;align-items:center;}
+  .tutorial-back-btn{
+    background:none;border:none;color:var(--muted);font-weight:700;font-size:13px;cursor:pointer;
+    padding:0 6px;flex-shrink:0;width:56px;font-family:'Plus Jakarta Sans',sans-serif;
+  }
 </style>
 </head>
 <body>
@@ -683,6 +696,20 @@
 
   <button class="onboard-start" id="onboardStartBtn">Começar</button>
   <button class="onboard-skip" id="onboardSkipBtn">Saltar por agora</button>
+</div>
+
+<div class="onboard-overlay hide" id="tutorialOverlay">
+  <div class="tutorial-slide">
+    <div class="tutorial-emoji" id="tutorialEmoji">👋</div>
+    <div class="tutorial-title" id="tutorialTitle">—</div>
+    <div class="tutorial-desc" id="tutorialDesc">—</div>
+  </div>
+  <div class="tutorial-dots" id="tutorialDots"></div>
+  <div class="tutorial-actions">
+    <button class="tutorial-back-btn" id="tutorialBackBtn">Voltar</button>
+    <button class="onboard-start" id="tutorialNextBtn" style="flex:1;">Seguinte</button>
+  </div>
+  <button class="onboard-skip" id="tutorialSkipBtn">Saltar tutorial</button>
 </div>
 
 <div class="app">
@@ -1031,6 +1058,7 @@
         <option value="yes">Mostrar</option>
       </select>
       <button class="goal-save" id="goalSaveBtn">Guardar</button>
+      <button class="onboard-skip" id="replayTutorialBtn" style="border:2px solid var(--track);border-radius:14px;color:var(--ink);margin-top:10px;width:100%;">Ver tutorial da app novamente</button>
     </div>
   </div>
 </div>
@@ -1372,6 +1400,15 @@ const els = {
   gymDurationInput: document.getElementById('gymDurationInput'),
   gymPrefsSaveBtn: document.getElementById('gymPrefsSaveBtn'),
   gymPrefsCancelBtn: document.getElementById('gymPrefsCancelBtn'),
+  tutorialOverlay: document.getElementById('tutorialOverlay'),
+  tutorialEmoji: document.getElementById('tutorialEmoji'),
+  tutorialTitle: document.getElementById('tutorialTitle'),
+  tutorialDesc: document.getElementById('tutorialDesc'),
+  tutorialDots: document.getElementById('tutorialDots'),
+  tutorialNextBtn: document.getElementById('tutorialNextBtn'),
+  tutorialBackBtn: document.getElementById('tutorialBackBtn'),
+  tutorialSkipBtn: document.getElementById('tutorialSkipBtn'),
+  replayTutorialBtn: document.getElementById('replayTutorialBtn'),
 };
 
 els.ringProgress.setAttribute('stroke-dasharray', CIRC.toFixed(2));
@@ -1547,12 +1584,76 @@ async function init(){
   updateOfflineUI();
   if(!settings.onboarded){
     document.getElementById('onboardOverlay').classList.remove('hide');
+  } else {
+    maybeShowTutorial();
   }
 }
 
 function finishOnboarding(){
   document.getElementById('onboardOverlay').classList.add('hide');
 }
+
+// ---- Tutorial de primeira utilização ---------------------------------------
+
+const TUTORIAL_SLIDES = [
+  { emoji: '👋', title: 'Bem-vindo ao Trinca', desc: 'O teu registo diário de calorias, nutrição, treino e progresso — tudo num só sítio. Uma vista rápida ao que podes fazer.' },
+  { emoji: '📸', title: 'Regista refeições em segundos', desc: 'Tira uma foto do prato e a IA estima as calorias — ou adiciona manualmente. A água e o exercício também se registam no separador Hoje.' },
+  { emoji: '🥗', title: 'Nutrição: plano de refeições', desc: 'Gera um plano semanal adaptado ao teu objetivo e preferências alimentares, e adiciona qualquer refeição ao registo de hoje com um toque.' },
+  { emoji: '🏋️', title: 'Ginásio: plano de treino', desc: 'Um plano semanal com os dias e o material que tens disponível. Cada sessão pode ser adicionada diretamente ao registo de exercício.' },
+  { emoji: '📈', title: 'Progresso ao longo do tempo', desc: 'Histórico de dias, peso, e um registo fotográfico opcional com feedback semanal da IA sobre a tua evolução.' },
+  { emoji: '⚙️', title: 'Tudo ajustável', desc: 'Podes mudar a meta de calorias, preferências, aparência e muito mais a qualquer momento no ícone de engrenagem. Vamos a isso?' },
+];
+
+let tutorialIndex = 0;
+
+function renderTutorialSlide(){
+  const slide = TUTORIAL_SLIDES[tutorialIndex];
+  els.tutorialEmoji.textContent = slide.emoji;
+  els.tutorialTitle.textContent = slide.title;
+  els.tutorialDesc.textContent = slide.desc;
+  els.tutorialDots.innerHTML = TUTORIAL_SLIDES.map((_, i)=> `<span class="tutorial-dot${i === tutorialIndex ? ' active' : ''}"></span>`).join('');
+  els.tutorialNextBtn.textContent = tutorialIndex === TUTORIAL_SLIDES.length - 1 ? 'Vamos a isso!' : 'Seguinte';
+  els.tutorialBackBtn.style.visibility = tutorialIndex === 0 ? 'hidden' : 'visible';
+}
+
+function openTutorial(){
+  tutorialIndex = 0;
+  renderTutorialSlide();
+  els.tutorialOverlay.classList.remove('hide');
+}
+
+async function closeTutorial(){
+  settings.tutorialSeen = true;
+  await saveSettings();
+  els.tutorialOverlay.classList.add('hide');
+}
+
+// Mostra o tutorial uma única vez (controlado por settings.tutorialSeen) —
+// tanto a quem acaba de se registar como a quem já usava a app antes desta
+// funcionalidade existir, para conhecer as zonas mais recentes.
+function maybeShowTutorial(){
+  if(!settings.tutorialSeen) openTutorial();
+}
+
+els.tutorialNextBtn.addEventListener('click', async ()=>{
+  if(tutorialIndex < TUTORIAL_SLIDES.length - 1){
+    tutorialIndex++;
+    renderTutorialSlide();
+  } else {
+    await closeTutorial();
+  }
+});
+els.tutorialBackBtn.addEventListener('click', ()=>{
+  if(tutorialIndex > 0){
+    tutorialIndex--;
+    renderTutorialSlide();
+  }
+});
+els.tutorialSkipBtn.addEventListener('click', closeTutorial);
+els.replayTutorialBtn.addEventListener('click', ()=>{
+  els.goalOverlay.classList.remove('show');
+  openTutorial();
+});
 
 function calcSuggestedGoal({ sex, weight, height, age, activity, objective }){
   if(!weight || !height || !age) return null;
@@ -1612,12 +1713,14 @@ document.getElementById('onboardStartBtn').addEventListener('click', async ()=>{
   render();
   renderBodyCard();
   finishOnboarding();
+  maybeShowTutorial();
 });
 
 document.getElementById('onboardSkipBtn').addEventListener('click', async ()=>{
   settings.onboarded = true;
   await saveSettings();
   finishOnboarding();
+  maybeShowTutorial();
 });
 
 async function loadSettings(){
@@ -1634,6 +1737,7 @@ async function loadSettings(){
   if(!Array.isArray(settings.gymEquipment)) settings.gymEquipment = [];
   if(typeof settings.gymDaysPerWeek !== 'number') settings.gymDaysPerWeek = 3;
   if(typeof settings.gymSessionMinutes !== 'number') settings.gymSessionMinutes = 45;
+  if(typeof settings.tutorialSeen !== 'boolean') settings.tutorialSeen = false;
 }
 async function saveSettings(){
   try{ localStorage.setItem('settings', JSON.stringify(settings)); }
