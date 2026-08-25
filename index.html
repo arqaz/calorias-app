@@ -541,6 +541,36 @@
     max-width:340px;background:rgba(255,255,255,.08);color:rgba(255,255,255,.85);
     font-size:12px;font-weight:500;line-height:1.5;padding:12px 14px;border-radius:14px;margin-top:14px;text-align:left;
   }
+
+  .nutri-card{background:var(--card);border-radius:22px;box-shadow:var(--shadow);padding:30px 22px;text-align:center;margin-bottom:18px;}
+  .nutri-empty-icon{font-size:38px;margin-bottom:8px;}
+  .nutri-empty-title{font-size:17.5px;font-weight:800;margin-bottom:6px;}
+  .nutri-empty-sub{font-size:12.5px;color:var(--muted);font-weight:500;line-height:1.55;margin-bottom:18px;}
+  .nutri-meta{font-size:11.5px;color:var(--muted);font-weight:600;margin-bottom:14px;}
+  .nutri-day-title{font-size:15px;font-weight:800;margin-bottom:2px;text-transform:capitalize;}
+  .nutri-meal-item{background:var(--card);border-radius:18px;box-shadow:var(--shadow-soft);padding:14px 15px;margin-bottom:10px;}
+  .nutri-meal-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
+  .nutri-meal-type{font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;}
+  .nutri-meal-name{font-size:14.5px;font-weight:800;margin-top:2px;}
+  .nutri-meal-desc{font-size:12px;color:var(--muted);font-weight:500;margin-top:3px;line-height:1.45;}
+  .nutri-meal-cal{font-size:13px;font-weight:800;color:var(--a2);white-space:nowrap;flex-shrink:0;}
+  .nutri-meal-add{
+    margin-top:10px;width:100%;background:var(--fresh-soft);color:var(--fresh);border:none;
+    font-weight:800;font-size:12.5px;padding:9px;border-radius:12px;cursor:pointer;
+  }
+  .nutri-meal-add.added{background:var(--track);color:var(--muted);cursor:default;}
+  .nutri-actions-row{display:flex;justify-content:space-between;gap:10px;margin-top:6px;}
+  .nutri-week-day{margin-bottom:20px;}
+  .nutri-notes{
+    background:var(--fresh-soft);color:var(--fresh);font-size:12.5px;font-weight:600;line-height:1.5;
+    padding:12px 13px;border-radius:16px;margin-bottom:18px;
+  }
+  .pref-chips-wrap{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 4px;}
+  .pref-chip{
+    background:var(--track);color:var(--ink);font-size:12.5px;font-weight:700;
+    padding:8px 14px;border-radius:20px;border:none;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;
+  }
+  .pref-chip.active{background:linear-gradient(135deg,var(--a1),var(--a2));color:#fff;}
 </style>
 </head>
 <body>
@@ -774,6 +804,33 @@
   <div id="mealList"></div>
   </div>
 
+  <div id="tabNutricao" style="display:none;">
+    <div class="nutri-card" id="nutriEmptyCard">
+      <div class="nutri-empty-icon">🥗</div>
+      <div class="nutri-empty-title">Plano de refeições</div>
+      <div class="nutri-empty-sub">Gera um plano semanal de refeições adaptado ao teu objetivo, meta calórica e preferências alimentares.</div>
+      <div class="scan-offline-notice" id="nutriOfflineNotice">📡 Estás offline — a geração do plano precisa de ligação à internet.</div>
+      <div id="nutriGenErrorBox" class="error" style="display:none;"></div>
+      <button class="add-btn" id="nutriGenerateBtn">Gerar plano semanal</button>
+      <button class="link-btn" id="nutriPrefsBtn" style="display:block;margin:10px auto 0;">Preferências e restrições alimentares</button>
+    </div>
+
+    <div id="nutriPlanView" style="display:none;">
+      <div class="nutri-meta" id="nutriMeta"></div>
+      <div class="nutri-notes" id="nutriNotes" style="display:none;"></div>
+      <div class="section-title" style="margin-top:0;">
+        <span>🥗 Plano de hoje</span>
+        <button class="clear-link" id="nutriWeekLink">ver semana</button>
+      </div>
+      <div id="nutriTodayMeals"></div>
+
+      <div class="nutri-actions-row">
+        <button class="link-btn" id="nutriPrefsBtn2">Preferências</button>
+        <button class="link-btn" id="nutriRegenBtn">Gerar novo plano</button>
+      </div>
+    </div>
+  </div>
+
   <div id="tabProgresso" style="display:none;">
     <div class="week-card">
       <div class="week-title">📊 Últimos 7 dias</div>
@@ -811,6 +868,10 @@
     <button class="nav-btn active" id="tabBtnHoje">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
       <span>Hoje</span>
+    </button>
+    <button class="nav-btn" id="tabBtnNutricao">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 2a9 9 0 0 0-9 9c0 4.5 4 8.5 9 11 5-2.5 9-6.5 9-11a9 9 0 0 0-9-9z"/><path d="M11 6v6l4 2"/></svg>
+      <span>Nutrição</span>
     </button>
     <button class="nav-cam" id="navCamBtn" aria-label="Adicionar refeição">
       <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8a2 2 0 0 1 2-2h1.5l1-1.5h7l1 1.5H18a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><circle cx="12" cy="13" r="3.5"/></svg>
@@ -1029,6 +1090,32 @@
   </div>
 </div>
 
+<div class="overlay" id="nutriWeekOverlay">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Plano semanal</div>
+    <div id="nutriWeekList"></div>
+    <button class="discard-btn" id="nutriWeekCloseBtn">Fechar</button>
+  </div>
+</div>
+
+<div class="overlay" id="nutriPrefsOverlay">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Preferências alimentares</div>
+    <div class="manual-form">
+      <label>Restrições</label>
+      <div class="pref-chips-wrap" id="nutriRestrictionsGrid"></div>
+      <label>Alimentos que gostas particularmente (opcional)</label>
+      <input type="text" id="nutriPrefsText" placeholder="ex: frango, arroz, brócolos">
+      <label>Alimentos a evitar (opcional)</label>
+      <input type="text" id="nutriDislikesText" placeholder="ex: cogumelos, peixe">
+      <button class="add-btn" id="nutriPrefsSaveBtn" style="margin-top:16px;">Guardar preferências</button>
+      <button class="discard-btn" id="nutriPrefsCancelBtn">Cancelar</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const RADIUS = 64;
 const CIRC = 2 * Math.PI * RADIUS;
@@ -1158,6 +1245,28 @@ const els = {
   bodyFeedbackDoneBtn: document.getElementById('bodyFeedbackDoneBtn'),
   targetWeightInput: document.getElementById('targetWeightInput'),
   bodyCheckinInput: document.getElementById('bodyCheckinInput'),
+  tabBtnNutricao: document.getElementById('tabBtnNutricao'),
+  nutriEmptyCard: document.getElementById('nutriEmptyCard'),
+  nutriOfflineNotice: document.getElementById('nutriOfflineNotice'),
+  nutriGenErrorBox: document.getElementById('nutriGenErrorBox'),
+  nutriGenerateBtn: document.getElementById('nutriGenerateBtn'),
+  nutriPrefsBtn: document.getElementById('nutriPrefsBtn'),
+  nutriPrefsBtn2: document.getElementById('nutriPrefsBtn2'),
+  nutriPlanView: document.getElementById('nutriPlanView'),
+  nutriMeta: document.getElementById('nutriMeta'),
+  nutriNotes: document.getElementById('nutriNotes'),
+  nutriTodayMeals: document.getElementById('nutriTodayMeals'),
+  nutriWeekLink: document.getElementById('nutriWeekLink'),
+  nutriRegenBtn: document.getElementById('nutriRegenBtn'),
+  nutriWeekOverlay: document.getElementById('nutriWeekOverlay'),
+  nutriWeekList: document.getElementById('nutriWeekList'),
+  nutriWeekCloseBtn: document.getElementById('nutriWeekCloseBtn'),
+  nutriPrefsOverlay: document.getElementById('nutriPrefsOverlay'),
+  nutriRestrictionsGrid: document.getElementById('nutriRestrictionsGrid'),
+  nutriPrefsText: document.getElementById('nutriPrefsText'),
+  nutriDislikesText: document.getElementById('nutriDislikesText'),
+  nutriPrefsSaveBtn: document.getElementById('nutriPrefsSaveBtn'),
+  nutriPrefsCancelBtn: document.getElementById('nutriPrefsCancelBtn'),
 };
 
 els.ringProgress.setAttribute('stroke-dasharray', CIRC.toFixed(2));
@@ -1227,27 +1336,32 @@ function renderHistory(){
 }
 
 function switchTab(tab){
-  const tabHoje = document.getElementById('tabHoje');
-  const tabProgresso = document.getElementById('tabProgresso');
-  const btnHoje = document.getElementById('tabBtnHoje');
-  const btnProgresso = document.getElementById('tabBtnProgresso');
+  const panels = {
+    hoje: document.getElementById('tabHoje'),
+    nutricao: document.getElementById('tabNutricao'),
+    progresso: document.getElementById('tabProgresso'),
+  };
+  const btns = {
+    hoje: document.getElementById('tabBtnHoje'),
+    nutricao: document.getElementById('tabBtnNutricao'),
+    progresso: document.getElementById('tabBtnProgresso'),
+  };
+  Object.keys(panels).forEach(key=>{
+    const active = key === tab;
+    panels[key].style.display = active ? 'block' : 'none';
+    btns[key].classList.toggle('active', active);
+  });
   if(tab === 'progresso'){
-    tabHoje.style.display = 'none';
-    tabProgresso.style.display = 'block';
-    btnHoje.classList.remove('active');
-    btnProgresso.classList.add('active');
     renderHistory();
     renderWeightChart();
     renderBodyCard();
-  } else {
-    tabHoje.style.display = 'block';
-    tabProgresso.style.display = 'none';
-    btnProgresso.classList.remove('active');
-    btnHoje.classList.add('active');
+  } else if(tab === 'nutricao'){
+    renderNutriTab();
   }
 }
 
 document.getElementById('tabBtnHoje').addEventListener('click', ()=> switchTab('hoje'));
+document.getElementById('tabBtnNutricao').addEventListener('click', ()=> switchTab('nutricao'));
 document.getElementById('tabBtnProgresso').addEventListener('click', ()=> switchTab('progresso'));
 
 function applyTheme(){
@@ -1299,6 +1413,9 @@ function updateOfflineUI(){
   // qualquer forma) — só o enquadramento/validação por IA fica indisponível,
   // por isso a dropzone em si não é desativada, apenas mostramos um aviso.
   if(els.bodyOfflineNotice) els.bodyOfflineNotice.style.display = offline ? 'block' : 'none';
+  if(els.nutriOfflineNotice) els.nutriOfflineNotice.style.display = offline ? 'block' : 'none';
+  if(els.nutriGenerateBtn) els.nutriGenerateBtn.disabled = offline;
+  if(els.nutriRegenBtn) els.nutriRegenBtn.disabled = offline;
 }
 
 window.addEventListener('online', updateOfflineUI);
@@ -1310,6 +1427,7 @@ async function init(){
   applyTheme();
   await loadDay();
   loadBodyCheckins();
+  loadMealPlan();
   render();
   startFastingTicker();
   updateOfflineUI();
@@ -1396,10 +1514,29 @@ async function loadSettings(){
   if(!settings.fasting) settings.fasting = { plan: 16, active: false, startTime: null };
   if(typeof settings.fastingEnabled !== 'boolean') settings.fastingEnabled = false;
   if(typeof settings.bodyCheckinFreq !== 'string') settings.bodyCheckinFreq = 'no';
+  if(!Array.isArray(settings.dietaryRestrictions)) settings.dietaryRestrictions = [];
+  if(typeof settings.dietaryPreferencesText !== 'string') settings.dietaryPreferencesText = '';
+  if(typeof settings.dietaryDislikesText !== 'string') settings.dietaryDislikesText = '';
 }
 async function saveSettings(){
   try{ localStorage.setItem('settings', JSON.stringify(settings)); }
   catch(e){ console.error('Erro ao guardar definições', e); }
+}
+
+let mealPlan = null;
+
+function loadMealPlan(){
+  try{
+    const raw = localStorage.getItem('mealPlan');
+    mealPlan = raw ? JSON.parse(raw) : null;
+  }catch(e){ mealPlan = null; }
+}
+function saveMealPlan(){
+  try{
+    if(mealPlan) localStorage.setItem('mealPlan', JSON.stringify(mealPlan));
+    else localStorage.removeItem('mealPlan');
+    return true;
+  }catch(e){ console.error('Erro ao guardar plano de refeições', e); return false; }
 }
 
 function bodyCheckinFreqDays(){
@@ -2161,6 +2298,233 @@ document.getElementById('onBodyPhotoRetakeBtn').addEventListener('click', ()=>{
   document.getElementById('onBodyPhotoDropzone').style.display = 'block';
   document.getElementById('onBodyPhotoPreviewWrap').style.display = 'none';
 });
+
+// ---- Nutrição: plano de refeições semanal ----------------------------------
+
+const NUTRI_RESTRICTIONS = [
+  { id: 'vegetariano', label: 'Vegetariano' },
+  { id: 'vegano', label: 'Vegano' },
+  { id: 'sem_gluten', label: 'Sem glúten' },
+  { id: 'sem_lactose', label: 'Sem lactose' },
+  { id: 'halal', label: 'Halal' },
+  { id: 'kosher', label: 'Kosher' },
+];
+
+function emojiForMealType(type){
+  const t = (type || '').toLowerCase();
+  if(t.includes('pequeno')) return '🍳';
+  if(t.includes('lanche')) return '🍎';
+  if(t.includes('jantar')) return '🌙';
+  return '🍽️';
+}
+
+// Refeições já registadas no dia real de hoje (independente do dia que
+// estiver a ser visto no separador "Hoje"), para saber que botões de
+// "adicionar" já foram usados.
+function todaysMealsForCheck(){
+  if(todayStr() === currentDate) return dayData.meals;
+  try{
+    const raw = localStorage.getItem(dayKey(todayStr()));
+    const data = raw ? JSON.parse(raw) : { meals: [] };
+    return Array.isArray(data.meals) ? data.meals : [];
+  }catch(e){ return []; }
+}
+
+async function addNutriMealToLog(meal, dayIdx, mealIdx){
+  const now = new Date();
+  const mealEntry = {
+    id: Date.now(),
+    name: meal.name || 'Refeição',
+    calories: Number(meal.calories) || 0,
+    protein_g: Number(meal.protein_g) || 0,
+    carbs_g: Number(meal.carbs_g) || 0,
+    fat_g: Number(meal.fat_g) || 0,
+    fiber_g: 0,
+    emoji: emojiForMealType(meal.type),
+    time: now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0'),
+    planKey: dayIdx + '-' + mealIdx,
+  };
+  const ds = todayStr();
+  if(ds === currentDate){
+    dayData.meals.push(mealEntry);
+    await saveDay();
+    render();
+  } else {
+    // A pessoa está a ver outro dia no separador "Hoje" — adiciona na mesma
+    // ao registo do dia real de hoje, sem mexer no dia atualmente carregado.
+    try{
+      const raw = localStorage.getItem(dayKey(ds));
+      const data = raw ? JSON.parse(raw) : { meals: [] };
+      if(!Array.isArray(data.meals)) data.meals = [];
+      data.meals.push(mealEntry);
+      localStorage.setItem(dayKey(ds), JSON.stringify(data));
+    }catch(e){ console.error('Erro ao adicionar refeição do plano', e); }
+  }
+}
+
+function buildNutriMealItem(meal, dayIdx, mealIdx){
+  const item = document.createElement('div');
+  item.className = 'nutri-meal-item';
+  const planKey = dayIdx + '-' + mealIdx;
+  const wasAdded = todaysMealsForCheck().some(m => m.planKey === planKey);
+  item.innerHTML = `
+    <div class="nutri-meal-top">
+      <div>
+        <div class="nutri-meal-type">${escapeHtml(meal.type || '')}</div>
+        <div class="nutri-meal-name">${emojiForMealType(meal.type)} ${escapeHtml(meal.name || '')}</div>
+        <div class="nutri-meal-desc">${escapeHtml(meal.description || '')}</div>
+      </div>
+      <div class="nutri-meal-cal">${Math.round(meal.calories) || 0} kcal</div>
+    </div>
+    <button class="nutri-meal-add ${wasAdded ? 'added' : ''}">${wasAdded ? '✓ Adicionado hoje' : '+ Adicionar ao registo de hoje'}</button>
+  `;
+  const btn = item.querySelector('.nutri-meal-add');
+  btn.addEventListener('click', async ()=>{
+    if(btn.classList.contains('added')) return;
+    btn.disabled = true;
+    await addNutriMealToLog(meal, dayIdx, mealIdx);
+    btn.disabled = false;
+    btn.classList.add('added');
+    btn.textContent = '✓ Adicionado hoje';
+  });
+  return item;
+}
+
+function renderNutriTab(){
+  if(!mealPlan || !Array.isArray(mealPlan.days) || mealPlan.days.length === 0){
+    els.nutriEmptyCard.style.display = 'block';
+    els.nutriPlanView.style.display = 'none';
+    return;
+  }
+  els.nutriEmptyCard.style.display = 'none';
+  els.nutriPlanView.style.display = 'block';
+
+  const macros = mealPlan.macro_targets || {};
+  const metaParts = [];
+  if(mealPlan.goalCalories) metaParts.push(Math.round(mealPlan.goalCalories) + ' kcal/dia');
+  if(macros.protein_g) metaParts.push('P ' + Math.round(macros.protein_g) + 'g');
+  if(macros.carbs_g) metaParts.push('H ' + Math.round(macros.carbs_g) + 'g');
+  if(macros.fat_g) metaParts.push('G ' + Math.round(macros.fat_g) + 'g');
+  els.nutriMeta.textContent = metaParts.join(' · ');
+
+  if(mealPlan.notes){
+    els.nutriNotes.textContent = mealPlan.notes;
+    els.nutriNotes.style.display = 'block';
+  } else {
+    els.nutriNotes.style.display = 'none';
+  }
+
+  const planIndex = (new Date().getDay() + 6) % 7; // getDay(): 0=domingo -> planIndex 0=segunda
+  const today = mealPlan.days[planIndex];
+
+  els.nutriTodayMeals.innerHTML = '';
+  if(!today || !Array.isArray(today.meals) || today.meals.length === 0){
+    const empty = document.createElement('div');
+    empty.className = 'empty-state';
+    empty.textContent = 'Sem refeições para hoje neste plano.';
+    els.nutriTodayMeals.appendChild(empty);
+    return;
+  }
+  today.meals.forEach((meal, idx)=> els.nutriTodayMeals.appendChild(buildNutriMealItem(meal, planIndex, idx)));
+}
+
+function openNutriWeek(){
+  els.nutriWeekList.innerHTML = '';
+  if(mealPlan && Array.isArray(mealPlan.days)){
+    mealPlan.days.forEach((day, dayIdx)=>{
+      const section = document.createElement('div');
+      section.className = 'nutri-week-day';
+      const title = document.createElement('div');
+      title.className = 'nutri-day-title';
+      title.textContent = day.day || ('Dia ' + (dayIdx + 1));
+      section.appendChild(title);
+      (day.meals || []).forEach((meal, mealIdx)=> section.appendChild(buildNutriMealItem(meal, dayIdx, mealIdx)));
+      els.nutriWeekList.appendChild(section);
+    });
+  }
+  els.nutriWeekOverlay.classList.add('show');
+}
+els.nutriWeekLink.addEventListener('click', openNutriWeek);
+els.nutriWeekCloseBtn.addEventListener('click', ()=> els.nutriWeekOverlay.classList.remove('show'));
+els.nutriWeekOverlay.addEventListener('click', (e)=>{ if(e.target === els.nutriWeekOverlay) els.nutriWeekOverlay.classList.remove('show'); });
+
+function openNutriPrefs(){
+  els.nutriRestrictionsGrid.innerHTML = '';
+  NUTRI_RESTRICTIONS.forEach(r=>{
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'pref-chip' + (settings.dietaryRestrictions.includes(r.id) ? ' active' : '');
+    btn.textContent = r.label;
+    btn.dataset.id = r.id;
+    btn.addEventListener('click', ()=> btn.classList.toggle('active'));
+    els.nutriRestrictionsGrid.appendChild(btn);
+  });
+  els.nutriPrefsText.value = settings.dietaryPreferencesText || '';
+  els.nutriDislikesText.value = settings.dietaryDislikesText || '';
+  els.nutriPrefsOverlay.classList.add('show');
+}
+els.nutriPrefsBtn.addEventListener('click', openNutriPrefs);
+els.nutriPrefsBtn2.addEventListener('click', openNutriPrefs);
+els.nutriPrefsCancelBtn.addEventListener('click', ()=> els.nutriPrefsOverlay.classList.remove('show'));
+els.nutriPrefsOverlay.addEventListener('click', (e)=>{ if(e.target === els.nutriPrefsOverlay) els.nutriPrefsOverlay.classList.remove('show'); });
+els.nutriPrefsSaveBtn.addEventListener('click', async ()=>{
+  const active = Array.from(els.nutriRestrictionsGrid.querySelectorAll('.pref-chip.active')).map(b => b.dataset.id);
+  settings.dietaryRestrictions = active;
+  settings.dietaryPreferencesText = els.nutriPrefsText.value.trim();
+  settings.dietaryDislikesText = els.nutriDislikesText.value.trim();
+  await saveSettings();
+  els.nutriPrefsOverlay.classList.remove('show');
+});
+
+async function generateMealPlan(){
+  if(isOffline()){
+    els.nutriGenErrorBox.textContent = 'Estás offline — a geração do plano precisa de ligação à internet.';
+    els.nutriGenErrorBox.style.display = 'block';
+    return;
+  }
+  els.nutriGenErrorBox.style.display = 'none';
+  const btn = els.nutriEmptyCard.style.display !== 'none' ? els.nutriGenerateBtn : els.nutriRegenBtn;
+  const origLabel = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'A gerar plano…';
+  try{
+    const response = await fetch('/api/meal-plan', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        objective: settings.objective || 'manter',
+        goalCalories: settings.goal || 2000,
+        restrictions: settings.dietaryRestrictions || [],
+        preferences: settings.dietaryPreferencesText || '',
+        dislikes: settings.dietaryDislikesText || '',
+      }),
+    });
+    if(!response.ok){
+      const errData = await response.json().catch(()=>({}));
+      throw new Error((errData.error || ('Falha na chamada à API (' + response.status + ')')) + (errData.details ? ' — ' + errData.details : ''));
+    }
+    const parsed = await response.json();
+    mealPlan = {
+      generatedAt: new Date().toISOString(),
+      objective: settings.objective || 'manter',
+      goalCalories: settings.goal || 2000,
+      macro_targets: parsed.macro_targets || {},
+      days: Array.isArray(parsed.days) ? parsed.days : [],
+      notes: parsed.notes || '',
+    };
+    saveMealPlan();
+    renderNutriTab();
+  }catch(err){
+    console.error(err);
+    els.nutriGenErrorBox.textContent = 'Erro: ' + (err.message || 'não foi possível gerar o plano') + '. Tenta novamente.';
+    els.nutriGenErrorBox.style.display = 'block';
+  }finally{
+    btn.disabled = false;
+    btn.textContent = origLabel;
+  }
+}
+els.nutriGenerateBtn.addEventListener('click', generateMealPlan);
+els.nutriRegenBtn.addEventListener('click', generateMealPlan);
 
 function escapeHtml(s){
   const d = document.createElement('div');
