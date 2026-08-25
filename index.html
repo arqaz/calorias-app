@@ -1108,12 +1108,33 @@
   <div class="sheet">
     <div class="sheet-handle"></div>
     <div class="sheet-title">Adicionar exercício</div>
-    <div class="manual-form">
+
+    <div id="exAiSection">
+      <div class="scan-offline-notice" id="exOfflineNotice" style="display:none;">📡 Estás offline — a estimativa por IA fica indisponível, mas podes adicionar manualmente.</div>
+      <div class="manual-form">
+        <label>Descreve o que fizeste</label>
+        <textarea id="exDescInput" rows="2" placeholder="ex: Corri 5 km em cerca de 30 minutos"></textarea>
+        <button class="add-btn" id="exEstimateBtn" style="margin-top:12px;">Estimar calorias com IA</button>
+      </div>
+      <div id="exEstimateErrorBox" class="error" style="display:none;"></div>
+      <div id="exEstimateResult" style="display:none;margin-top:14px;">
+        <div class="quickask-suggestion">
+          <div class="quickask-suggestion-name" id="exEstimateName"></div>
+          <div class="quickask-suggestion-meta" id="exEstimateCal"></div>
+          <div class="quickask-suggestion-note" id="exEstimateNote"></div>
+        </div>
+        <button class="add-btn" id="exEstimateConfirmBtn" style="margin-top:10px;">Adicionar ao registo</button>
+      </div>
+      <button class="link-btn" id="exManualToggleBtn">ou adicionar manualmente</button>
+    </div>
+
+    <div class="manual-form" id="exManualForm" style="display:none;">
       <label>Nome do exercício</label>
       <input type="text" id="exName" placeholder="ex: Corrida, Ginásio">
       <label>Calorias queimadas (kcal)</label>
       <input type="number" id="exCal" inputmode="numeric" placeholder="0">
       <button class="add-btn" id="exAddBtn" style="margin-top:16px;">Adicionar</button>
+      <button class="link-btn" id="exAiToggleBtn">ou estimar com IA</button>
     </div>
   </div>
 </div>
@@ -1348,6 +1369,19 @@ const els = {
   exerciseList: document.getElementById('exerciseList'),
   addExerciseLink: document.getElementById('addExerciseLink'),
   exerciseOverlay: document.getElementById('exerciseOverlay'),
+  exAiSection: document.getElementById('exAiSection'),
+  exOfflineNotice: document.getElementById('exOfflineNotice'),
+  exDescInput: document.getElementById('exDescInput'),
+  exEstimateBtn: document.getElementById('exEstimateBtn'),
+  exEstimateErrorBox: document.getElementById('exEstimateErrorBox'),
+  exEstimateResult: document.getElementById('exEstimateResult'),
+  exEstimateName: document.getElementById('exEstimateName'),
+  exEstimateCal: document.getElementById('exEstimateCal'),
+  exEstimateNote: document.getElementById('exEstimateNote'),
+  exEstimateConfirmBtn: document.getElementById('exEstimateConfirmBtn'),
+  exManualToggleBtn: document.getElementById('exManualToggleBtn'),
+  exManualForm: document.getElementById('exManualForm'),
+  exAiToggleBtn: document.getElementById('exAiToggleBtn'),
   exName: document.getElementById('exName'),
   exCal: document.getElementById('exCal'),
   exAddBtn: document.getElementById('exAddBtn'),
@@ -1828,6 +1862,7 @@ function updateOfflineUI(){
   if(els.gymRegenBtn) els.gymRegenBtn.disabled = offline;
   if(els.quickAskOpenBtn) els.quickAskOpenBtn.disabled = offline;
   if(els.quickAskSubmitBtn) els.quickAskSubmitBtn.disabled = offline;
+  updateExerciseOfflineUI();
 }
 
 window.addEventListener('online', updateOfflineUI);
@@ -2648,19 +2683,100 @@ function renderExercise(){
   });
 }
 
-els.addExerciseLink.addEventListener('click', ()=>{
+let lastExerciseEstimate = null;
+
+function updateExerciseOfflineUI(){
+  const offline = isOffline();
+  if(els.exOfflineNotice) els.exOfflineNotice.style.display = offline ? 'block' : 'none';
+  if(els.exEstimateBtn) els.exEstimateBtn.disabled = offline;
+}
+
+function resetExerciseSheet(){
+  els.exDescInput.value = '';
   els.exName.value = '';
   els.exCal.value = '';
-  els.exerciseOverlay.classList.add('show');
-});
-els.exerciseOverlay.addEventListener('click', (e)=>{ if(e.target === els.exerciseOverlay) els.exerciseOverlay.classList.remove('show'); });
-els.exAddBtn.addEventListener('click', async ()=>{
-  const name = els.exName.value.trim();
-  if(!name){ els.exName.focus(); return; }
-  dayData.exercise.push({ id: Date.now(), name, calories: Number(els.exCal.value) || 0 });
+  els.exEstimateErrorBox.style.display = 'none';
+  els.exEstimateResult.style.display = 'none';
+  lastExerciseEstimate = null;
+  els.exAiSection.style.display = 'block';
+  els.exManualForm.style.display = 'none';
+  updateExerciseOfflineUI();
+}
+
+// Regista o exercício no dia atual — ponto único usado tanto pelo formulário
+// manual como pela confirmação da estimativa da IA.
+async function addExerciseEntry(name, calories){
+  dayData.exercise.push({ id: Date.now(), name, calories: Number(calories) || 0 });
   await saveDay();
   render();
   els.exerciseOverlay.classList.remove('show');
+}
+
+els.addExerciseLink.addEventListener('click', ()=>{
+  resetExerciseSheet();
+  els.exerciseOverlay.classList.add('show');
+});
+els.exerciseOverlay.addEventListener('click', (e)=>{ if(e.target === els.exerciseOverlay) els.exerciseOverlay.classList.remove('show'); });
+
+els.exManualToggleBtn.addEventListener('click', ()=>{
+  els.exAiSection.style.display = 'none';
+  els.exManualForm.style.display = 'block';
+});
+els.exAiToggleBtn.addEventListener('click', ()=>{
+  els.exAiSection.style.display = 'block';
+  els.exManualForm.style.display = 'none';
+});
+
+els.exAddBtn.addEventListener('click', async ()=>{
+  const name = els.exName.value.trim();
+  if(!name){ els.exName.focus(); return; }
+  await addExerciseEntry(name, els.exCal.value);
+});
+
+async function submitExerciseEstimate(){
+  const description = els.exDescInput.value.trim();
+  if(!description){ els.exDescInput.focus(); return; }
+  if(isOffline()){
+    els.exEstimateErrorBox.textContent = 'Estás offline — esta funcionalidade precisa de ligação à internet.';
+    els.exEstimateErrorBox.style.display = 'block';
+    return;
+  }
+  els.exEstimateErrorBox.style.display = 'none';
+  els.exEstimateResult.style.display = 'none';
+  const origLabel = els.exEstimateBtn.textContent;
+  els.exEstimateBtn.disabled = true;
+  els.exEstimateBtn.textContent = 'A calcular…';
+  try{
+    const parsed = await callAiEndpoint('/api/exercise-estimate', {
+      description,
+      weight: settings.weight || null,
+      sex: settings.sex || null,
+      activity: settings.activity || null,
+    });
+    lastExerciseEstimate = {
+      name: (parsed.name || description).trim() || description,
+      calories: Math.max(0, Math.round(Number(parsed.calories) || 0)),
+    };
+    els.exEstimateName.textContent = lastExerciseEstimate.name;
+    els.exEstimateCal.textContent = lastExerciseEstimate.calories + ' kcal';
+    els.exEstimateNote.textContent = parsed.note || '';
+    els.exEstimateResult.style.display = 'block';
+  }catch(err){
+    if(err.requiresLogin){
+      showLoginRequiredIn(els.exEstimateErrorBox, err.message);
+    } else {
+      els.exEstimateErrorBox.textContent = err.message || 'Não foi possível calcular a estimativa. Tenta novamente.';
+      els.exEstimateErrorBox.style.display = 'block';
+    }
+  } finally {
+    els.exEstimateBtn.disabled = false;
+    els.exEstimateBtn.textContent = origLabel;
+  }
+}
+els.exEstimateBtn.addEventListener('click', submitExerciseEstimate);
+els.exEstimateConfirmBtn.addEventListener('click', async ()=>{
+  if(!lastExerciseEstimate) return;
+  await addExerciseEntry(lastExerciseEstimate.name, lastExerciseEstimate.calories);
 });
 
 // ---- Registo de progresso corporal ----------------------------------------
