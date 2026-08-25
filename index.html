@@ -583,6 +583,7 @@
   .gym-session-add.added{background:var(--track);color:var(--muted);cursor:default;}
   .gym-rest-card{background:var(--fresh-soft);color:var(--fresh);border-radius:20px;padding:26px 20px;text-align:center;font-size:13.5px;font-weight:700;margin-bottom:14px;}
   .gym-week-day{margin-bottom:20px;}
+  .ai-disclaimer{font-size:10.5px;color:var(--muted-soft);font-weight:500;line-height:1.5;margin:8px 2px 4px;}
 </style>
 </head>
 <body>
@@ -857,6 +858,7 @@
     <div id="gymPlanView" style="display:none;">
       <div class="nutri-meta" id="gymMeta"></div>
       <div class="nutri-notes" id="gymNotes" style="display:none;"></div>
+      <div class="ai-disclaimer" id="gymDisclaimer"></div>
       <div class="section-title" style="margin-top:0;">
         <span>🏋️ Treino de hoje</span>
         <button class="clear-link" id="gymWeekLink">ver semana</button>
@@ -1357,6 +1359,7 @@ const els = {
   gymPlanView: document.getElementById('gymPlanView'),
   gymMeta: document.getElementById('gymMeta'),
   gymNotes: document.getElementById('gymNotes'),
+  gymDisclaimer: document.getElementById('gymDisclaimer'),
   gymTodaySession: document.getElementById('gymTodaySession'),
   gymWeekLink: document.getElementById('gymWeekLink'),
   gymRegenBtn: document.getElementById('gymRegenBtn'),
@@ -2759,10 +2762,13 @@ function renderGymTab(){
   if(gymPlan.sessionMinutes) metaParts.push('~' + gymPlan.sessionMinutes + ' min/sessão');
   els.gymMeta.textContent = metaParts.join(' · ');
 
-  const noteParts = ['⚠️ Plano gerado por IA — não substitui o acompanhamento de um profissional de exercício físico. Se sentires dor, para.'];
-  if(gymPlan.notes) noteParts.push(gymPlan.notes);
-  els.gymNotes.textContent = noteParts.join(' ');
-  els.gymNotes.style.display = 'block';
+  if(gymPlan.notes){
+    els.gymNotes.textContent = gymPlan.notes;
+    els.gymNotes.style.display = 'block';
+  } else {
+    els.gymNotes.style.display = 'none';
+  }
+  els.gymDisclaimer.textContent = 'Plano gerado por IA como ponto de partida, adaptado às tuas respostas — ajusta a intensidade ao que sentires confortável e considera complementar com o acompanhamento de um profissional de exercício físico.';
 
   const planIndex = (new Date().getDay() + 6) % 7; // getDay(): 0=domingo -> planIndex 0=segunda
   const today = gymPlan.days[planIndex];
