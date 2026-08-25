@@ -571,6 +571,18 @@
     padding:8px 14px;border-radius:20px;border:none;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;
   }
   .pref-chip.active{background:linear-gradient(135deg,var(--a1),var(--a2));color:#fff;}
+
+  .gym-session-card{background:var(--card);border-radius:22px;box-shadow:var(--shadow);padding:16px 18px;margin-bottom:14px;}
+  .gym-session-top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px;}
+  .gym-session-cal{font-size:13px;font-weight:800;color:var(--fresh);white-space:nowrap;flex-shrink:0;}
+  .gym-exercise-item{background:var(--bg);border-radius:16px;padding:11px 13px;margin-bottom:8px;}
+  .gym-exercise-name{font-size:13.5px;font-weight:700;}
+  .gym-exercise-meta{font-size:11.5px;color:var(--muted);font-weight:600;margin-top:2px;}
+  .gym-exercise-notes{font-size:11.5px;color:var(--muted);font-weight:500;margin-top:3px;line-height:1.45;}
+  .gym-session-add{margin-top:6px;width:100%;background:var(--fresh-soft);color:var(--fresh);border:none;font-weight:800;font-size:12.5px;padding:10px;border-radius:12px;cursor:pointer;}
+  .gym-session-add.added{background:var(--track);color:var(--muted);cursor:default;}
+  .gym-rest-card{background:var(--fresh-soft);color:var(--fresh);border-radius:20px;padding:26px 20px;text-align:center;font-size:13.5px;font-weight:700;margin-bottom:14px;}
+  .gym-week-day{margin-bottom:20px;}
 </style>
 </head>
 <body>
@@ -831,6 +843,33 @@
     </div>
   </div>
 
+  <div id="tabGinasio" style="display:none;">
+    <div class="nutri-card" id="gymEmptyCard">
+      <div class="nutri-empty-icon">🏋️</div>
+      <div class="nutri-empty-title">Plano de exercícios</div>
+      <div class="nutri-empty-sub">Gera um plano semanal de treino adaptado ao teu objetivo, nível de atividade e material disponível.</div>
+      <div class="scan-offline-notice" id="gymOfflineNotice">📡 Estás offline — a geração do plano precisa de ligação à internet.</div>
+      <div id="gymGenErrorBox" class="error" style="display:none;"></div>
+      <button class="add-btn" id="gymGenerateBtn">Gerar plano semanal</button>
+      <button class="link-btn" id="gymPrefsBtn" style="display:block;margin:10px auto 0;">Material e preferências de treino</button>
+    </div>
+
+    <div id="gymPlanView" style="display:none;">
+      <div class="nutri-meta" id="gymMeta"></div>
+      <div class="nutri-notes" id="gymNotes" style="display:none;"></div>
+      <div class="section-title" style="margin-top:0;">
+        <span>🏋️ Treino de hoje</span>
+        <button class="clear-link" id="gymWeekLink">ver semana</button>
+      </div>
+      <div id="gymTodaySession"></div>
+
+      <div class="nutri-actions-row">
+        <button class="link-btn" id="gymPrefsBtn2">Preferências</button>
+        <button class="link-btn" id="gymRegenBtn">Gerar novo plano</button>
+      </div>
+    </div>
+  </div>
+
   <div id="tabProgresso" style="display:none;">
     <div class="week-card">
       <div class="week-title">📊 Últimos 7 dias</div>
@@ -875,6 +914,10 @@
     </button>
     <button class="nav-cam" id="navCamBtn" aria-label="Adicionar refeição">
       <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8a2 2 0 0 1 2-2h1.5l1-1.5h7l1 1.5H18a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><circle cx="12" cy="13" r="3.5"/></svg>
+    </button>
+    <button class="nav-btn" id="tabBtnGinasio">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6.5 6.5 11 11"/><path d="m21 21-1-1"/><path d="m3 3 1 1"/><path d="m18 22 4-4"/><path d="m2 6 4-4"/><path d="m3 10 7-7"/><path d="m14 21 7-7"/></svg>
+      <span>Ginásio</span>
     </button>
     <button class="nav-btn" id="tabBtnProgresso">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg>
@@ -1116,6 +1159,43 @@
   </div>
 </div>
 
+<div class="overlay" id="gymWeekOverlay">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Plano semanal de treino</div>
+    <div id="gymWeekList"></div>
+    <button class="discard-btn" id="gymWeekCloseBtn">Fechar</button>
+  </div>
+</div>
+
+<div class="overlay" id="gymPrefsOverlay">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Preferências de treino</div>
+    <div class="manual-form">
+      <label>Material disponível</label>
+      <div class="pref-chips-wrap" id="gymEquipmentGrid"></div>
+      <label style="display:block;margin-top:16px;">Dias de treino por semana</label>
+      <select id="gymDaysInput" style="width:100%;margin-top:8px;font-size:15px;font-weight:700;border:2px solid var(--track);border-radius:14px;padding:12px 14px;font-family:'Plus Jakarta Sans',sans-serif;color:var(--ink);">
+        <option value="2">2 dias</option>
+        <option value="3" selected>3 dias</option>
+        <option value="4">4 dias</option>
+        <option value="5">5 dias</option>
+        <option value="6">6 dias</option>
+      </select>
+      <label style="display:block;margin-top:16px;">Duração aproximada de cada treino</label>
+      <select id="gymDurationInput" style="width:100%;margin-top:8px;font-size:15px;font-weight:700;border:2px solid var(--track);border-radius:14px;padding:12px 14px;font-family:'Plus Jakarta Sans',sans-serif;color:var(--ink);">
+        <option value="20">até 20 min</option>
+        <option value="30">30 min</option>
+        <option value="45" selected>45 min</option>
+        <option value="60">60 min ou mais</option>
+      </select>
+      <button class="add-btn" id="gymPrefsSaveBtn" style="margin-top:16px;">Guardar preferências</button>
+      <button class="discard-btn" id="gymPrefsCancelBtn">Cancelar</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const RADIUS = 64;
 const CIRC = 2 * Math.PI * RADIUS;
@@ -1267,6 +1347,28 @@ const els = {
   nutriDislikesText: document.getElementById('nutriDislikesText'),
   nutriPrefsSaveBtn: document.getElementById('nutriPrefsSaveBtn'),
   nutriPrefsCancelBtn: document.getElementById('nutriPrefsCancelBtn'),
+  tabBtnGinasio: document.getElementById('tabBtnGinasio'),
+  gymEmptyCard: document.getElementById('gymEmptyCard'),
+  gymOfflineNotice: document.getElementById('gymOfflineNotice'),
+  gymGenErrorBox: document.getElementById('gymGenErrorBox'),
+  gymGenerateBtn: document.getElementById('gymGenerateBtn'),
+  gymPrefsBtn: document.getElementById('gymPrefsBtn'),
+  gymPrefsBtn2: document.getElementById('gymPrefsBtn2'),
+  gymPlanView: document.getElementById('gymPlanView'),
+  gymMeta: document.getElementById('gymMeta'),
+  gymNotes: document.getElementById('gymNotes'),
+  gymTodaySession: document.getElementById('gymTodaySession'),
+  gymWeekLink: document.getElementById('gymWeekLink'),
+  gymRegenBtn: document.getElementById('gymRegenBtn'),
+  gymWeekOverlay: document.getElementById('gymWeekOverlay'),
+  gymWeekList: document.getElementById('gymWeekList'),
+  gymWeekCloseBtn: document.getElementById('gymWeekCloseBtn'),
+  gymPrefsOverlay: document.getElementById('gymPrefsOverlay'),
+  gymEquipmentGrid: document.getElementById('gymEquipmentGrid'),
+  gymDaysInput: document.getElementById('gymDaysInput'),
+  gymDurationInput: document.getElementById('gymDurationInput'),
+  gymPrefsSaveBtn: document.getElementById('gymPrefsSaveBtn'),
+  gymPrefsCancelBtn: document.getElementById('gymPrefsCancelBtn'),
 };
 
 els.ringProgress.setAttribute('stroke-dasharray', CIRC.toFixed(2));
@@ -1339,11 +1441,13 @@ function switchTab(tab){
   const panels = {
     hoje: document.getElementById('tabHoje'),
     nutricao: document.getElementById('tabNutricao'),
+    ginasio: document.getElementById('tabGinasio'),
     progresso: document.getElementById('tabProgresso'),
   };
   const btns = {
     hoje: document.getElementById('tabBtnHoje'),
     nutricao: document.getElementById('tabBtnNutricao'),
+    ginasio: document.getElementById('tabBtnGinasio'),
     progresso: document.getElementById('tabBtnProgresso'),
   };
   Object.keys(panels).forEach(key=>{
@@ -1357,11 +1461,14 @@ function switchTab(tab){
     renderBodyCard();
   } else if(tab === 'nutricao'){
     renderNutriTab();
+  } else if(tab === 'ginasio'){
+    renderGymTab();
   }
 }
 
 document.getElementById('tabBtnHoje').addEventListener('click', ()=> switchTab('hoje'));
 document.getElementById('tabBtnNutricao').addEventListener('click', ()=> switchTab('nutricao'));
+document.getElementById('tabBtnGinasio').addEventListener('click', ()=> switchTab('ginasio'));
 document.getElementById('tabBtnProgresso').addEventListener('click', ()=> switchTab('progresso'));
 
 function applyTheme(){
@@ -1416,6 +1523,9 @@ function updateOfflineUI(){
   if(els.nutriOfflineNotice) els.nutriOfflineNotice.style.display = offline ? 'block' : 'none';
   if(els.nutriGenerateBtn) els.nutriGenerateBtn.disabled = offline;
   if(els.nutriRegenBtn) els.nutriRegenBtn.disabled = offline;
+  if(els.gymOfflineNotice) els.gymOfflineNotice.style.display = offline ? 'block' : 'none';
+  if(els.gymGenerateBtn) els.gymGenerateBtn.disabled = offline;
+  if(els.gymRegenBtn) els.gymRegenBtn.disabled = offline;
 }
 
 window.addEventListener('online', updateOfflineUI);
@@ -1428,6 +1538,7 @@ async function init(){
   await loadDay();
   loadBodyCheckins();
   loadMealPlan();
+  loadGymPlan();
   render();
   startFastingTicker();
   updateOfflineUI();
@@ -1517,6 +1628,9 @@ async function loadSettings(){
   if(!Array.isArray(settings.dietaryRestrictions)) settings.dietaryRestrictions = [];
   if(typeof settings.dietaryPreferencesText !== 'string') settings.dietaryPreferencesText = '';
   if(typeof settings.dietaryDislikesText !== 'string') settings.dietaryDislikesText = '';
+  if(!Array.isArray(settings.gymEquipment)) settings.gymEquipment = [];
+  if(typeof settings.gymDaysPerWeek !== 'number') settings.gymDaysPerWeek = 3;
+  if(typeof settings.gymSessionMinutes !== 'number') settings.gymSessionMinutes = 45;
 }
 async function saveSettings(){
   try{ localStorage.setItem('settings', JSON.stringify(settings)); }
@@ -1537,6 +1651,22 @@ function saveMealPlan(){
     else localStorage.removeItem('mealPlan');
     return true;
   }catch(e){ console.error('Erro ao guardar plano de refeições', e); return false; }
+}
+
+let gymPlan = null;
+
+function loadGymPlan(){
+  try{
+    const raw = localStorage.getItem('gymPlan');
+    gymPlan = raw ? JSON.parse(raw) : null;
+  }catch(e){ gymPlan = null; }
+}
+function saveGymPlan(){
+  try{
+    if(gymPlan) localStorage.setItem('gymPlan', JSON.stringify(gymPlan));
+    else localStorage.removeItem('gymPlan');
+    return true;
+  }catch(e){ console.error('Erro ao guardar plano de treino', e); return false; }
 }
 
 function bodyCheckinFreqDays(){
@@ -2525,6 +2655,219 @@ async function generateMealPlan(){
 }
 els.nutriGenerateBtn.addEventListener('click', generateMealPlan);
 els.nutriRegenBtn.addEventListener('click', generateMealPlan);
+
+// ---- Ginásio: plano de treino semanal --------------------------------------
+
+const GYM_EQUIPMENT = [
+  { id: 'nenhum', label: 'Sem equipamento' },
+  { id: 'halteres', label: 'Halteres' },
+  { id: 'barra_discos', label: 'Barra e discos' },
+  { id: 'maquinas', label: 'Máquinas de ginásio' },
+  { id: 'bandas', label: 'Bandas elásticas' },
+  { id: 'kettlebell', label: 'Kettlebell' },
+];
+
+// Exercício já registado no dia real de hoje (independente do dia visto no
+// separador "Hoje"), para saber se a sessão do plano já foi adicionada.
+function todaysExerciseForCheck(){
+  if(todayStr() === currentDate) return dayData.exercise;
+  try{
+    const raw = localStorage.getItem(dayKey(todayStr()));
+    const data = raw ? JSON.parse(raw) : { exercise: [] };
+    return Array.isArray(data.exercise) ? data.exercise : [];
+  }catch(e){ return []; }
+}
+
+async function addGymSessionToLog(day, dayIdx){
+  const exerciseEntry = {
+    id: Date.now(),
+    name: 'Treino: ' + (day.focus || 'Sessão de treino'),
+    calories: Number(day.estimated_calories) || 0,
+    gymPlanKey: String(dayIdx),
+  };
+  const ds = todayStr();
+  if(ds === currentDate){
+    dayData.exercise.push(exerciseEntry);
+    await saveDay();
+    render();
+  } else {
+    try{
+      const raw = localStorage.getItem(dayKey(ds));
+      const data = raw ? JSON.parse(raw) : { meals: [], exercise: [] };
+      if(!Array.isArray(data.meals)) data.meals = [];
+      if(!Array.isArray(data.exercise)) data.exercise = [];
+      data.exercise.push(exerciseEntry);
+      localStorage.setItem(dayKey(ds), JSON.stringify(data));
+    }catch(e){ console.error('Erro ao adicionar treino do plano', e); }
+  }
+}
+
+function buildGymDayCard(day, dayIdx){
+  const wrap = document.createElement('div');
+  if(!day || day.rest){
+    wrap.className = 'gym-rest-card';
+    wrap.textContent = '😌 Dia de descanso' + (day && day.focus ? ' — ' + day.focus : '');
+    return wrap;
+  }
+  wrap.className = 'gym-session-card';
+  const planKey = String(dayIdx);
+  const wasAdded = todaysExerciseForCheck().some(e => e.gymPlanKey === planKey);
+  const exercisesHtml = (day.exercises || []).map(ex=>{
+    const metaBits = [];
+    if(ex.sets) metaBits.push(ex.sets + ' séries');
+    if(ex.reps) metaBits.push('× ' + ex.reps);
+    if(ex.rest_seconds) metaBits.push('descanso ' + ex.rest_seconds + 's');
+    return `
+      <div class="gym-exercise-item">
+        <div class="gym-exercise-name">${escapeHtml(ex.name || '')}</div>
+        ${metaBits.length ? `<div class="gym-exercise-meta">${escapeHtml(metaBits.join(' · '))}</div>` : ''}
+        ${ex.notes ? `<div class="gym-exercise-notes">${escapeHtml(ex.notes)}</div>` : ''}
+      </div>
+    `;
+  }).join('');
+  wrap.innerHTML = `
+    <div class="gym-session-top">
+      <div class="nutri-day-title">${escapeHtml(day.focus || 'Treino')}</div>
+      <div class="gym-session-cal">~${Math.round(day.estimated_calories) || 0} kcal</div>
+    </div>
+    ${exercisesHtml || '<div class="empty-state">Sem exercícios definidos.</div>'}
+    <button class="gym-session-add ${wasAdded ? 'added' : ''}">${wasAdded ? '✓ Adicionado hoje' : '+ Adicionar ao registo de hoje'}</button>
+  `;
+  const btn = wrap.querySelector('.gym-session-add');
+  btn.addEventListener('click', async ()=>{
+    if(btn.classList.contains('added')) return;
+    btn.disabled = true;
+    await addGymSessionToLog(day, dayIdx);
+    btn.disabled = false;
+    btn.classList.add('added');
+    btn.textContent = '✓ Adicionado hoje';
+  });
+  return wrap;
+}
+
+function renderGymTab(){
+  if(!gymPlan || !Array.isArray(gymPlan.days) || gymPlan.days.length === 0){
+    els.gymEmptyCard.style.display = 'block';
+    els.gymPlanView.style.display = 'none';
+    return;
+  }
+  els.gymEmptyCard.style.display = 'none';
+  els.gymPlanView.style.display = 'block';
+
+  const metaParts = [];
+  if(gymPlan.daysPerWeek) metaParts.push(gymPlan.daysPerWeek + ' dias/semana');
+  if(gymPlan.sessionMinutes) metaParts.push('~' + gymPlan.sessionMinutes + ' min/sessão');
+  els.gymMeta.textContent = metaParts.join(' · ');
+
+  const noteParts = ['⚠️ Plano gerado por IA — não substitui o acompanhamento de um profissional de exercício físico. Se sentires dor, para.'];
+  if(gymPlan.notes) noteParts.push(gymPlan.notes);
+  els.gymNotes.textContent = noteParts.join(' ');
+  els.gymNotes.style.display = 'block';
+
+  const planIndex = (new Date().getDay() + 6) % 7; // getDay(): 0=domingo -> planIndex 0=segunda
+  const today = gymPlan.days[planIndex];
+  els.gymTodaySession.innerHTML = '';
+  els.gymTodaySession.appendChild(buildGymDayCard(today, planIndex));
+}
+
+function openGymWeek(){
+  els.gymWeekList.innerHTML = '';
+  if(gymPlan && Array.isArray(gymPlan.days)){
+    gymPlan.days.forEach((day, dayIdx)=>{
+      const section = document.createElement('div');
+      section.className = 'gym-week-day';
+      const title = document.createElement('div');
+      title.className = 'nutri-day-title';
+      title.style.marginBottom = '8px';
+      title.textContent = (day && day.day) || ('Dia ' + (dayIdx + 1));
+      section.appendChild(title);
+      section.appendChild(buildGymDayCard(day, dayIdx));
+      els.gymWeekList.appendChild(section);
+    });
+  }
+  els.gymWeekOverlay.classList.add('show');
+}
+els.gymWeekLink.addEventListener('click', openGymWeek);
+els.gymWeekCloseBtn.addEventListener('click', ()=> els.gymWeekOverlay.classList.remove('show'));
+els.gymWeekOverlay.addEventListener('click', (e)=>{ if(e.target === els.gymWeekOverlay) els.gymWeekOverlay.classList.remove('show'); });
+
+function openGymPrefs(){
+  els.gymEquipmentGrid.innerHTML = '';
+  GYM_EQUIPMENT.forEach(eq=>{
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'pref-chip' + (settings.gymEquipment.includes(eq.id) ? ' active' : '');
+    btn.textContent = eq.label;
+    btn.dataset.id = eq.id;
+    btn.addEventListener('click', ()=> btn.classList.toggle('active'));
+    els.gymEquipmentGrid.appendChild(btn);
+  });
+  els.gymDaysInput.value = String(settings.gymDaysPerWeek || 3);
+  els.gymDurationInput.value = String(settings.gymSessionMinutes || 45);
+  els.gymPrefsOverlay.classList.add('show');
+}
+els.gymPrefsBtn.addEventListener('click', openGymPrefs);
+els.gymPrefsBtn2.addEventListener('click', openGymPrefs);
+els.gymPrefsCancelBtn.addEventListener('click', ()=> els.gymPrefsOverlay.classList.remove('show'));
+els.gymPrefsOverlay.addEventListener('click', (e)=>{ if(e.target === els.gymPrefsOverlay) els.gymPrefsOverlay.classList.remove('show'); });
+els.gymPrefsSaveBtn.addEventListener('click', async ()=>{
+  const active = Array.from(els.gymEquipmentGrid.querySelectorAll('.pref-chip.active')).map(b => b.dataset.id);
+  settings.gymEquipment = active;
+  settings.gymDaysPerWeek = parseInt(els.gymDaysInput.value, 10) || 3;
+  settings.gymSessionMinutes = parseInt(els.gymDurationInput.value, 10) || 45;
+  await saveSettings();
+  els.gymPrefsOverlay.classList.remove('show');
+});
+
+async function generateGymPlan(){
+  if(isOffline()){
+    els.gymGenErrorBox.textContent = 'Estás offline — a geração do plano precisa de ligação à internet.';
+    els.gymGenErrorBox.style.display = 'block';
+    return;
+  }
+  els.gymGenErrorBox.style.display = 'none';
+  const btn = els.gymEmptyCard.style.display !== 'none' ? els.gymGenerateBtn : els.gymRegenBtn;
+  const origLabel = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'A gerar plano…';
+  try{
+    const response = await fetch('/api/gym-plan', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        objective: settings.objective || 'manter',
+        activity: settings.activity || 'moderado',
+        equipment: settings.gymEquipment || [],
+        daysPerWeek: settings.gymDaysPerWeek || 3,
+        sessionMinutes: settings.gymSessionMinutes || 45,
+      }),
+    });
+    if(!response.ok){
+      const errData = await response.json().catch(()=>({}));
+      throw new Error((errData.error || ('Falha na chamada à API (' + response.status + ')')) + (errData.details ? ' — ' + errData.details : ''));
+    }
+    const parsed = await response.json();
+    gymPlan = {
+      generatedAt: new Date().toISOString(),
+      objective: settings.objective || 'manter',
+      daysPerWeek: settings.gymDaysPerWeek || 3,
+      sessionMinutes: settings.gymSessionMinutes || 45,
+      days: Array.isArray(parsed.days) ? parsed.days : [],
+      notes: parsed.notes || '',
+    };
+    saveGymPlan();
+    renderGymTab();
+  }catch(err){
+    console.error(err);
+    els.gymGenErrorBox.textContent = 'Erro: ' + (err.message || 'não foi possível gerar o plano') + '. Tenta novamente.';
+    els.gymGenErrorBox.style.display = 'block';
+  }finally{
+    btn.disabled = false;
+    btn.textContent = origLabel;
+  }
+}
+els.gymGenerateBtn.addEventListener('click', generateGymPlan);
+els.gymRegenBtn.addEventListener('click', generateGymPlan);
 
 function escapeHtml(s){
   const d = document.createElement('div');
