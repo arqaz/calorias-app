@@ -1503,7 +1503,11 @@ function handleGoogleCredential(response){
 
 function initGoogleSignIn(){
   if(!GOOGLE_CLIENT_ID || !window.google || !window.google.accounts || !window.google.accounts.id) return;
-  google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: handleGoogleCredential });
+  // use_fedcm_for_prompt: pede à Google para usar o mecanismo moderno
+  // (FedCM), que em navegadores compatíveis mostra um seletor de conta
+  // nativo do próprio Android/Chrome em vez de abrir accounts.google.com
+  // numa aba à parte com o conteúdo pequeno e centrado no meio do ecrã.
+  google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: handleGoogleCredential, use_fedcm_for_prompt: true });
 }
 
 // Desenha o botão de início de sessão da Google dentro de um contentor à
