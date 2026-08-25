@@ -433,6 +433,21 @@
     font-weight:800;font-size:12.5px;padding:10px 16px;border-radius:12px;cursor:pointer;
   }
   .fast-btn.stop{background:none;border:2px solid var(--track);color:var(--ink);}
+  .fast-edit-toggle{
+    background:none;border:none;color:var(--muted);font-weight:700;font-size:11.5px;text-decoration:underline;
+    cursor:pointer;padding:10px 0 0;width:100%;text-align:center;font-family:'Plus Jakarta Sans',sans-serif;
+  }
+  .fast-edit-row{display:none;margin-top:10px;gap:8px;align-items:center;}
+  .fast-edit-row.show{display:flex;}
+  .fast-edit-row input[type=datetime-local]{
+    flex:1;min-width:0;font-size:12.5px;font-weight:700;border:2px solid var(--track);border-radius:12px;
+    padding:9px 8px;font-family:'Plus Jakarta Sans',sans-serif;color:var(--ink);background:var(--card);
+  }
+  .fast-edit-row input:focus{outline:none;border-color:var(--a2);}
+  .fast-edit-save{
+    flex-shrink:0;background:var(--fresh-soft);color:var(--fresh);border:none;font-weight:800;font-size:12.5px;
+    padding:9px 14px;border-radius:12px;cursor:pointer;white-space:nowrap;
+  }
 
   .water-card{
     background:var(--card);border-radius:22px;box-shadow:var(--shadow-soft);
@@ -800,6 +815,11 @@
     <div class="fast-bottom">
       <span class="fast-time" id="fastTime">00:00</span>
       <button class="fast-btn" id="fastToggleBtn">Iniciar jejum</button>
+    </div>
+    <button class="fast-edit-toggle" id="fastEditStartBtn" style="display:none;">Ajustar hora de início</button>
+    <div class="fast-edit-row" id="fastEditStartRow">
+      <input type="datetime-local" id="fastStartInput">
+      <button class="fast-edit-save" id="fastStartSaveBtn">Guardar</button>
     </div>
   </div>
 
@@ -2584,6 +2604,13 @@ function fmtHM(ms){
   return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');
 }
 
+// Formato exigido por <input type="datetime-local"> — hora local, sem fuso.
+function toDatetimeLocalValue(ts){
+  const d = new Date(ts);
+  const pad = n => String(n).padStart(2,'0');
+  return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T'+pad(d.getHours())+':'+pad(d.getMinutes());
+}
+
 function renderFasting(){
   const fastCard = document.querySelector('.fast-card');
   fastCard.style.display = settings.fastingEnabled ? 'block' : 'none';
@@ -2595,6 +2622,8 @@ function renderFasting(){
   const statusEl = document.getElementById('fastStatus');
   const timeEl = document.getElementById('fastTime');
   const fillEl = document.getElementById('fastFill');
+  const editBtn = document.getElementById('fastEditStartBtn');
+  const editRow = document.getElementById('fastEditStartRow');
 
   if(f.active && f.startTime){
     const elapsed = Date.now() - f.startTime;
@@ -2611,12 +2640,15 @@ function renderFasting(){
     }
     btn.textContent = 'Terminar jejum';
     btn.classList.add('stop');
+    editBtn.style.display = 'block';
   } else {
     fillEl.style.width = '0%';
     timeEl.textContent = '00:00';
     statusEl.textContent = 'Sem jejum ativo';
     btn.textContent = 'Iniciar jejum';
     btn.classList.remove('stop');
+    editBtn.style.display = 'none';
+    editRow.classList.remove('show');
   }
 }
 
@@ -2644,6 +2676,30 @@ document.getElementById('fastToggleBtn').addEventListener('click', async ()=>{
   }
   await saveSettings();
   renderFasting();
+});
+
+// Ajustar a hora de início de um jejum já em curso — útil para quem só se
+// lembra de tocar em "Iniciar jejum" algum tempo depois de já ter começado,
+// para não perder essa parte do tempo já feito.
+document.getElementById('fastEditStartBtn').addEventListener('click', ()=>{
+  const row = document.getElementById('fastEditStartRow');
+  const opening = !row.classList.contains('show');
+  if(opening){
+    const start = (settings.fasting && settings.fasting.startTime) || Date.now();
+    document.getElementById('fastStartInput').value = toDatetimeLocalValue(start);
+  }
+  row.classList.toggle('show', opening);
+});
+document.getElementById('fastStartSaveBtn').addEventListener('click', async ()=>{
+  const val = document.getElementById('fastStartInput').value;
+  if(!val) return;
+  const ts = new Date(val).getTime();
+  if(isNaN(ts)) return;
+  // nunca permitir uma hora de início no futuro
+  settings.fasting.startTime = Math.min(ts, Date.now());
+  await saveSettings();
+  renderFasting();
+  document.getElementById('fastEditStartRow').classList.remove('show');
 });
 
 function renderWater(){
