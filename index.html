@@ -723,6 +723,7 @@
   <div class="onboard-title">Entra na tua conta</div>
   <div class="onboard-sub">Inicia sessão com a Google para guardares o teu progresso e usares a app — gratuito enquanto estamos em fase de testes.</div>
   <div id="loginGateButtonContainer" class="login-gate-btn-container"></div>
+  <div id="loginGateError" class="error" style="display:none;"></div>
 </div>
 
 <div class="app">
@@ -1450,6 +1451,7 @@ const els = {
   accountSignOutBtn: document.getElementById('accountSignOutBtn'),
   loginGateOverlay: document.getElementById('loginGateOverlay'),
   loginGateButtonContainer: document.getElementById('loginGateButtonContainer'),
+  loginGateError: document.getElementById('loginGateError'),
 };
 
 els.ringProgress.setAttribute('stroke-dasharray', CIRC.toFixed(2));
@@ -1503,11 +1505,35 @@ function handleGoogleCredential(response){
 
 function initGoogleSignIn(){
   if(!GOOGLE_CLIENT_ID || !window.google || !window.google.accounts || !window.google.accounts.id) return;
-  // use_fedcm_for_prompt: pede à Google para usar o mecanismo moderno
-  // (FedCM), que em navegadores compatíveis mostra um seletor de conta
-  // nativo do próprio Android/Chrome em vez de abrir accounts.google.com
-  // numa aba à parte com o conteúdo pequeno e centrado no meio do ecrã.
-  google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: handleGoogleCredential, use_fedcm_for_prompt: true });
+  // ux_mode: 'redirect' — em vez de abrir o ecrã de login da Google numa
+  // janela/aba à parte (que, dentro de uma app instalada como PWA, acaba
+  // pequena e pouco legível, como se fosse sempre um pop-up), a página
+  // navega inteira para a Google e volta depois para login_uri, que
+  // redireciona de volta para a app com o token no fragmento do URL.
+  google.accounts.id.initialize({
+    client_id: GOOGLE_CLIENT_ID,
+    callback: handleGoogleCredential,
+    ux_mode: 'redirect',
+    login_uri: window.location.origin + '/api/google-login',
+  });
+}
+
+// Depois do fluxo de redireccionamento, a app recarrega com o token (ou um
+// sinal de erro) no fragmento do URL — processa-o uma única vez e limpa o
+// URL, para não ficar visível nem ser reprocessado ao atualizar a página.
+function processRedirectLoginToken(){
+  const hash = window.location.hash || '';
+  const tokenMatch = hash.match(/gtoken=([^&]+)/);
+  if(tokenMatch){
+    handleGoogleCredential({ credential: decodeURIComponent(tokenMatch[1]) });
+    history.replaceState(null, '', window.location.pathname + window.location.search);
+  } else if(hash.indexOf('gtoken_error=1') !== -1){
+    if(els.loginGateError){
+      els.loginGateError.textContent = 'Não foi possível iniciar sessão. Tenta novamente.';
+      els.loginGateError.style.display = 'block';
+    }
+    history.replaceState(null, '', window.location.pathname + window.location.search);
+  }
 }
 
 // Desenha o botão de início de sessão da Google dentro de um contentor à
@@ -1534,6 +1560,7 @@ function signOutGoogle(){
   saveAuthToStorage();
   if(window.google && window.google.accounts && window.google.accounts.id) google.accounts.id.disableAutoSelect();
   renderAuthUI();
+  if(els.loginGateError) els.loginGateError.style.display = 'none';
   maybeShowLoginGate();
 }
 
@@ -1781,6 +1808,7 @@ async function init(){
   loadMealPlan();
   loadGymPlan();
   loadAuthFromStorage();
+  processRedirectLoginToken();
   render();
   startFastingTicker();
   updateOfflineUI();
