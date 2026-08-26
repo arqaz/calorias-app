@@ -983,8 +983,12 @@
 
     <div class="manual-form" id="manualForm" style="display:none;">
       <label>Nome da refeição</label>
-      <input type="text" id="manualName" placeholder="ex: Sandes de fiambre">
-      <label>Calorias (kcal)</label>
+      <input type="text" id="manualName" placeholder="ex: Sandes de fiambre e queijo, com um copo de leite">
+      <div class="scan-offline-notice" id="manualEstimateOfflineNotice" style="display:none;">📡 Estás offline — a estimativa por IA fica indisponível. Preenche os valores abaixo manualmente.</div>
+      <button class="add-btn" id="manualEstimateBtn" style="margin-top:10px;">Estimar valores com IA</button>
+      <div id="manualEstimateErrorBox" class="error" style="display:none;"></div>
+      <div class="quickask-suggestion-note" id="manualEstimateNote" style="display:none;margin-top:6px;"></div>
+      <label style="margin-top:16px;">Calorias (kcal)</label>
       <input type="number" id="manualCal" inputmode="numeric" placeholder="0">
       <div class="macro-edit-grid" style="margin-top:12px;">
         <div class="macro-edit"><label>Proteína (g)</label><input type="number" id="manualProtein" inputmode="numeric" placeholder="0"></div>
@@ -1367,6 +1371,10 @@ const els = {
   manualToggleBtn: document.getElementById('manualToggleBtn'),
   manualForm: document.getElementById('manualForm'),
   manualName: document.getElementById('manualName'),
+  manualEstimateOfflineNotice: document.getElementById('manualEstimateOfflineNotice'),
+  manualEstimateBtn: document.getElementById('manualEstimateBtn'),
+  manualEstimateErrorBox: document.getElementById('manualEstimateErrorBox'),
+  manualEstimateNote: document.getElementById('manualEstimateNote'),
   manualCal: document.getElementById('manualCal'),
   manualProtein: document.getElementById('manualProtein'),
   manualCarbs: document.getElementById('manualCarbs'),
@@ -1872,6 +1880,8 @@ function updateOfflineUI(){
   if(els.scanOfflineNotice) els.scanOfflineNotice.style.display = offline ? 'block' : 'none';
   if(els.dropzone) els.dropzone.classList.toggle('is-disabled', offline);
   if(els.manualToggleBtn) els.manualToggleBtn.style.display = offline ? 'none' : 'inline';
+  if(els.manualEstimateBtn) els.manualEstimateBtn.disabled = offline;
+  if(els.manualEstimateOfflineNotice) els.manualEstimateOfflineNotice.style.display = offline ? 'block' : 'none';
   // Se a folha "Adicionar refeição" ficou presa no formulário manual porque
   // resetScan() a escondeu enquanto offline, repõe a dropzone assim que a
   // ligação volta (sem isto, ficava escondida até fechar e reabrir a folha).
@@ -3924,6 +3934,8 @@ function resetScan(){
   els.errorBox.style.display = 'none';
   els.manualForm.style.display = offline ? 'block' : 'none';
   els.manualToggleBtn.textContent = 'ou adicionar sem foto';
+  els.manualEstimateErrorBox.style.display = 'none';
+  els.manualEstimateNote.style.display = 'none';
   document.getElementById('resultPhotoWrap').style.display = 'none';
 }
 
@@ -4212,8 +4224,48 @@ els.manualToggleBtn.addEventListener('click', ()=>{
   if(opening){
     els.manualName.value = ''; els.manualCal.value = '';
     els.manualProtein.value = ''; els.manualCarbs.value = ''; els.manualFat.value = '';
+    els.manualEstimateErrorBox.style.display = 'none';
+    els.manualEstimateNote.style.display = 'none';
   }
 });
+
+async function submitManualEstimate(){
+  const description = els.manualName.value.trim();
+  if(!description){ els.manualName.focus(); return; }
+  if(isOffline()){
+    els.manualEstimateErrorBox.textContent = 'Estás offline — esta funcionalidade precisa de ligação à internet.';
+    els.manualEstimateErrorBox.style.display = 'block';
+    return;
+  }
+  els.manualEstimateErrorBox.style.display = 'none';
+  els.manualEstimateNote.style.display = 'none';
+  const origLabel = els.manualEstimateBtn.textContent;
+  els.manualEstimateBtn.disabled = true;
+  els.manualEstimateBtn.textContent = 'A calcular…';
+  try{
+    const parsed = await callAiEndpoint('/api/meal-estimate', { description });
+    if(parsed.name) els.manualName.value = parsed.name;
+    els.manualCal.value = Math.max(0, Math.round(Number(parsed.calories) || 0));
+    els.manualProtein.value = Math.max(0, Math.round(Number(parsed.protein_g) || 0));
+    els.manualCarbs.value = Math.max(0, Math.round(Number(parsed.carbs_g) || 0));
+    els.manualFat.value = Math.max(0, Math.round(Number(parsed.fat_g) || 0));
+    if(parsed.note){
+      els.manualEstimateNote.textContent = parsed.note;
+      els.manualEstimateNote.style.display = 'block';
+    }
+  }catch(err){
+    if(err.requiresLogin){
+      showLoginRequiredIn(els.manualEstimateErrorBox, err.message);
+    } else {
+      els.manualEstimateErrorBox.textContent = err.message || 'Não foi possível calcular a estimativa. Tenta novamente.';
+      els.manualEstimateErrorBox.style.display = 'block';
+    }
+  } finally {
+    els.manualEstimateBtn.disabled = false;
+    els.manualEstimateBtn.textContent = origLabel;
+  }
+}
+els.manualEstimateBtn.addEventListener('click', submitManualEstimate);
 
 els.manualAddBtn.addEventListener('click', async ()=>{
   const name = els.manualName.value.trim();
