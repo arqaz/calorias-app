@@ -21,6 +21,8 @@
     --fresh:#2FA66B;
     --fresh-soft:#E4F3EA;
     --track:#E9EEE1;
+    --gold:#E8A317;
+    --gold-soft:#FBF0DA;
     --shadow: 0 10px 30px rgba(23,32,22,.07);
     --shadow-soft: 0 4px 14px rgba(23,32,22,.05);
     --radius: 22px;
@@ -33,6 +35,8 @@
     --muted-soft:#69705F;
     --fresh-soft:rgba(47,166,107,.20);
     --track:#2C3324;
+    --gold:#F0B429;
+    --gold-soft:rgba(240,180,41,.16);
     --shadow: 0 10px 30px rgba(0,0,0,.35);
     --shadow-soft: 0 4px 14px rgba(0,0,0,.28);
   }
@@ -132,7 +136,7 @@
     align-items:center;
     margin-bottom:18px;
   }
-  .ring-wrap{position:relative;width:150px;height:150px;flex-shrink:0;}
+  .ring-wrap{position:relative;width:168px;height:168px;flex-shrink:0;}
   .ring-wrap svg{transform:rotate(-90deg);}
   .ring-center{
     position:absolute;inset:0;
@@ -140,6 +144,60 @@
   }
   .ring-num{font-size:38px;font-weight:800;line-height:1;letter-spacing:-.02em;}
   .ring-unit{font-size:11px;color:var(--muted);font-weight:700;margin-top:2px;}
+
+  /* ---- Anel de pontos (gamificação) --------------------------------- */
+  .points-badge{
+    display:flex;align-items:center;gap:6px;
+    background:var(--gold-soft);color:var(--gold);
+    border:none;border-radius:999px;padding:7px 14px;margin-top:12px;
+    font-size:12.5px;font-weight:800;cursor:pointer;
+  }
+  .points-badge-emoji{font-size:14px;}
+  .points-level-header{display:flex;align-items:center;gap:12px;margin-bottom:6px;}
+  .points-level-emoji{font-size:34px;line-height:1;}
+  .points-level-title{font-size:17px;font-weight:800;}
+  .points-level-sub{font-size:12px;color:var(--muted);font-weight:600;margin-top:1px;}
+  .points-progress-track{
+    width:100%;height:10px;border-radius:999px;background:var(--track);
+    overflow:hidden;margin-top:14px;
+  }
+  .points-progress-fill{
+    height:100%;border-radius:999px;
+    background:linear-gradient(90deg,var(--gold),#FFD166);
+    transition:width .5s ease;
+  }
+  .points-progress-label{font-size:11.5px;color:var(--muted);font-weight:600;margin-top:6px;text-align:center;}
+  .points-section-title{font-size:13px;font-weight:800;margin:20px 0 10px;}
+  .points-goal-row{
+    display:flex;align-items:center;gap:10px;padding:10px 0;
+    border-bottom:1px solid var(--track);
+  }
+  .points-goal-row:last-child{border-bottom:none;}
+  .points-goal-check{
+    width:26px;height:26px;border-radius:50%;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;font-size:13px;
+    background:var(--track);color:var(--muted-soft);
+  }
+  .points-goal-row.met .points-goal-check{background:var(--fresh);color:#fff;}
+  .points-goal-name{flex:1;font-size:13.5px;font-weight:700;}
+  .points-goal-pts{font-size:12px;font-weight:800;color:var(--muted);}
+  .points-goal-row.met .points-goal-pts{color:var(--fresh);}
+  .streak-card{
+    display:flex;align-items:center;gap:14px;
+    background:var(--gold-soft);border-radius:18px;padding:14px 16px;margin-top:8px;
+  }
+  .streak-num{font-size:26px;font-weight:800;color:var(--gold);line-height:1;}
+  .streak-label{font-size:11px;color:var(--muted);font-weight:700;}
+  .streak-shields{font-size:12px;font-weight:700;color:var(--ink);margin-top:3px;}
+  .badge-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:8px;}
+  .badge-tile{
+    background:var(--track);border-radius:16px;padding:14px 8px 10px;text-align:center;
+  }
+  .badge-tile.unlocked{background:var(--gold-soft);}
+  .badge-emoji{font-size:24px;filter:grayscale(1);opacity:.35;}
+  .badge-tile.unlocked .badge-emoji{filter:none;opacity:1;}
+  .badge-title{font-size:10px;font-weight:800;margin-top:6px;color:var(--muted);line-height:1.25;}
+  .badge-tile.unlocked .badge-title{color:var(--ink);}
 
   .section-title{
     font-size:16px;font-weight:800;margin:22px 0 12px;
@@ -728,13 +786,19 @@
   <div id="tabHoje">
     <div class="ring-card">
       <div class="ring-wrap">
-        <svg width="150" height="150" viewBox="0 0 150 150">
-          <circle cx="75" cy="75" r="64" fill="none" class="ring-track" stroke="#E9EEE1" stroke-width="13"/>
-          <circle id="ringProgress" cx="75" cy="75" r="64" fill="none" stroke="url(#grad)" stroke-width="13" stroke-linecap="round" stroke-dasharray="402.1" stroke-dashoffset="402.1"/>
+        <svg width="168" height="168" viewBox="0 0 168 168">
+          <circle cx="84" cy="84" r="76" fill="none" class="ring-track" stroke="#E9EEE1" stroke-width="5"/>
+          <circle id="pointsRing" cx="84" cy="84" r="76" fill="none" stroke="url(#goldGrad)" stroke-width="5" stroke-linecap="round" stroke-dasharray="477.5" stroke-dashoffset="477.5"/>
+          <circle cx="84" cy="84" r="64" fill="none" class="ring-track" stroke="#E9EEE1" stroke-width="13"/>
+          <circle id="ringProgress" cx="84" cy="84" r="64" fill="none" stroke="url(#grad)" stroke-width="13" stroke-linecap="round" stroke-dasharray="402.1" stroke-dashoffset="402.1"/>
           <defs>
             <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stop-color="#FF7A45"/>
               <stop offset="100%" stop-color="#FF3D68"/>
+            </linearGradient>
+            <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#E8A317"/>
+              <stop offset="100%" stop-color="#FFD166"/>
             </linearGradient>
           </defs>
         </svg>
@@ -744,6 +808,7 @@
         </div>
       </div>
       <div class="ring-caption"><span id="ringNum">0</span> kcal consumidas &middot; meta <span id="ringGoalTxt">2000</span> kcal<span id="ringExerciseNote"></span></div>
+      <button class="points-badge" id="pointsBadgeBtn"><span class="points-badge-emoji">🏆</span><span id="pointsBadgeText">Nível 1 · 0 pts hoje</span></button>
 
       <div class="macro-rings">
         <div class="macro-ring-col">
@@ -1254,6 +1319,43 @@
   </div>
 </div>
 
+<div class="overlay" id="pointsOverlay">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Pontos e conquistas</div>
+
+    <div class="points-level-header">
+      <div class="points-level-emoji" id="pointsLevelEmoji">🌱</div>
+      <div>
+        <div class="points-level-title" id="pointsLevelTitle">Nível 1 · Semente</div>
+        <div class="points-level-sub" id="pointsLevelSub">0 pts no total</div>
+      </div>
+    </div>
+    <div class="points-progress-track"><div class="points-progress-fill" id="pointsProgressFill" style="width:0%;"></div></div>
+    <div class="points-progress-label" id="pointsProgressLabel">0 / 150 pts para o próximo nível</div>
+
+    <div class="points-section-title">Objetivos de hoje</div>
+    <div id="pointsGoalsList"></div>
+
+    <div class="points-section-title">Sequência</div>
+    <div class="streak-card">
+      <div>
+        <div class="streak-num" id="streakNum">0</div>
+        <div class="streak-label">dias seguidos</div>
+      </div>
+      <div style="flex:1;">
+        <div class="streak-shields" id="streakShieldsText">0 escudos de proteção disponíveis</div>
+        <div class="points-progress-label" style="text-align:left;margin-top:2px;">Ganhas 1 escudo a cada 7 dias de sequência — protege-te automaticamente se faltar um único dia.</div>
+      </div>
+    </div>
+
+    <div class="points-section-title">Conquistas</div>
+    <div class="badge-grid" id="badgeGrid"></div>
+
+    <button class="discard-btn" id="pointsCloseBtn" style="margin-top:18px;">Fechar</button>
+  </div>
+</div>
+
 <div class="overlay" id="nutriPrefsOverlay">
   <div class="sheet">
     <div class="sheet-handle"></div>
@@ -1313,6 +1415,8 @@ const RADIUS = 64;
 const CIRC = 2 * Math.PI * RADIUS;
 const MACRO_RADIUS = 26;
 const MACRO_CIRC = 2 * Math.PI * MACRO_RADIUS;
+const POINTS_RADIUS = 76;
+const POINTS_CIRC = 2 * Math.PI * POINTS_RADIUS;
 
 function todayStr(){
   const d = new Date();
@@ -1481,6 +1585,20 @@ const els = {
   quickAskAnswer: document.getElementById('quickAskAnswer'),
   quickAskSuggestions: document.getElementById('quickAskSuggestions'),
   quickAskCloseBtn: document.getElementById('quickAskCloseBtn'),
+  pointsRing: document.getElementById('pointsRing'),
+  pointsBadgeBtn: document.getElementById('pointsBadgeBtn'),
+  pointsBadgeText: document.getElementById('pointsBadgeText'),
+  pointsOverlay: document.getElementById('pointsOverlay'),
+  pointsLevelEmoji: document.getElementById('pointsLevelEmoji'),
+  pointsLevelTitle: document.getElementById('pointsLevelTitle'),
+  pointsLevelSub: document.getElementById('pointsLevelSub'),
+  pointsProgressFill: document.getElementById('pointsProgressFill'),
+  pointsProgressLabel: document.getElementById('pointsProgressLabel'),
+  pointsGoalsList: document.getElementById('pointsGoalsList'),
+  streakNum: document.getElementById('streakNum'),
+  streakShieldsText: document.getElementById('streakShieldsText'),
+  badgeGrid: document.getElementById('badgeGrid'),
+  pointsCloseBtn: document.getElementById('pointsCloseBtn'),
   nutriPrefsOverlay: document.getElementById('nutriPrefsOverlay'),
   nutriRestrictionsGrid: document.getElementById('nutriRestrictionsGrid'),
   nutriPrefsText: document.getElementById('nutriPrefsText'),
@@ -1542,6 +1660,7 @@ const els = {
 };
 
 els.ringProgress.setAttribute('stroke-dasharray', CIRC.toFixed(2));
+els.pointsRing.setAttribute('stroke-dasharray', POINTS_CIRC.toFixed(2));
 
 // ---- Conta (login Google) ---------------------------------------------
 // Só serve para autenticar pedidos às funcionalidades de IA (análise de
@@ -2496,6 +2615,194 @@ function fillMacroRing(id, value, target){
   el.setAttribute('stroke-dashoffset', offset.toFixed(2));
 }
 
+// ---- Sistema de pontos (gamificação) ---------------------------------------
+// Três objetivos diários (meta calórica, água, exercício) valem pontos fixos,
+// mais um bónus por "dia perfeito". Tudo é calculado de forma pura a partir
+// do histórico de dias já guardado (nada de estado extra a manter em
+// sincronia) — para não haver risco de o total de pontos ou a sequência
+// dessincronizarem dos dados reais.
+const DAILY_POINT_VALUE = 10;
+const PERFECT_DAY_BONUS = 10;
+const POINTS_PER_LEVEL = 150;
+const MAX_SHIELDS = 2;
+
+const LEVEL_TITLES = [
+  { emoji: '🌱', name: 'Semente' },
+  { emoji: '🌿', name: 'Broto' },
+  { emoji: '📘', name: 'Aprendiz' },
+  { emoji: '💪', name: 'Disciplinado' },
+  { emoji: '🔥', name: 'Consistente' },
+  { emoji: '⭐', name: 'Dedicado' },
+  { emoji: '🚀', name: 'Imparável' },
+  { emoji: '🏆', name: 'Mestre' },
+  { emoji: '👑', name: 'Lenda' },
+  { emoji: '✨', name: 'Lenda Suprema' },
+];
+
+const BADGES = [
+  { id: 'first_perfect', emoji: '🎯', title: 'Dia perfeito', desc: 'Cumpre as 3 metas no mesmo dia', check: s => s.perfectDays >= 1 },
+  { id: 'streak_3', emoji: '🔥', title: '3 dias seguidos', desc: 'Sequência de 3 dias com a meta calórica cumprida', check: s => s.longestStreak >= 3 },
+  { id: 'streak_7', emoji: '🔥🔥', title: 'Semana em cheio', desc: 'Sequência de 7 dias', check: s => s.longestStreak >= 7 },
+  { id: 'streak_30', emoji: '🔥🔥🔥', title: 'Imparável', desc: 'Sequência de 30 dias', check: s => s.longestStreak >= 30 },
+  { id: 'water_7', emoji: '💧', title: 'Bem hidratado', desc: 'Meta de água cumprida em 7 dias', check: s => s.waterDays >= 7 },
+  { id: 'water_30', emoji: '💧💧', title: 'Mestre da hidratação', desc: 'Meta de água cumprida em 30 dias', check: s => s.waterDays >= 30 },
+  { id: 'exercise_10', emoji: '🏋️', title: 'Atleta', desc: 'Exercício registado em 10 dias', check: s => s.exerciseDays >= 10 },
+  { id: 'exercise_30', emoji: '🏋️🏋️', title: 'Máquina', desc: 'Exercício registado em 30 dias', check: s => s.exerciseDays >= 30 },
+  { id: 'perfect_5', emoji: '🌟', title: '5 dias perfeitos', desc: 'As 3 metas cumpridas em 5 dias', check: s => s.perfectDays >= 5 },
+  { id: 'perfect_20', emoji: '🌟🌟', title: 'Perfeccionista', desc: 'As 3 metas cumpridas em 20 dias', check: s => s.perfectDays >= 20 },
+  { id: 'points_100', emoji: '⭐', title: '100 pontos', desc: 'Chega aos 100 pontos no total', check: s => s.totalPoints >= 100 },
+  { id: 'points_500', emoji: '⭐⭐', title: '500 pontos', desc: 'Chega aos 500 pontos no total', check: s => s.totalPoints >= 500 },
+  { id: 'points_1000', emoji: '🏆', title: '1000 pontos', desc: 'Chega aos 1000 pontos no total', check: s => s.totalPoints >= 1000 },
+];
+
+function readDayRaw(ds){
+  try{
+    const raw = localStorage.getItem(dayKey(ds));
+    return raw ? JSON.parse(raw) : null;
+  }catch(e){ return null; }
+}
+
+// Função pura: dado o registo (bruto) de um dia, devolve que objetivos foram
+// cumpridos e quantos pontos isso vale. Não depende de qual o dia
+// atualmente aberto na app — só dos dados desse dia em concreto.
+function computeDayScore(data){
+  const meals = (data && Array.isArray(data.meals)) ? data.meals : [];
+  const exercise = (data && Array.isArray(data.exercise)) ? data.exercise : [];
+  const water = (data && typeof data.water_ml === 'number') ? data.water_ml : 0;
+  const cal = meals.reduce((s,m)=> s + (Number(m.calories)||0), 0);
+  const exerciseBurned = exercise.reduce((s,e)=> s + (Number(e.calories)||0), 0);
+  const goal = (Number(settings.goal)||2000) + exerciseBurned;
+  const waterGoal = Number(settings.waterGoal) || 2000;
+  // Margem: não vale a pena "perder" o dia por passar 1 kcal da meta, mas
+  // também não conta como cumprido comer muito pouco (ex: saltar refeições).
+  const calorieMet = cal >= goal * 0.7 && cal <= goal;
+  const waterMet = water >= waterGoal;
+  const exerciseMet = exercise.length > 0;
+  const metCount = (calorieMet?1:0) + (waterMet?1:0) + (exerciseMet?1:0);
+  const perfect = metCount === 3;
+  const points = metCount * DAILY_POINT_VALUE + (perfect ? PERFECT_DAY_BONUS : 0);
+  return { calorieMet, waterMet, exerciseMet, perfect, points, metCount };
+}
+
+// Percorre todo o histórico de dias guardados (do primeiro dia registado até
+// ontem) para calcular pontos totais, sequência atual e escudos de proteção
+// — depois soma o progresso (ainda em curso) do dia de hoje. A sequência
+// ganha 1 escudo a cada 7 dias seguidos (até um máximo de 2 guardados); um
+// dia falhado consome automaticamente um escudo em vez de quebrar a
+// sequência, tal como um "streak freeze".
+function computeGamification(){
+  const today = todayStr();
+  const dates = [];
+  for(let i=0;i<localStorage.length;i++){
+    const key = localStorage.key(i);
+    if(key && /^day:\d{4}-\d{2}-\d{2}$/.test(key)) dates.push(key.slice(4));
+  }
+  dates.sort();
+
+  let totalPoints = 0, calorieDays = 0, waterDays = 0, exerciseDays = 0, perfectDays = 0;
+  let streak = 0, longestStreak = 0, shields = 0;
+
+  if(dates.length){
+    const yesterday = addDays(today, -1);
+    let ds = dates[0];
+    if(ds <= yesterday){
+      while(ds <= yesterday){
+        const score = computeDayScore(readDayRaw(ds));
+        totalPoints += score.points;
+        if(score.calorieMet) calorieDays++;
+        if(score.waterMet) waterDays++;
+        if(score.exerciseMet) exerciseDays++;
+        if(score.perfect) perfectDays++;
+        if(score.calorieMet){
+          streak++;
+          if(streak % 7 === 0) shields = Math.min(MAX_SHIELDS, shields+1);
+        } else if(shields > 0){
+          shields--;
+        } else {
+          streak = 0;
+        }
+        longestStreak = Math.max(longestStreak, streak);
+        ds = addDays(ds, 1);
+      }
+    }
+  }
+
+  const todayScore = computeDayScore(readDayRaw(today));
+  totalPoints += todayScore.points;
+  if(todayScore.calorieMet) calorieDays++;
+  if(todayScore.waterMet) waterDays++;
+  if(todayScore.exerciseMet) exerciseDays++;
+  if(todayScore.perfect) perfectDays++;
+  // A sequência de hoje só "conta" visualmente enquanto a meta calórica de
+  // hoje já estiver cumprida — evita mostrar um número que ainda pode vir a
+  // não se confirmar até ao fim do dia.
+  const displayStreak = streak + (todayScore.calorieMet ? 1 : 0);
+  longestStreak = Math.max(longestStreak, displayStreak);
+
+  const level = Math.floor(totalPoints / POINTS_PER_LEVEL) + 1;
+  const pointsIntoLevel = totalPoints % POINTS_PER_LEVEL;
+  const levelInfo = LEVEL_TITLES[Math.min(level-1, LEVEL_TITLES.length-1)];
+
+  const stats = { totalPoints, calorieDays, waterDays, exerciseDays, perfectDays, longestStreak };
+  const badges = BADGES.map(b => Object.assign({}, b, { unlocked: b.check(stats) }));
+
+  return {
+    totalPoints, level, levelInfo, pointsIntoLevel,
+    streak: displayStreak, shields, todayScore, badges,
+  };
+}
+
+let lastGamification = null;
+
+function renderPoints(){
+  const g = computeGamification();
+  lastGamification = g;
+
+  const pct = g.todayScore.metCount / 3;
+  const offset = POINTS_CIRC * (1 - pct);
+  els.pointsRing.style.transition = 'stroke-dashoffset .6s ease';
+  els.pointsRing.setAttribute('stroke-dashoffset', offset.toFixed(2));
+  els.pointsBadgeText.textContent = 'Nível ' + g.level + ' · ' + g.todayScore.points + ' pts hoje';
+
+  els.pointsLevelEmoji.textContent = g.levelInfo.emoji;
+  els.pointsLevelTitle.textContent = 'Nível ' + g.level + ' · ' + g.levelInfo.name;
+  els.pointsLevelSub.textContent = g.totalPoints + ' pts no total';
+  const levelPct = Math.min(g.pointsIntoLevel / POINTS_PER_LEVEL, 1) * 100;
+  els.pointsProgressFill.style.width = levelPct.toFixed(1) + '%';
+  els.pointsProgressLabel.textContent = g.pointsIntoLevel + ' / ' + POINTS_PER_LEVEL + ' pts para o próximo nível';
+
+  const goals = [
+    { met: g.todayScore.calorieMet, name: '🎯 Meta calórica', pts: DAILY_POINT_VALUE },
+    { met: g.todayScore.waterMet, name: '💧 Água', pts: DAILY_POINT_VALUE },
+    { met: g.todayScore.exerciseMet, name: '🏋️ Exercício', pts: DAILY_POINT_VALUE },
+    { met: g.todayScore.perfect, name: '✨ Dia perfeito (bónus pelas 3 metas)', pts: PERFECT_DAY_BONUS },
+  ];
+  els.pointsGoalsList.innerHTML = goals.map(item => `
+    <div class="points-goal-row ${item.met ? 'met' : ''}">
+      <div class="points-goal-check">${item.met ? '✓' : ''}</div>
+      <div class="points-goal-name">${item.name}</div>
+      <div class="points-goal-pts">${item.met ? '+' : ''}${item.pts} pts</div>
+    </div>
+  `).join('');
+
+  els.streakNum.textContent = g.streak;
+  els.streakShieldsText.textContent = g.shields + (g.shields === 1 ? ' escudo de proteção disponível' : ' escudos de proteção disponíveis');
+
+  els.badgeGrid.innerHTML = g.badges.map(b => `
+    <div class="badge-tile ${b.unlocked ? 'unlocked' : ''}">
+      <div class="badge-emoji">${b.emoji}</div>
+      <div class="badge-title">${escapeHtml(b.title)}</div>
+    </div>
+  `).join('');
+}
+
+els.pointsBadgeBtn.addEventListener('click', ()=>{
+  renderPoints();
+  els.pointsOverlay.classList.add('show');
+});
+els.pointsCloseBtn.addEventListener('click', ()=> els.pointsOverlay.classList.remove('show'));
+els.pointsOverlay.addEventListener('click', (e)=>{ if(e.target === els.pointsOverlay) els.pointsOverlay.classList.remove('show'); });
+
 function renderDayStrip(){
   const strip = document.getElementById('dayStrip');
   strip.innerHTML = '';
@@ -2521,6 +2828,7 @@ function render(){
   renderWater();
   renderExercise();
   renderFasting();
+  renderPoints();
   const t = totals();
   const exerciseBurned = (dayData.exercise||[]).reduce((s,ex)=> s + (Number(ex.calories)||0), 0);
   const goal = (Number(settings.goal)||2000) + exerciseBurned;
@@ -2723,7 +3031,9 @@ function renderWater(){
 async function addWater(ml){
   dayData.water_ml = Math.max(0, (Number(dayData.water_ml)||0) + ml);
   await saveDay();
-  renderWater();
+  // render() em vez de só renderWater() — atingir a meta de água também pode
+  // completar um objetivo do anel de pontos, que precisa de se atualizar.
+  render();
 }
 
 els.water250Btn.addEventListener('click', ()=> addWater(250));
@@ -2731,7 +3041,7 @@ els.water500Btn.addEventListener('click', ()=> addWater(500));
 els.waterResetBtn.addEventListener('click', async ()=>{
   dayData.water_ml = 0;
   await saveDay();
-  renderWater();
+  render();
 });
 
 function renderExercise(){
