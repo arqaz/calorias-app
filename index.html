@@ -1035,16 +1035,16 @@
 
     <div class="scan-offline-notice" id="scanOfflineNotice">📡 Estás offline: a identificação de pratos por foto (IA) precisa de ligação à internet. Usa o registo manual abaixo.</div>
 
-    <label for="fileInput" id="dropzone" class="dropzone">
-      <div class="camicon">🖼️</div>
-      <p>Carregar foto do prato</p>
+    <label for="fileInputCamera" id="dropzone" class="dropzone">
+      <div class="camicon">📷</div>
+      <p>Tirar foto do prato</p>
       <small>uma refeição por foto</small>
     </label>
-    <input type="file" id="fileInput" accept="image/*">
+    <input type="file" id="fileInputCamera" accept="image/*" capture="environment">
     <div style="text-align:center;">
-      <button type="button" class="link-btn" id="fileInputCameraBtn">📷 ou tirar foto agora</button>
+      <button type="button" class="link-btn" id="fileInputGalleryBtn">🖼️ ou carregar foto</button>
     </div>
-    <input type="file" id="fileInputCamera" accept="image/*" capture="environment" style="display:none;">
+    <input type="file" id="fileInput" accept="image/*">
 
     <div style="text-align:center;">
       <button class="link-btn" id="manualToggleBtn">ou adicionar sem foto</button>
@@ -1459,7 +1459,7 @@ const els = {
   dropzone: document.getElementById('dropzone'),
   fileInput: document.getElementById('fileInput'),
   fileInputCamera: document.getElementById('fileInputCamera'),
-  fileInputCameraBtn: document.getElementById('fileInputCameraBtn'),
+  fileInputGalleryBtn: document.getElementById('fileInputGalleryBtn'),
   previewWrap: document.getElementById('previewWrap'),
   previewImg: document.getElementById('previewImg'),
   retakeBtn: document.getElementById('retakeBtn'),
@@ -2093,6 +2093,7 @@ function updateOfflineUI(){
   if(!offline && scanManualForcedByOffline && els.scanOverlay && els.scanOverlay.classList.contains('show')){
     scanManualForcedByOffline = false;
     els.dropzone.style.display = 'block';
+    els.fileInputGalleryBtn.style.display = 'inline';
     els.manualForm.style.display = 'none';
     els.manualToggleBtn.textContent = 'ou adicionar sem foto';
   }
@@ -4351,7 +4352,7 @@ function resetScan(){
   const offline = isOffline();
   scanManualForcedByOffline = offline;
   els.dropzone.style.display = offline ? 'none' : 'block';
-  els.fileInputCameraBtn.style.display = offline ? 'none' : 'inline';
+  els.fileInputGalleryBtn.style.display = offline ? 'none' : 'inline';
   els.previewWrap.style.display = 'none';
   els.analyzeBtn.style.display = 'none';
   els.resultCard.classList.remove('show');
@@ -4371,7 +4372,7 @@ async function handleFileSelected(e){
   base64Data = dataUrl.split(',')[1];
   els.previewImg.src = dataUrl;
   els.dropzone.style.display = 'none';
-  els.fileInputCameraBtn.style.display = 'none';
+  els.fileInputGalleryBtn.style.display = 'none';
   els.previewWrap.style.display = 'block';
   els.analyzeBtn.style.display = 'flex';
   els.resultCard.classList.remove('show');
@@ -4379,7 +4380,7 @@ async function handleFileSelected(e){
 }
 els.fileInput.addEventListener('change', handleFileSelected);
 els.fileInputCamera.addEventListener('change', handleFileSelected);
-els.fileInputCameraBtn.addEventListener('click', ()=> els.fileInputCamera.click());
+els.fileInputGalleryBtn.addEventListener('click', ()=> els.fileInput.click());
 els.retakeBtn.addEventListener('click', resetScan);
 els.discardBtn.addEventListener('click', closeScan);
 
@@ -4648,6 +4649,7 @@ els.manualToggleBtn.addEventListener('click', ()=>{
   const opening = els.manualForm.style.display === 'none';
   els.manualForm.style.display = opening ? 'block' : 'none';
   els.dropzone.style.display = opening ? 'none' : 'block';
+  els.fileInputGalleryBtn.style.display = opening ? 'none' : 'inline';
   els.manualToggleBtn.textContent = opening ? 'ou tirar/carregar foto' : 'ou adicionar sem foto';
   if(opening){
     els.manualName.value = ''; els.manualCal.value = '';
