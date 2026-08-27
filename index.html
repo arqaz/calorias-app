@@ -2780,9 +2780,10 @@ function computeDayScore(data){
   const exerciseBurned = exercise.reduce((s,e)=> s + (Number(e.calories)||0), 0);
   const goal = (Number(settings.goal)||2000) + exerciseBurned;
   const waterGoal = Number(settings.waterGoal) || 2000;
-  // Margem: não vale a pena "perder" o dia por passar 1 kcal da meta, mas
-  // também não conta como cumprido comer muito pouco (ex: saltar refeições).
-  const calorieMet = cal >= goal * 0.7 && cal <= goal;
+  // Ficar dentro OU abaixo da meta conta como objetivo cumprido — só não
+  // conta um dia sem nada registado (cal 0), que não é o mesmo que "ficar
+  // abaixo da meta".
+  const calorieMet = cal > 0 && cal <= goal;
   const waterMet = water >= waterGoal;
   const exerciseMet = exercise.length > 0;
   const metCount = (calorieMet?1:0) + (waterMet?1:0) + (exerciseMet?1:0);
