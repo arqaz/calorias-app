@@ -1,5 +1,6 @@
 import { requireEntitledUser, getClientIp } from '../lib/auth.js';
 import { checkRateLimit } from '../lib/kv.js';
+import { callGeminiJSON } from '../lib/gemini.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -62,53 +63,19 @@ Responde APENAS com um objeto JSON válido, sem markdown, sem texto antes ou dep
 }`;
 
   try {
-    const model = 'gemini-flash-latest';
-    const apiResponse = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{
-            parts: [
-              { text: prompt },
-              { text: 'Foto de referência (mais antiga):' },
-              { inlineData: { mimeType: previousMediaType, data: previousImage } },
-              { text: 'Foto atual (mais recente):' },
-              { inlineData: { mimeType: currentMediaType, data: currentImage } },
-            ],
-          }],
-          generationConfig: {
-            temperature: 0.4,
-            responseMimeType: 'application/json',
-          },
-        }),
-      }
-    );
-
-    if (!apiResponse.ok) {
-      const errText = await apiResponse.text();
-      res.status(502).json({ error: 'Erro na API do Gemini', details: errText });
-      return;
-    }
-
-    const data = await apiResponse.json();
-    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!text) {
-      res.status(502).json({ error: 'Resposta sem conteúdo de texto' });
-      return;
-    }
-
-    const clean = text
-      .trim()
-      .replace(/^```json/i, '')
-      .replace(/^```/, '')
-      .replace(/```$/, '')
-      .trim();
-
-    const parsed = JSON.parse(clean);
+    const parsed = await callGeminiJSON({
+      apiKey,
+      parts: [
+        { text: prompt },
+        { text: 'Foto de referência (mais antiga):' },
+        { inlineData: { mimeType: previousMediaType, data: previousImage } },
+        { text: 'Foto atual (mais recente):' },
+        { inlineData: { mimeType: currentMediaType, data: currentImage } },
+      ],
+      temperature: 0.4,
+    });
     res.status(200).json(parsed);
   } catch (err) {
-    res.status(500).json({ error: 'Falha ao gerar feedback de progresso', details: String(err) });
+    res.status(err.status || 500).json({ error: err.message || 'Falha ao gerar feedback de progresso' });
   }
 }
