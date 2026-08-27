@@ -3987,7 +3987,7 @@ async function generateMealPlan(){
     if(err.requiresLogin){
       showLoginRequiredIn(els.nutriGenErrorBox, err.message);
     } else {
-      els.nutriGenErrorBox.textContent = 'Erro: ' + (err.message || 'não foi possível gerar o plano') + '. Tenta novamente.';
+      els.nutriGenErrorBox.textContent = 'Erro: ' + (err.message || 'não foi possível gerar o plano. Tenta novamente.');
       els.nutriGenErrorBox.style.display = 'block';
     }
   }finally{
@@ -4200,7 +4200,7 @@ async function generateGymPlan(){
     if(err.requiresLogin){
       showLoginRequiredIn(els.gymGenErrorBox, err.message);
     } else {
-      els.gymGenErrorBox.textContent = 'Erro: ' + (err.message || 'não foi possível gerar o plano') + '. Tenta novamente.';
+      els.gymGenErrorBox.textContent = 'Erro: ' + (err.message || 'não foi possível gerar o plano. Tenta novamente.');
       els.gymGenErrorBox.style.display = 'block';
     }
   }finally{
@@ -4413,7 +4413,7 @@ els.analyzeBtn.addEventListener('click', async ()=>{
     if(err.requiresLogin){
       showLoginRequiredIn(els.errorBox, err.message);
     } else {
-      els.errorBox.textContent = "Erro: " + (err.message || "não foi possível analisar a foto") + ". Tenta novamente.";
+      els.errorBox.textContent = "Erro: " + (err.message || "não foi possível analisar a foto. Tenta novamente.");
       els.errorBox.style.display = 'block';
     }
   }finally{
