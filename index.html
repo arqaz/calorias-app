@@ -1036,11 +1036,15 @@
     <div class="scan-offline-notice" id="scanOfflineNotice">📡 Estás offline: a identificação de pratos por foto (IA) precisa de ligação à internet. Usa o registo manual abaixo.</div>
 
     <label for="fileInput" id="dropzone" class="dropzone">
-      <div class="camicon">📷</div>
-      <p>Tirar ou carregar foto do prato</p>
+      <div class="camicon">🖼️</div>
+      <p>Carregar foto do prato</p>
       <small>uma refeição por foto</small>
     </label>
     <input type="file" id="fileInput" accept="image/*">
+    <div style="text-align:center;">
+      <button type="button" class="link-btn" id="fileInputCameraBtn">📷 ou tirar foto agora</button>
+    </div>
+    <input type="file" id="fileInputCamera" accept="image/*" capture="environment" style="display:none;">
 
     <div style="text-align:center;">
       <button class="link-btn" id="manualToggleBtn">ou adicionar sem foto</button>
@@ -1239,10 +1243,14 @@
 
       <label for="bodyFileInput" id="bodyDropzone" class="dropzone">
         <div class="camicon">🧍</div>
-        <p>Tirar ou carregar foto de corpo inteiro</p>
+        <p>Carregar foto de corpo inteiro</p>
         <small>de frente, de pé, boa iluminação</small>
       </label>
       <input type="file" id="bodyFileInput" accept="image/*">
+      <div style="text-align:center;">
+        <button type="button" class="link-btn" id="bodyFileInputCameraBtn">📷 ou tirar foto agora</button>
+      </div>
+      <input type="file" id="bodyFileInputCamera" accept="image/*" capture="environment" style="display:none;">
 
       <div style="text-align:center;">
         <button type="button" class="body-photo-skip" id="bodySkipPhotoBtn">registar só o peso, sem foto</button>
@@ -1450,6 +1458,8 @@ const els = {
   goalOverlay: document.getElementById('goalOverlay'),
   dropzone: document.getElementById('dropzone'),
   fileInput: document.getElementById('fileInput'),
+  fileInputCamera: document.getElementById('fileInputCamera'),
+  fileInputCameraBtn: document.getElementById('fileInputCameraBtn'),
   previewWrap: document.getElementById('previewWrap'),
   previewImg: document.getElementById('previewImg'),
   retakeBtn: document.getElementById('retakeBtn'),
@@ -1534,6 +1544,8 @@ const els = {
   bodyOfflineNotice: document.getElementById('bodyOfflineNotice'),
   bodyDropzone: document.getElementById('bodyDropzone'),
   bodyFileInput: document.getElementById('bodyFileInput'),
+  bodyFileInputCamera: document.getElementById('bodyFileInputCamera'),
+  bodyFileInputCameraBtn: document.getElementById('bodyFileInputCameraBtn'),
   bodySkipPhotoBtn: document.getElementById('bodySkipPhotoBtn'),
   bodyPreviewWrap: document.getElementById('bodyPreviewWrap'),
   bodyPreviewImg: document.getElementById('bodyPreviewImg'),
@@ -1700,6 +1712,19 @@ function decodeJwtPayload(token){
   }catch(e){ return null; }
 }
 
+// Os tokens de sessão da Google (ID tokens) expiram ao fim de cerca de 1
+// hora — isto verifica isso client-side (sem pedir nada ao servidor) para
+// sabermos, antes de uma chamada de IA, se vale a pena tentar renovar a
+// sessão em silêncio primeiro. Margem de 60s para não usar um token que
+// expira mesmo a seguir a este teste.
+function isTokenFresh(token){
+  const payload = decodeJwtPayload(token);
+  if(!payload || !payload.exp) return false;
+  return (payload.exp * 1000) > (Date.now() + 60000);
+}
+
+let pendingSilentRefreshResolve = null;
+
 function handleGoogleCredential(response){
   googleIdToken = response.credential;
   const payload = decodeJwtPayload(googleIdToken);
@@ -1707,6 +1732,11 @@ function handleGoogleCredential(response){
   saveAuthToStorage();
   renderAuthUI();
   maybeShowLoginGate();
+  if(pendingSilentRefreshResolve){
+    const resolve = pendingSilentRefreshResolve;
+    pendingSilentRefreshResolve = null;
+    resolve(true);
+  }
 }
 
 function initGoogleSignIn(){
@@ -1716,11 +1746,60 @@ function initGoogleSignIn(){
   // pequena e pouco legível, como se fosse sempre um pop-up), a página
   // navega inteira para a Google e volta depois para login_uri, que
   // redireciona de volta para a app com o token no fragmento do URL.
+  // auto_select: true é o que permite a renovação silenciosa em
+  // attemptSilentGoogleRefresh() — quando a pessoa ainda tem sessão Google
+  // ativa no browser e já usou esta app antes, a Google devolve um novo
+  // token sem mostrar UI nenhuma.
   google.accounts.id.initialize({
     client_id: GOOGLE_CLIENT_ID,
     callback: handleGoogleCredential,
     ux_mode: 'redirect',
     login_uri: window.location.origin + '/api/google-login',
+    auto_select: true,
+  });
+}
+
+// Tenta renovar o token da Google sem qualquer ecrã visível, usando o
+// "auto select" do Google Identity Services — evita ter de mostrar o ecrã
+// de login sempre que o token de ~1h expira, desde que a pessoa continue
+// com sessão Google ativa no aparelho (o caso mais comum). Se não for
+// possível (sem sessão Google ativa, terceiros bloqueados, etc.), falha em
+// silêncio e quem chamou cai de volta no comportamento anterior — pedir
+// login. Nunca demora mais do que alguns segundos.
+function attemptSilentGoogleRefresh(){
+  return new Promise((resolve)=>{
+    if(!GOOGLE_CLIENT_ID || !window.google || !window.google.accounts || !window.google.accounts.id){
+      resolve(false);
+      return;
+    }
+    // Garante que o GSI está inicializado com o nosso callback mesmo que a
+    // pessoa já estivesse autenticada ao abrir a app (nesse caso,
+    // initGoogleSignIn() normalmente só é chamado a partir do ecrã de
+    // login ou das Definições, que podem nunca ter sido abertos).
+    initGoogleSignIn();
+    let settled = false;
+    const finish = (ok)=>{
+      if(settled) return;
+      settled = true;
+      pendingSilentRefreshResolve = null;
+      resolve(ok);
+    };
+    pendingSilentRefreshResolve = finish;
+    const timer = setTimeout(()=> finish(false), 4000);
+    try{
+      google.accounts.id.prompt((notification)=>{
+        const notDisplayed = notification && typeof notification.isNotDisplayed === 'function' && notification.isNotDisplayed();
+        const skipped = notification && typeof notification.isSkippedMoment === 'function' && notification.isSkippedMoment();
+        const dismissed = notification && typeof notification.isDismissedMoment === 'function' && notification.isDismissedMoment();
+        if(notDisplayed || skipped || dismissed){
+          clearTimeout(timer);
+          finish(false);
+        }
+      });
+    }catch(e){
+      clearTimeout(timer);
+      finish(false);
+    }
   });
 }
 
@@ -1834,6 +1913,13 @@ function showLoginRequiredIn(box, message){
 // existir) e normaliza os erros, incluindo um sinalizador requiresLogin
 // para a UI poder mostrar o pedido de login em vez de um erro genérico.
 async function callAiEndpoint(url, body){
+  // Se o token guardado já expirou (ou está prestes a expirar), tenta
+  // renovar a sessão em silêncio antes de sequer tentar o pedido — evita
+  // pedir login de novo sempre que os ~60 minutos do token passam, desde
+  // que a pessoa continue com sessão Google ativa no aparelho.
+  if(googleIdToken && authProfile && !isTokenFresh(googleIdToken)){
+    await attemptSilentGoogleRefresh();
+  }
   const headers = { 'Content-Type': 'application/json' };
   if(googleIdToken) headers['Authorization'] = 'Bearer ' + googleIdToken;
   const response = await fetch(url, { method: 'POST', headers, body: JSON.stringify(body) });
@@ -2037,11 +2123,18 @@ async function init(){
   loadMealPlan();
   loadGymPlan();
   loadAuthFromStorage();
+  initGoogleSignIn();
   processRedirectLoginToken();
   render();
   startFastingTicker();
   updateOfflineUI();
   advanceOnboardingFlow();
+  // Se o token já estava expirado ao abrir a app, tenta renovar em
+  // silêncio desde já (sem esperar por isso) — assim, quando a pessoa
+  // realmente usar uma funcionalidade de IA, o token já pode estar fresco.
+  if(googleIdToken && authProfile && !isTokenFresh(googleIdToken)){
+    attemptSilentGoogleRefresh();
+  }
 }
 
 function finishOnboarding(){
@@ -2427,10 +2520,14 @@ function renderWizardPhoto(){
   wrap.innerHTML = `
     <label class="dropzone" id="wizardPhotoDropzone" for="wizardPhotoInput" style="padding:22px 16px;display:${onboardBodyPhotoDataUrl ? 'none' : 'block'};">
       <div class="camicon">🧍</div>
-      <p>Tirar ou carregar foto</p>
+      <p>Carregar foto</p>
       <small>de corpo inteiro, de frente · fica só neste aparelho</small>
     </label>
     <input type="file" id="wizardPhotoInput" accept="image/*" style="display:none;">
+    <div id="wizardPhotoCameraRow" style="text-align:center;display:${onboardBodyPhotoDataUrl ? 'none' : 'block'};">
+      <button type="button" class="link-btn" id="wizardPhotoCameraBtn">📷 ou tirar foto agora</button>
+    </div>
+    <input type="file" id="wizardPhotoInputCamera" accept="image/*" capture="environment" style="display:none;">
     <div id="wizardPhotoPreviewWrap" style="display:${onboardBodyPhotoDataUrl ? 'block' : 'none'};margin-top:10px;">
       <img id="wizardPhotoPreview" src="${onboardBodyPhotoDataUrl || ''}" style="width:100%;max-height:240px;object-fit:cover;border-radius:18px;display:block;" alt="Pré-visualização">
       <button type="button" class="body-photo-skip" id="wizardPhotoRetakeBtn">Trocar foto</button>
@@ -2439,22 +2536,31 @@ function renderWizardPhoto(){
   els.wizardBody.appendChild(wrap);
   const dropzone = wrap.querySelector('#wizardPhotoDropzone');
   const input = wrap.querySelector('#wizardPhotoInput');
+  const cameraInput = wrap.querySelector('#wizardPhotoInputCamera');
+  const cameraBtn = wrap.querySelector('#wizardPhotoCameraBtn');
+  const cameraRow = wrap.querySelector('#wizardPhotoCameraRow');
   const previewWrap = wrap.querySelector('#wizardPhotoPreviewWrap');
   const preview = wrap.querySelector('#wizardPhotoPreview');
   const retakeBtn = wrap.querySelector('#wizardPhotoRetakeBtn');
-  input.addEventListener('change', async (e)=>{
+  async function handleWizardPhotoPick(e){
     const file = e.target.files && e.target.files[0];
     if(!file) return;
     const { dataUrl } = await processBodyPhotoCapture(file);
     onboardBodyPhotoDataUrl = dataUrl;
     preview.src = dataUrl;
     dropzone.style.display = 'none';
+    cameraRow.style.display = 'none';
     previewWrap.style.display = 'block';
-  });
+  }
+  input.addEventListener('change', handleWizardPhotoPick);
+  cameraInput.addEventListener('change', handleWizardPhotoPick);
+  cameraBtn.addEventListener('click', ()=> cameraInput.click());
   retakeBtn.addEventListener('click', ()=>{
     onboardBodyPhotoDataUrl = null;
     input.value = '';
+    cameraInput.value = '';
     dropzone.style.display = 'block';
+    cameraRow.style.display = 'block';
     previewWrap.style.display = 'none';
   });
   els.wizardContinueBtn.style.display = 'block';
@@ -3433,8 +3539,10 @@ let bodyPhotoDataUrl = null, bodyPhotoMediaType = null;
 
 function resetBodyCheckinSheet(){
   els.bodyFileInput.value = '';
+  els.bodyFileInputCamera.value = '';
   bodyPhotoDataUrl = null; bodyPhotoMediaType = null;
   els.bodyDropzone.style.display = 'block';
+  els.bodyFileInputCameraBtn.style.display = 'inline';
   els.bodyPreviewWrap.style.display = 'none';
   els.bodyCheckErrorBox.style.display = 'none';
   els.bodyWeightInput.value = settings.weight || '';
@@ -3501,16 +3609,20 @@ els.bodyCheckinBtn.addEventListener('click', ()=>{
 els.bodyCheckinCancelBtn.addEventListener('click', ()=> els.bodyCheckinOverlay.classList.remove('show'));
 els.bodyCheckinOverlay.addEventListener('click', (e)=>{ if(e.target === els.bodyCheckinOverlay) els.bodyCheckinOverlay.classList.remove('show'); });
 
-els.bodyFileInput.addEventListener('change', async (e)=>{
+async function handleBodyFileSelected(e){
   const file = e.target.files[0];
   if(!file) return;
   const { dataUrl, mediaType } = await processBodyPhotoCapture(file);
   bodyPhotoDataUrl = dataUrl; bodyPhotoMediaType = mediaType;
   els.bodyPreviewImg.src = dataUrl;
   els.bodyDropzone.style.display = 'none';
+  els.bodyFileInputCameraBtn.style.display = 'none';
   els.bodyPreviewWrap.style.display = 'block';
   els.bodyCheckErrorBox.style.display = 'none';
-});
+}
+els.bodyFileInput.addEventListener('change', handleBodyFileSelected);
+els.bodyFileInputCamera.addEventListener('change', handleBodyFileSelected);
+els.bodyFileInputCameraBtn.addEventListener('click', ()=> els.bodyFileInputCamera.click());
 els.bodyRetakeBtn.addEventListener('click', resetBodyCheckinSheet);
 els.bodySkipPhotoBtn.addEventListener('click', ()=> els.bodyWeightInput.focus());
 
@@ -4233,11 +4345,13 @@ function closeScan(){ els.scanOverlay.classList.remove('show'); }
 
 function resetScan(){
   els.fileInput.value = '';
+  els.fileInputCamera.value = '';
   base64Data = null; pendingResult = null;
   updateOfflineUI();
   const offline = isOffline();
   scanManualForcedByOffline = offline;
   els.dropzone.style.display = offline ? 'none' : 'block';
+  els.fileInputCameraBtn.style.display = offline ? 'none' : 'inline';
   els.previewWrap.style.display = 'none';
   els.analyzeBtn.style.display = 'none';
   els.resultCard.classList.remove('show');
@@ -4249,7 +4363,7 @@ function resetScan(){
   document.getElementById('resultPhotoWrap').style.display = 'none';
 }
 
-els.fileInput.addEventListener('change', async (e)=>{
+async function handleFileSelected(e){
   const file = e.target.files[0];
   if(!file) return;
   const dataUrl = await resizeImageFile(file, 1024, 0.75);
@@ -4257,11 +4371,15 @@ els.fileInput.addEventListener('change', async (e)=>{
   base64Data = dataUrl.split(',')[1];
   els.previewImg.src = dataUrl;
   els.dropzone.style.display = 'none';
+  els.fileInputCameraBtn.style.display = 'none';
   els.previewWrap.style.display = 'block';
   els.analyzeBtn.style.display = 'flex';
   els.resultCard.classList.remove('show');
   els.errorBox.style.display = 'none';
-});
+}
+els.fileInput.addEventListener('change', handleFileSelected);
+els.fileInputCamera.addEventListener('change', handleFileSelected);
+els.fileInputCameraBtn.addEventListener('click', ()=> els.fileInputCamera.click());
 els.retakeBtn.addEventListener('click', resetScan);
 els.discardBtn.addEventListener('click', closeScan);
 
