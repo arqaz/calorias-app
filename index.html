@@ -4286,6 +4286,9 @@ function downscaleDataUrl(dataUrl, size, quality){
 }
 
 els.clearLink.addEventListener('click', async ()=>{
+  const count = dayData.meals.length;
+  const label = count === 1 ? '1 refeição' : (count + ' refeições');
+  if(!confirm('Apagar todas as ' + label + ' de hoje? Esta ação não pode ser desfeita.')) return;
   dayData.meals = [];
   await saveDay();
   render();
