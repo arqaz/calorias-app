@@ -325,6 +325,12 @@
     background:var(--fresh-soft);color:var(--fresh);font-size:11.5px;font-weight:700;
     padding:6px 11px;border-radius:20px;
   }
+  .reuse-chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+  .reuse-chip{
+    background:var(--fresh-soft);color:var(--fresh);font-size:11.5px;font-weight:700;
+    padding:7px 13px;border-radius:20px;border:none;cursor:pointer;
+  }
+  .reuse-chip:active{transform:scale(.96);}
   .result-photo-wrap{display:flex;justify-content:center;margin-bottom:14px;}
   .result-photo-wrap img{
     width:130px;height:130px;border-radius:50%;object-fit:cover;
@@ -1053,6 +1059,7 @@
     <div class="manual-form" id="manualForm" style="display:none;">
       <label>Nome da refeição</label>
       <input type="text" id="manualName" placeholder="ex: Sandes de fiambre e queijo, com um copo de leite">
+      <div class="reuse-chips" id="mealCacheChips" style="display:none;"></div>
       <div class="scan-offline-notice" id="manualEstimateOfflineNotice" style="display:none;">📡 Estás offline — a estimativa por IA fica indisponível. Preenche os valores abaixo manualmente.</div>
       <button class="add-btn" id="manualEstimateBtn" style="margin-top:10px;">Estimar valores com IA</button>
       <div id="manualEstimateErrorBox" class="error" style="display:none;"></div>
@@ -1485,6 +1492,7 @@ const els = {
   manualToggleBtn: document.getElementById('manualToggleBtn'),
   manualForm: document.getElementById('manualForm'),
   manualName: document.getElementById('manualName'),
+  mealCacheChips: document.getElementById('mealCacheChips'),
   manualEstimateOfflineNotice: document.getElementById('manualEstimateOfflineNotice'),
   manualEstimateBtn: document.getElementById('manualEstimateBtn'),
   manualEstimateErrorBox: document.getElementById('manualEstimateErrorBox'),
@@ -2608,6 +2616,7 @@ async function loadSettings(){
   if(settings.planDetailLevel !== 'simples' && settings.planDetailLevel !== 'elaborado') settings.planDetailLevel = 'simples';
   if(settings.planFlexibility !== 'guiado' && settings.planFlexibility !== 'flexivel') settings.planFlexibility = 'guiado';
   if(typeof settings.tutorialSeen !== 'boolean') settings.tutorialSeen = false;
+  if(!Array.isArray(settings.mealEstimateCache)) settings.mealEstimateCache = [];
 }
 async function saveSettings(){
   try{ localStorage.setItem('settings', JSON.stringify(settings)); }
@@ -4366,6 +4375,7 @@ function resetScan(){
   els.manualEstimateErrorBox.style.display = 'none';
   els.manualEstimateNote.style.display = 'none';
   document.getElementById('resultPhotoWrap').style.display = 'none';
+  renderMealCacheChips();
 }
 
 async function handleFileSelected(e){
@@ -4660,19 +4670,124 @@ els.manualToggleBtn.addEventListener('click', ()=>{
     els.manualProtein.value = ''; els.manualCarbs.value = ''; els.manualFat.value = '';
     els.manualEstimateErrorBox.style.display = 'none';
     els.manualEstimateNote.style.display = 'none';
+    renderMealCacheChips();
   }
 });
+
+// ---- Cache local de estimativas de refeições manuais -----------------------
+// Guarda a última estimativa de IA associada a cada descrição de refeição já
+// usada, para reutilizar sem gastar pedidos de IA quando a mesma refeição é
+// registada outra vez (ex: o pequeno-almoço do dia a dia é muitas vezes
+// igual). Guardada em settings, por isso sobrevive a fechar a app.
+const MEAL_CACHE_MAX = 20;
+
+function normalizeMealKey(text){
+  return (text || '').trim().toLowerCase().replace(/\s+/g, ' ');
+}
+
+function findMealEstimateInCache(description){
+  const key = normalizeMealKey(description);
+  if(!key) return null;
+  return settings.mealEstimateCache.find(e => e.key === key) || null;
+}
+
+async function saveMealEstimateToCache(description, estimate){
+  const key = normalizeMealKey(description);
+  if(!key) return;
+  const existing = settings.mealEstimateCache.find(e => e.key === key);
+  const entry = {
+    key,
+    name: estimate.name || description,
+    calories: Math.max(0, Math.round(Number(estimate.calories) || 0)),
+    protein_g: Math.max(0, Math.round(Number(estimate.protein_g) || 0)),
+    carbs_g: Math.max(0, Math.round(Number(estimate.carbs_g) || 0)),
+    fat_g: Math.max(0, Math.round(Number(estimate.fat_g) || 0)),
+    count: (existing?.count || 0) + 1,
+    lastUsed: Date.now(),
+  };
+  settings.mealEstimateCache = settings.mealEstimateCache.filter(e => e.key !== key);
+  settings.mealEstimateCache.push(entry);
+  // Mantém a lista dentro de um tamanho razoável: descarta primeiro as
+  // entradas menos usadas e, a seguir, as mais antigas.
+  if(settings.mealEstimateCache.length > MEAL_CACHE_MAX){
+    settings.mealEstimateCache.sort((a,b) => (b.count - a.count) || (b.lastUsed - a.lastUsed));
+    settings.mealEstimateCache.length = MEAL_CACHE_MAX;
+  }
+  await saveSettings();
+}
+
+// Preenche o formulário a partir de uma entrada da cache, sem qualquer
+// chamada de IA — usado tanto pelo toque rápido como por uma descrição
+// escrita que já corresponda a um registo anterior.
+async function applyMealCacheEntry(entry){
+  els.manualName.value = entry.name;
+  els.manualCal.value = entry.calories;
+  els.manualProtein.value = entry.protein_g;
+  els.manualCarbs.value = entry.carbs_g;
+  els.manualFat.value = entry.fat_g;
+  els.manualEstimateErrorBox.style.display = 'none';
+  els.manualEstimateNote.textContent = '⚡ Valores reutilizados de um registo anterior — sem gastar pedidos de IA.';
+  els.manualEstimateNote.style.display = 'block';
+  // Conta esta reutilização como uso — sem isto, uma refeição muito repetida
+  // mas sempre reaproveitada da cache (nunca voltando a pedir à IA) nunca
+  // subiria nos toques rápidos, o que ia contra o objetivo destes.
+  entry.count = (entry.count || 0) + 1;
+  entry.lastUsed = Date.now();
+  await saveSettings();
+  renderMealCacheChips();
+}
+
+// Mostra toques rápidos das refeições mais usadas por cima do campo de nome,
+// para reaproveitar valores sem sequer voltar a escrever a descrição.
+function renderMealCacheChips(){
+  if(!els.mealCacheChips) return;
+  // Uma refeição pode estar guardada sob duas chaves (a descrição original e
+  // o nome já limpo pela IA, ver saveMealEstimateToCache) — para os toques
+  // rápidos interessa só um por nome, não um por chave.
+  const byName = new Map();
+  settings.mealEstimateCache.forEach(e => {
+    const nameKey = normalizeMealKey(e.name);
+    const prev = byName.get(nameKey);
+    if(!prev || e.count > prev.count || (e.count === prev.count && e.lastUsed > prev.lastUsed)){
+      byName.set(nameKey, e);
+    }
+  });
+  const entries = [...byName.values()]
+    .sort((a,b) => (b.count - a.count) || (b.lastUsed - a.lastUsed))
+    .slice(0, 6);
+  if(entries.length === 0){
+    els.mealCacheChips.style.display = 'none';
+    els.mealCacheChips.innerHTML = '';
+    return;
+  }
+  els.mealCacheChips.style.display = 'flex';
+  els.mealCacheChips.innerHTML = entries.map((e, i) =>
+    `<button type="button" class="reuse-chip" data-idx="${i}">${escapeHtml(e.name)}</button>`
+  ).join('');
+  els.mealCacheChips.querySelectorAll('.reuse-chip').forEach((btn, i) => {
+    btn.addEventListener('click', () => applyMealCacheEntry(entries[i]));
+  });
+}
 
 async function submitManualEstimate(){
   const description = els.manualName.value.trim();
   if(!description){ els.manualName.focus(); return; }
+  els.manualEstimateErrorBox.style.display = 'none';
+  els.manualEstimateNote.style.display = 'none';
+
+  // Já temos uma estimativa guardada para exatamente esta descrição — usa-a
+  // diretamente, sem gastar um pedido de IA.
+  const cached = findMealEstimateInCache(description);
+  if(cached){
+    applyMealCacheEntry(cached);
+    return;
+  }
+
   if(isOffline()){
     els.manualEstimateErrorBox.textContent = 'Estás offline — esta funcionalidade precisa de ligação à internet.';
     els.manualEstimateErrorBox.style.display = 'block';
     return;
   }
-  els.manualEstimateErrorBox.style.display = 'none';
-  els.manualEstimateNote.style.display = 'none';
   const origLabel = els.manualEstimateBtn.textContent;
   els.manualEstimateBtn.disabled = true;
   els.manualEstimateBtn.textContent = 'A calcular…';
@@ -4687,6 +4802,14 @@ async function submitManualEstimate(){
       els.manualEstimateNote.textContent = parsed.note;
       els.manualEstimateNote.style.display = 'block';
     }
+    // Guarda para reutilização futura — tanto pela descrição original como
+    // (se for diferente) pelo nome já limpo que a IA devolveu, para que uma
+    // futura pesquisa por qualquer um dos dois textos encontre isto.
+    await saveMealEstimateToCache(description, parsed);
+    if(parsed.name && normalizeMealKey(parsed.name) !== normalizeMealKey(description)){
+      await saveMealEstimateToCache(parsed.name, parsed);
+    }
+    renderMealCacheChips();
   }catch(err){
     if(err.requiresLogin){
       showLoginRequiredIn(els.manualEstimateErrorBox, err.message);
