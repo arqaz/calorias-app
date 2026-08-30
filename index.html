@@ -1040,6 +1040,7 @@
     <div class="sheet-title">Adicionar refeição</div>
 
     <div class="scan-offline-notice" id="scanOfflineNotice">📡 Estás offline: a identificação de pratos por foto (IA) precisa de ligação à internet. Usa o registo manual abaixo.</div>
+    <div class="scan-offline-notice" id="resumeRestoredNotice" style="display:none;">🔄 A sessão expirou por breves momentos, mas a tua foto foi recuperada — toca em "Estimar calorias" para continuar.</div>
 
     <label for="fileInputCamera" id="dropzone" class="dropzone">
       <div class="camicon">📷</div>
@@ -1543,6 +1544,7 @@ const els = {
   editDeleteBtn: document.getElementById('editDeleteBtn'),
   offlineBanner: document.getElementById('offlineBanner'),
   scanOfflineNotice: document.getElementById('scanOfflineNotice'),
+  resumeRestoredNotice: document.getElementById('resumeRestoredNotice'),
   bodyCard: document.getElementById('bodyCard'),
   bodyStatus: document.getElementById('bodyStatus'),
   bodyCheckinBtn: document.getElementById('bodyCheckinBtn'),
@@ -1814,12 +1816,17 @@ function attemptSilentGoogleRefresh(){
 // Depois do fluxo de redireccionamento, a app recarrega com o token (ou um
 // sinal de erro) no fragmento do URL — processa-o uma única vez e limpa o
 // URL, para não ficar visível nem ser reprocessado ao atualizar a página.
+// Devolve true quando um login por redireccionamento acabou de se concluir
+// com sucesso — usado por init() para saber se deve tentar restaurar o que
+// a pessoa tinha em curso antes de ser mandada para o login (ver
+// saveResumeSnapshot/restoreResumeSnapshotIfAny).
 function processRedirectLoginToken(){
   const hash = window.location.hash || '';
   const tokenMatch = hash.match(/gtoken=([^&]+)/);
   if(tokenMatch){
     handleGoogleCredential({ credential: decodeURIComponent(tokenMatch[1]) });
     history.replaceState(null, '', window.location.pathname + window.location.search);
+    return true;
   } else if(hash.indexOf('gtoken_error=1') !== -1){
     if(els.loginGateError){
       els.loginGateError.textContent = 'Não foi possível iniciar sessão. Tenta novamente.';
@@ -1827,6 +1834,7 @@ function processRedirectLoginToken(){
     }
     history.replaceState(null, '', window.location.pathname + window.location.search);
   }
+  return false;
 }
 
 // Desenha o botão de início de sessão da Google dentro de um contentor à
@@ -1928,23 +1936,43 @@ async function callAiEndpoint(url, body){
   if(googleIdToken && authProfile && !isTokenFresh(googleIdToken)){
     await attemptSilentGoogleRefresh();
   }
-  const headers = { 'Content-Type': 'application/json' };
-  if(googleIdToken) headers['Authorization'] = 'Bearer ' + googleIdToken;
-  const response = await fetch(url, { method: 'POST', headers, body: JSON.stringify(body) });
+  const doFetch = () => {
+    const headers = { 'Content-Type': 'application/json' };
+    if(googleIdToken) headers['Authorization'] = 'Bearer ' + googleIdToken;
+    return fetch(url, { method: 'POST', headers, body: JSON.stringify(body) });
+  };
+  let response = await doFetch();
+  let errData = response.ok ? null : await response.json().catch(()=>({}));
+  if(errData && errData.requiresLogin && googleIdToken){
+    // O token pode ter expirado mesmo entre a verificação acima e este
+    // pedido — tenta renovar em silêncio mais uma vez antes de desistir e
+    // forçar novo login (que, ao contrário disto, é visível e interrompe o
+    // que a pessoa estava a fazer).
+    const refreshed = await attemptSilentGoogleRefresh();
+    if(refreshed){
+      response = await doFetch();
+      errData = response.ok ? null : await response.json().catch(()=>({}));
+    }
+  }
   if(!response.ok){
-    const errData = await response.json().catch(()=>({}));
     const err = new Error((errData.error || ('Falha na chamada à API (' + response.status + ')')) + (errData.details ? ' — ' + errData.details : ''));
     err.requiresLogin = !!errData.requiresLogin;
     err.status = response.status;
     // O servidor recusou o token guardado (ex: expirou, o que os tokens de
-    // sessão da Google fazem ao fim de cerca de uma hora) — sem isto, a app
-    // continuava a mostrar-se "com sessão iniciada" (o ecrã de login não
-    // reaparece, e as Definições mostram a conta como ligada), levando a
-    // pessoa a um beco sem saída: o link "Iniciar sessão" do erro abria
-    // Definições, que mostravam sempre a vista de sessão iniciada. Limpar a
-    // sessão aqui faz o ecrã de login reaparecer, com um caminho real para
-    // voltar a entrar.
-    if(err.requiresLogin && googleIdToken) signOutGoogle();
+    // sessão da Google fazem ao fim de cerca de uma hora) e a renovação
+    // silenciosa não resolveu — sem isto, a app continuava a mostrar-se
+    // "com sessão iniciada" (o ecrã de login não reaparece, e as Definições
+    // mostram a conta como ligada), levando a pessoa a um beco sem saída: o
+    // link "Iniciar sessão" do erro abria Definições, que mostravam sempre
+    // a vista de sessão iniciada. Limpar a sessão aqui faz o ecrã de login
+    // reaparecer, com um caminho real para voltar a entrar — mas isso
+    // implica um redireccionamento para a Google e de volta, que recarrega
+    // a página; por isso guarda-se primeiro o que estava em curso (foto já
+    // tirada ou descrição já escrita), para o repor depois do login.
+    if(err.requiresLogin && googleIdToken){
+      saveResumeSnapshot();
+      signOutGoogle();
+    }
     throw err;
   }
   return response.json();
@@ -2133,11 +2161,16 @@ async function init(){
   loadGymPlan();
   loadAuthFromStorage();
   initGoogleSignIn();
-  processRedirectLoginToken();
+  const justCompletedRedirectLogin = processRedirectLoginToken();
   render();
   startFastingTicker();
   updateOfflineUI();
   advanceOnboardingFlow();
+  // Se o login que acabou de se concluir foi forçado a meio de "Estimar
+  // calorias" (token expirado), repõe a foto/descrição que ficaram guardadas
+  // antes do redireccionamento — nunca num arranque normal da app, só mesmo
+  // a seguir a voltar da Google com sessão válida.
+  if(justCompletedRedirectLogin) restoreResumeSnapshotIfAny();
   // Se o token já estava expirado ao abrir a app, tenta renovar em
   // silêncio desde já (sem esperar por isso) — assim, quando a pessoa
   // realmente usar uma funcionalidade de IA, o token já pode estar fresco.
@@ -4346,6 +4379,79 @@ els.editDeleteBtn.addEventListener('click', async ()=>{
   editingMealId = null;
 });
 
+// ---- Recuperação de progresso interrompido por um login forçado -----------
+// Um token expirado a meio de "Estimar calorias" obriga a passar pelo ecrã
+// de login (redireccionamento para a Google e de volta, que recarrega a
+// página) — sem isto, a foto já tirada ou a descrição já escrita perdiam-se
+// nesse recarregamento. Guarda-se aqui, antes de forçar o login, e repõe-se
+// depois de voltar com sessão válida (ver init()).
+const RESUME_SNAPSHOT_KEY = 'pendingScanResume';
+const RESUME_SNAPSHOT_MAX_AGE_MS = 30 * 60 * 1000; // meia hora — passado isso, descarta-se em vez de surpreender com dados antigos
+
+function saveResumeSnapshot(){
+  try{
+    if(!els.scanOverlay.classList.contains('show')) return;
+    const manualVisible = els.manualForm.style.display !== 'none';
+    let snapshot = null;
+    if(manualVisible){
+      if(els.manualName.value.trim()){
+        snapshot = {
+          manualVisible: true,
+          manualName: els.manualName.value,
+          manualCal: els.manualCal.value,
+          manualProtein: els.manualProtein.value,
+          manualCarbs: els.manualCarbs.value,
+          manualFat: els.manualFat.value,
+        };
+      }
+    } else if(base64Data && els.previewImg.src){
+      snapshot = { manualVisible: false, photoDataUrl: els.previewImg.src, mediaType };
+    }
+    if(!snapshot){ localStorage.removeItem(RESUME_SNAPSHOT_KEY); return; }
+    snapshot.timestamp = Date.now();
+    localStorage.setItem(RESUME_SNAPSHOT_KEY, JSON.stringify(snapshot));
+  }catch(e){ /* localStorage indisponível ou cheio — sem gravidade, só perde-se a recuperação */ }
+}
+
+// Chamado só uma vez, em init(), e só quando a app acabou mesmo de voltar de
+// um login por redireccionamento bem-sucedido — nunca num arranque normal,
+// para não reabrir inesperadamente algo antigo.
+function restoreResumeSnapshotIfAny(){
+  let snapshot = null;
+  try{
+    const raw = localStorage.getItem(RESUME_SNAPSHOT_KEY);
+    localStorage.removeItem(RESUME_SNAPSHOT_KEY);
+    if(!raw) return;
+    snapshot = JSON.parse(raw);
+  }catch(e){ return; }
+  if(!snapshot || (Date.now() - (snapshot.timestamp || 0)) > RESUME_SNAPSHOT_MAX_AGE_MS) return;
+
+  resetScan();
+  els.scanOverlay.classList.add('show');
+  if(snapshot.manualVisible){
+    els.manualForm.style.display = 'block';
+    els.dropzone.style.display = 'none';
+    els.fileInputGalleryBtn.style.display = 'none';
+    els.manualToggleBtn.textContent = 'ou tirar/carregar foto';
+    els.manualName.value = snapshot.manualName || '';
+    els.manualCal.value = snapshot.manualCal || '';
+    els.manualProtein.value = snapshot.manualProtein || '';
+    els.manualCarbs.value = snapshot.manualCarbs || '';
+    els.manualFat.value = snapshot.manualFat || '';
+    els.manualEstimateNote.textContent = 'A sessão expirou por breves momentos, mas o que tinhas escrito foi recuperado.';
+    els.manualEstimateNote.style.display = 'block';
+  } else if(snapshot.photoDataUrl){
+    mediaType = snapshot.mediaType || 'image/jpeg';
+    base64Data = snapshot.photoDataUrl.split(',')[1] || null;
+    els.previewImg.src = snapshot.photoDataUrl;
+    els.dropzone.style.display = 'none';
+    els.fileInputGalleryBtn.style.display = 'none';
+    els.previewWrap.style.display = 'block';
+    els.analyzeBtn.style.display = 'flex';
+    els.resumeRestoredNotice.style.display = 'block';
+  }
+}
+
 els.fabBtn.addEventListener('click', ()=>{
   resetScan();
   els.scanOverlay.classList.add('show');
@@ -4374,6 +4480,7 @@ function resetScan(){
   els.manualToggleBtn.textContent = 'ou adicionar sem foto';
   els.manualEstimateErrorBox.style.display = 'none';
   els.manualEstimateNote.style.display = 'none';
+  els.resumeRestoredNotice.style.display = 'none';
   document.getElementById('resultPhotoWrap').style.display = 'none';
   renderMealCacheChips();
 }
